@@ -15,7 +15,6 @@ using System.Windows.Shapes;
 using System.IO;
 namespace Crossword
 {
-    // Поменять очередь генерации. сразу проверять право и вниз.
     // Установка цифр в начале слов. скриншоты заполненной и пустой сетки с определениями
     // Создать структуру которая будет ставить слово, потом перебирать все слова, если не подходит, менять предыдущее и пробовать снова
     public partial class MainWindow : Window
@@ -23,7 +22,6 @@ namespace Crossword
         List<Label> listLabel = new List<Label>();
         List<Border> listBorder = new List<Border>();
         List<Border> listWhiteBorder = new List<Border>();
-        bool number = false;
         List<string> words;
         ClassMove classMove = new ClassMove();
         List<Border> saveYellowListborder = new List<Border>();
@@ -185,6 +183,7 @@ namespace Crossword
                 }
                 foreach (Border whiteBorder in listWhiteBorder)
                 {
+
                     int numberColumn = Grid.GetColumn(whiteBorder);
                     int numberRow = Grid.GetRow(whiteBorder);
                     bool black = true;
@@ -198,14 +197,21 @@ namespace Crossword
                     }
                     if (black == true)
                     {
-                        classMove.MoveRight(whiteBorder, listWhiteBorder, listLabel, words, Worlds);
+                        bool right = true;
+                        error = classMove.InsertWord(right, whiteBorder, listWhiteBorder, listLabel, words, Worlds);
+                        if (error)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            await Task.Delay(1);
+                        }
                     }
-                }
-                foreach (Border whiteBorder in listWhiteBorder)
-                {
-                    int numberColumn = Grid.GetColumn(whiteBorder);
-                    int numberRow = Grid.GetRow(whiteBorder);
-                    bool black = true;
+
+
+
+                    black = true;
                     foreach (Border whiteLeftBorder in listWhiteBorder)
                     {
                         if (Grid.GetColumn(whiteLeftBorder) == numberColumn && Grid.GetRow(whiteLeftBorder) == numberRow - 1)
@@ -216,15 +222,21 @@ namespace Crossword
                     }
                     if (black == true)
                     {
-                        error = classMove.MoveDown(whiteBorder, listWhiteBorder, listLabel, words, Worlds);
+                        bool right = false;
+                        error = classMove.InsertWord(right, whiteBorder, listWhiteBorder, listLabel, words, Worlds);
                         if (error)
                         {
                             break;
+                        }
+                        else
+                        {
+                            await Task.Delay(1);
                         }
                     }
                 }
                 if (error == false)
                 {
+
                     break;
                 }
                 else if (countGen == 0)
@@ -236,21 +248,14 @@ namespace Crossword
         }
         private void MoveChangeColor(object sender, MouseEventArgs e)
         {
-            if (Mouse.LeftButton == MouseButtonState.Pressed && number == false)
+            if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
                 ChangeColorBlackWhite(sender);
             }
         }
         private void ClickChangeColor(object sender, MouseButtonEventArgs e)
         {
-            if (number == false)
-            {
-                ChangeColorBlackWhite(sender);
-            }
-            else
-            {
-                ChangeColorWhiteYellow(sender);
-            }
+            ChangeColorBlackWhite(sender);
         }
         void ChangeColorBlackWhite(object sender)
         {
@@ -264,31 +269,9 @@ namespace Crossword
                 myBorder.Background = Brushes.Transparent;
             }
         }
-        void ChangeColorWhiteYellow(object sender)
-        {
-            Border myBorder = (Border)sender;
-            if (myBorder.Background == Brushes.Transparent)
-            {
-                myBorder.Background = Brushes.Yellow;
-            }
-            else if (myBorder.Background == Brushes.Yellow)
-            {
-                myBorder.Background = Brushes.Transparent;
-            }
-        }
-        private void Button_ClickNumber(object sender, RoutedEventArgs e)
-        {
-            number = true;
-            Testing.Text = "Назначай начало слов";
-        }
         private void Button_ClickGen(object sender, RoutedEventArgs e)
         {
             Generation();
-        }
-        private void Button_ClickGrid(object sender, RoutedEventArgs e)
-        {
-            number = false;
-            Testing.Text = "Рисуй сетку";
         }
         private void Button_ClickSaveGrid(object sender, RoutedEventArgs e)
         {
