@@ -27,13 +27,67 @@ namespace Crossword
         List<Border> yellowListborder = new List<Border>();
         List<Border> saveYellowListborder = new List<Border>();
         List<Border> saveWhiteListborder = new List<Border>();
-
-
         public MainWindow()
         {
             InitializeComponent();
             words = new List<string>(Data.Split('\n'));
             CreateGrid();
+        }
+        void TestingConvert()
+        {
+            var ttt = File.ReadAllLines("4word.txt");
+            List<string> TestWords = ttt.ToList();
+            string AllText = "";
+            List<string> temp1;
+            List<string> temp2;
+            string ShowError = "";
+            foreach (var item in TestWords)
+            {
+                try
+                {
+                    temp1 = new List<string>(item.Split('-'));
+                    if (temp1.Count > 2)
+                    {
+                        ShowError += "Тире - " + item + "\n";
+                    }
+                    temp2 = new List<string>(temp1[1].Split('.'));
+                    AllText += temp1[0] + ";";
+                    for (int i = 0; i < temp2.Count; i++)
+                    {
+                        if (temp2[i].Length < 3)
+                        {
+                            ShowError += "Меньше 3 - " + item + "\n";
+                        }
+                        AllText += temp2[i];
+                        if (i != temp2.Count - 1)
+                        {
+                            AllText += ";";
+                        }
+                    }
+                    AllText += "\n";
+                }
+                catch
+                {
+                    ShowError += "Ошибка - " + item + "\n";
+                }
+            }
+            MessageBox.Show(ShowError);
+            File.WriteAllText("newText.txt", AllText);
+        }
+        void TestingConvert2()
+        {
+            var ttt = File.ReadAllLines("4word.txt");
+            List<string> TestWords = ttt.ToList();
+            //string AllText = "";
+            List<string> temp1;
+            string ShowError = "";
+            foreach (var item in TestWords)
+            {
+                temp1 = new List<string>(item.Split(';'));
+                ShowError += temp1[0] + " - ";
+            }
+            MessageBox.Show(ShowError);
+            //File.WriteAllText("newText.txt", AllText);
         }
         void CreateGrid()
         {
@@ -196,17 +250,6 @@ namespace Crossword
                 MessageBox.Show("Генерация прошла успешно");
 
             }
-            //foreach (var border in yellowListborder)
-            //{
-            //    if (check == true)
-            //    {
-            //        border.Background = Brushes.Transparent;
-            //    }
-            //    else
-            //    {
-            //        border.Background = Brushes.Yellow;
-            //    }
-            //}
         }
         private void Button_ClickGrid(object sender, RoutedEventArgs e)
         {
