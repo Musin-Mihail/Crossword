@@ -15,22 +15,24 @@ using System.Windows.Shapes;
 using System.IO;
 namespace Crossword
 {
-    //Удалить жёлтые отметки. Установка цифр в начале слов. скриншоты заполненной и пустой сетки.
+    // Поменять очередь генерации. сразу проверять право и вниз.
+    // Установка цифр в начале слов. скриншоты заполненной и пустой сетки с определениями
+    // Создать структуру которая будет ставить слово, потом перебирать все слова, если не подходит, менять предыдущее и пробовать снова
     public partial class MainWindow : Window
     {
         List<Label> listLabel = new List<Label>();
         List<Border> listBorder = new List<Border>();
+        List<Border> listWhiteBorder = new List<Border>();
         bool number = false;
-        string Data = File.ReadAllText("dict.txt");
         List<string> words;
         ClassMove classMove = new ClassMove();
-        List<Border> yellowListborder = new List<Border>();
         List<Border> saveYellowListborder = new List<Border>();
         List<Border> saveWhiteListborder = new List<Border>();
         public MainWindow()
         {
             InitializeComponent();
-            words = new List<string>(Data.Split('\n'));
+            string[] array = File.ReadAllLines("dict.txt");
+            words = array.ToList();
             CreateGrid();
         }
         void TestingConvert()
@@ -89,6 +91,31 @@ namespace Crossword
             MessageBox.Show(ShowError);
             //File.WriteAllText("newText.txt", AllText);
         }
+        //void SaveJPG()
+        //{
+        //    Visual target;
+        //    string fileName;
+
+        //    Rect bounds = VisualTreeHelper.GetDescendantBounds(target);
+
+        //    RenderTargetBitmap renderTarget = new RenderTargetBitmap((Int32)bounds.Width, (Int32)bounds.Height, 96, 96, PixelFormats.Pbgra32);
+
+        //    DrawingVisual visual = new DrawingVisual();
+
+        //    using (DrawingContext context = visual.RenderOpen())
+        //    {
+        //        VisualBrush visualBrush = new VisualBrush(target);
+        //        context.DrawRectangle(visualBrush, null, new Rect(new Point(), bounds.Size));
+        //    }
+
+        //    renderTarget.Render(visual);
+        //    PngBitmapEncoder bitmapEncoder = new PngBitmapEncoder();
+        //    bitmapEncoder.Frames.Add(BitmapFrame.Create(renderTarget));
+        //    using (Stream stm = File.Create(fileName))
+        //    {
+        //        bitmapEncoder.Save(stm);
+        //    }
+        //}
         void CreateGrid()
         {
             for (int y = 0; y < 30; y++)
@@ -125,6 +152,87 @@ namespace Crossword
             myLabel.HorizontalAlignment = HorizontalAlignment.Center;
             myLabel.VerticalAlignment = VerticalAlignment.Center;
             return myLabel;
+        }
+        async void Generation()
+        {
+            Gen.Visibility = Visibility.Hidden;
+            await Task.Delay(500);
+            int countGen = 0;
+            try
+            {
+                countGen = Int32.Parse(CountGen.Text);
+            }
+            catch
+            {
+                MessageBox.Show("Вводите только цифры в количество генераций");
+            }
+            bool error = false;
+            while (countGen > 0)
+            {
+                countGen--;
+                Worlds.Content = "";
+                listWhiteBorder.Clear();
+                foreach (Border border in listBorder)
+                {
+                    if (border.Background == Brushes.Transparent)
+                    {
+                        listWhiteBorder.Add(border);
+                    }
+                }
+                foreach (var label in listLabel)
+                {
+                    label.Content = null;
+                }
+                foreach (Border whiteBorder in listWhiteBorder)
+                {
+                    int numberColumn = Grid.GetColumn(whiteBorder);
+                    int numberRow = Grid.GetRow(whiteBorder);
+                    bool black = true;
+                    foreach (Border whiteLeftBorder in listWhiteBorder)
+                    {
+                        if (Grid.GetColumn(whiteLeftBorder) == numberColumn - 1 && Grid.GetRow(whiteLeftBorder) == numberRow)
+                        {
+                            black = false;
+                            break;
+                        }
+                    }
+                    if (black == true)
+                    {
+                        classMove.MoveRight(whiteBorder, listWhiteBorder, listLabel, words, Worlds);
+                    }
+                }
+                foreach (Border whiteBorder in listWhiteBorder)
+                {
+                    int numberColumn = Grid.GetColumn(whiteBorder);
+                    int numberRow = Grid.GetRow(whiteBorder);
+                    bool black = true;
+                    foreach (Border whiteLeftBorder in listWhiteBorder)
+                    {
+                        if (Grid.GetColumn(whiteLeftBorder) == numberColumn && Grid.GetRow(whiteLeftBorder) == numberRow - 1)
+                        {
+                            black = false;
+                            break;
+                        }
+                    }
+                    if (black == true)
+                    {
+                        error = classMove.MoveDown(whiteBorder, listWhiteBorder, listLabel, words, Worlds);
+                        if (error)
+                        {
+                            break;
+                        }
+                    }
+                }
+                if (error == false)
+                {
+                    break;
+                }
+                else if (countGen == 0)
+                {
+                    Worlds.Content = "Ошибка в генерации";
+                }
+            }
+            Gen.Visibility = Visibility.Visible;
         }
         private void MoveChangeColor(object sender, MouseEventArgs e)
         {
@@ -175,81 +283,7 @@ namespace Crossword
         }
         private void Button_ClickGen(object sender, RoutedEventArgs e)
         {
-
-            bool check = false;
-            yellowListborder.Clear();
-            foreach (var border in listBorder)
-            {
-                if (border.Background == Brushes.Yellow)
-                {
-                    yellowListborder.Add(border);
-                }
-            }
-            foreach (var label in listLabel)
-            {
-                label.Content = null;
-            }
-            int count = 0;
-            int countGen = 0;
-            try
-            {
-                countGen = Int32.Parse(CountGen.Text);
-            }
-            catch
-            {
-                MessageBox.Show("Вводите только цифры в количество генераций");
-            }
-            while (count < countGen && yellowListborder.Count > 0)
-            {
-                Worlds.Content = "";
-                count++;
-                foreach (var border in yellowListborder)
-                {
-                    if (border.Background == Brushes.Yellow)
-                    {
-                        classMove.MoveRight(border, listBorder, listLabel, words, Worlds);
-                    }
-                }
-                foreach (var border in yellowListborder)
-                {
-                    if (border.Background == Brushes.Yellow)
-                    {
-                        check = classMove.MoveDown(border, listBorder, listLabel, words, Worlds);
-                        if (check == false)
-                        {
-                            break;
-                        }
-                    }
-                }
-                if (check == false)
-                {
-                    foreach (var border in yellowListborder)
-                    {
-                        border.Background = Brushes.Yellow;
-                    }
-                    foreach (var label in listLabel)
-                    {
-                        label.Content = null;
-                    }
-                }
-                else
-                {
-                    foreach (var border in yellowListborder)
-                    {
-                        border.Background = Brushes.Transparent;
-                    }
-                    yellowListborder.Clear();
-                }
-            }
-            if (check == false)
-            {
-                MessageBox.Show("Генерация не удалась");
-            }
-            else
-            {
-                MessageBox.Show("Генерация прошла успешно");
-
-            }
+            Generation();
         }
         private void Button_ClickGrid(object sender, RoutedEventArgs e)
         {

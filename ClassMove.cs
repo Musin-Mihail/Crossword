@@ -19,7 +19,7 @@ namespace Crossword
                     List<string> listString = new List<string>();
                     foreach (string word in words)
                     {
-                        if (word.Length == newListLabel.Count + 1)
+                        if (word.Length == newListLabel.Count)
                         {
                             listString.Add(word);
                         }
@@ -27,7 +27,6 @@ namespace Crossword
                     Random rnd = new Random();
                     string newWord = listString[rnd.Next(0, listString.Count - 1)];
                     label.Content += newWord + "\n";
-                    //MessageBox.Show(newWord);
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
                         newListLabel[i].Content = newWord[i];
@@ -39,48 +38,40 @@ namespace Crossword
                 MessageBox.Show("Есть поле больше 15");
             }
         }
-        List<Label> LoopsRight(int numColumn, int numRow, List<Border> listBorder, List<Label> listLabel)
+        List<Label> LoopsRight(int firstNumColumn, int firstNumRow, List<Border> listBorder, List<Label> listLabel)
         {
-            List<Label> newListLabel = new List<Label>();
-            for (int i = numColumn; i < 30; i++)
+            int letterСount = 0;
+            for (int i = firstNumColumn; i < 30; i++)
             {
-                foreach (Border border2 in listBorder)
+                bool black = true;
+                foreach (Border border in listBorder)
                 {
-                    if (Grid.GetRow(border2) == numRow)
+                    if (Grid.GetRow(border) == firstNumRow && Grid.GetColumn(border) == i)
                     {
-                        if (Grid.GetColumn(border2) == i)
+                        letterСount++;
+                        black = false;
+                        break;
+                    }
+                }
+                if (black == true)
+                {
+                    break;
+                }
+            }
+            List<Label> newListLabel = new List<Label>();
+            for (int i = firstNumColumn; i < firstNumColumn + letterСount; i++)
+            {
+                foreach (Label label in listLabel)
+                {
+                    if (Grid.GetRow(label) == firstNumRow && Grid.GetColumn(label) == i)
+                    {
+                        if (label.Content == null)
                         {
-                            if (border2.Background == Brushes.Transparent || border2.Background == Brushes.Yellow)
-                            {
-                                foreach (Label label in listLabel)
-                                {
-                                    if (Grid.GetRow(label) == numRow)
-                                    {
-                                        if (Grid.GetColumn(label) == i)
-                                        {
-                                            if (i == numColumn)
-                                            {
-                                                newListLabel.Add(label);
-                                            }
-                                            else
-                                            {
-                                                if (label.Content == null)
-                                                {
-                                                    newListLabel.Add(label);
-                                                }
-                                                else
-                                                {
-                                                    return newListLabel;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                return newListLabel;
-                            }
+                            newListLabel.Add(label);
+                        }
+                        else
+                        {
+                            return newListLabel;
                         }
                     }
                 }
@@ -97,7 +88,7 @@ namespace Crossword
                 List<string> listString = new List<string>();
                 foreach (string word in words)
                 {
-                    if (word.Length == newListLabel.Count + 1)
+                    if (word.Length == newListLabel.Count)
                     {
                         listString.Add(word);
                     }
@@ -123,56 +114,67 @@ namespace Crossword
                         }
                         else
                         {
-                            border1.Background = Brushes.Blue;
-                            //MessageBox.Show("Нет подходящего слова");
-                            border1.Background = Brushes.Yellow;
-                            return false;
+                            //border1.Background = Brushes.Yellow;
+                            return true;
                         }
                     }
                 }
                 Random rnd = new Random();
                 string newWord = listString[rnd.Next(0, listString.Count - 1)];
                 label.Content += newWord + "\n";
-                //MessageBox.Show(newWord);
                 for (int i = 0; i < newListLabel.Count; i++)
                 {
                     newListLabel[i].Content = newWord[i];
                 }
             }
-            return true;
+            return false;
         }
-        List<Label> LoopsDown(int numColumn, int numRow, List<Border> listBorder, List<Label> listLabel)
+        List<Label> LoopsDown(int firstNumColumn, int firstNumRow, List<Border> listBorder, List<Label> listLabel)
         {
-            List<Label> newListLabel = new List<Label>();
-            for (int i = numRow; i < 30; i++)
+            int letterСount = 0;
+            for (int i = firstNumRow; i < 30; i++)
             {
-                foreach (Border border2 in listBorder)
+                bool black = true;
+                foreach (Border border in listBorder)
                 {
-                    if (Grid.GetColumn(border2) == numColumn)
+                    if (Grid.GetRow(border) == i && Grid.GetColumn(border) == firstNumColumn)
                     {
-                        if (Grid.GetRow(border2) == i)
-                        {
-                            if (border2.Background == Brushes.Transparent || border2.Background == Brushes.Yellow)
-                            {
-                                border2.Background = Brushes.Transparent;
-                                foreach (Label label in listLabel)
-                                {
-                                    if (Grid.GetColumn(label) == numColumn)
-                                    {
-                                        if (Grid.GetRow(label) == i)
-                                        {
-
-                                            newListLabel.Add(label);
-
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                return newListLabel;
-                            }
-                        }
+                        letterСount++;
+                        black = false;
+                        break;
+                    }
+                }
+                if (black == true)
+                {
+                    break;
+                }
+            }
+            List<Label> newListLabel = new List<Label>();
+            for (int i = firstNumRow; i < firstNumRow + letterСount; i++)
+            {
+                foreach (Label label in listLabel)
+                {
+                    if (Grid.GetColumn(label) == firstNumColumn && Grid.GetRow(label) == i)
+                    {
+                        //foreach (Label label2 in listLabel)
+                        //{
+                        //    if (Grid.GetColumn(label2) == firstNumColumn && Grid.GetRow(label2) == i + 1)
+                        //    {
+                        //        if (label2.Content == null)
+                        //        {
+                                    newListLabel.Add(label);
+                        //        }
+                        //    }
+                        //}
+                        //if (label.Content == null)
+                        //{
+                        //newListLabel.Add(label);
+                        //}
+                        //else
+                        //{
+                        //    return newListLabel;
+                        //}
+                        //newListLabel.Add(label);
                     }
                 }
             }

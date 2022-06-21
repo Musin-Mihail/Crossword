@@ -77,7 +77,7 @@
         <TextBlock x:Name="Testing" Text="Рисуй сетку" Grid.Row="30" Grid.Column="0" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.ColumnSpan="8" Width="200" Height="25" Margin="15,13,0,0"></TextBlock>
         <Button Content="Рисовать сетку" Click="Button_ClickGrid"  Grid.Row="30" Grid.Column="7" Grid.ColumnSpan="5" Height="50" VerticalAlignment="Top" Margin="20,10,15,0"/>
         <Button Content="Начало слов" Click="Button_ClickNumber" Grid.Row="30" Grid.Column="12" Grid.ColumnSpan="5" Height="50" VerticalAlignment="Top" Margin="25,10,15,0"/>
-        <Button Content="Генерация" Click="Button_ClickGen" Margin="54,0,71,0" Grid.Column="30" Grid.RowSpan="2" Grid.Row="11"/>
+        <Button x:Name="Gen" Content="Генерация" Click="Button_ClickGen" Margin="54,0,71,0" Grid.Column="30" Grid.RowSpan="2" Grid.Row="11"/>
         <TextBox x:Name="CountGen" TextWrapping="Wrap" Text="10" Width="120" Grid.Column="30" Margin="88,10,0,0" Grid.Row="9" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.RowSpan="2"/>
         <Label x:Name="Worlds" Content="" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="187" FontSize="10" Height="234" Grid.Column="30" Grid.RowSpan="9"/>
         <Label Grid.Column="30" Content="Количество попыток" HorizontalAlignment="Center" Grid.Row="8" VerticalAlignment="Center" Width="188" FontSize="18"/>
