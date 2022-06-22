@@ -5,7 +5,7 @@ using System.Windows.Media;
 using System.Windows;
 namespace Crossword
 {
-    internal class ClassMove
+    internal class GenerationWord
     {
         List<Label> LoopsRight(int firstNumColumn, int firstNumRow, List<Border> listBorder, List<Label> listLabel)
         {
@@ -71,12 +71,13 @@ namespace Crossword
                     }
                 }
             }
+            
             return newListLabel;
         }
-        public bool InsertWord(bool right, Border border1, List<Border> listBorder, List<Label> listLabel, List<string> words, Label label)
+        public bool InsertWord(bool right, Label label1, List<Border> listBorder, List<Label> listLabel, List<string> words, Label label)
         {
-            int numColumn = Grid.GetColumn(border1);
-            int numRow = Grid.GetRow(border1);
+            int numColumn = Grid.GetColumn(label1);
+            int numRow = Grid.GetRow(label1);
             List<Label> newListLabel;
             if (right == true)
             {
@@ -86,24 +87,19 @@ namespace Crossword
             {
                 newListLabel = LoopsDown(numColumn, numRow, listBorder, listLabel);
             }
+            
             if (newListLabel.Count < 16)
             {
                 if (newListLabel.Count >= 2)
                 {
-                    List<string> listString = new List<string>();
-                    foreach (string word in words)
-                    {
-                        if (word.Length == newListLabel.Count)
-                        {
-                            listString.Add(word);
-                        }
-                    }
+                    List<string> listWords = new List<string>(words);
                     List<string> tempListString = new List<string>();
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
                         if (newListLabel[i].Content != null)
                         {
-                            foreach (string item in listString)
+                            
+                            foreach (string item in listWords)
                             {
                                 string tempString = newListLabel[i].Content.ToString();
                                 string tempString2 = item[i].ToString();
@@ -114,7 +110,7 @@ namespace Crossword
                             }
                             if (tempListString.Count > 0)
                             {
-                                listString = new List<string>(tempListString);
+                                listWords = new List<string>(tempListString);
                                 tempListString.Clear();
                             }
                             else
@@ -124,7 +120,7 @@ namespace Crossword
                         }
                     }
                     Random rnd = new Random();
-                    string newWord = listString[rnd.Next(0, listString.Count - 1)];
+                    string newWord = listWords[rnd.Next(0, listWords.Count - 1)];
                     label.Content += newWord + "\n";
                     for (int i = 0; i < newListLabel.Count; i++)
                     {

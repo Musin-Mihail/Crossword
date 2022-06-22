@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.IO;
 namespace Crossword
 {
+    // Добавить кнопку СТОП
     // Установка цифр в начале слов. скриншоты заполненной и пустой сетки с определениями
     // Создать структуру которая будет ставить слово, потом перебирать все слова, если не подходит, менять предыдущее и пробовать снова
     public partial class MainWindow : Window
@@ -22,10 +23,12 @@ namespace Crossword
         List<Label> listLabel = new List<Label>();
         List<Border> listBorder = new List<Border>();
         List<Border> listWhiteBorder = new List<Border>();
+        List<Label> listWhiteLabel = new List<Label>();
         List<string> words;
-        ClassMove classMove = new ClassMove();
+        GenerationWord generationWord = new GenerationWord();
         List<Border> saveYellowListborder = new List<Border>();
         List<Border> saveWhiteListborder = new List<Border>();
+        List<Word> ListWord = new List<Word>();
         public MainWindow()
         {
             InitializeComponent();
@@ -33,87 +36,6 @@ namespace Crossword
             words = array.ToList();
             CreateGrid();
         }
-        void TestingConvert()
-        {
-            var ttt = File.ReadAllLines("4word.txt");
-            List<string> TestWords = ttt.ToList();
-            string AllText = "";
-            List<string> temp1;
-            List<string> temp2;
-            string ShowError = "";
-            foreach (var item in TestWords)
-            {
-                try
-                {
-                    temp1 = new List<string>(item.Split('-'));
-                    if (temp1.Count > 2)
-                    {
-                        ShowError += "Тире - " + item + "\n";
-                    }
-                    temp2 = new List<string>(temp1[1].Split('.'));
-                    AllText += temp1[0] + ";";
-                    for (int i = 0; i < temp2.Count; i++)
-                    {
-                        if (temp2[i].Length < 3)
-                        {
-                            ShowError += "Меньше 3 - " + item + "\n";
-                        }
-                        AllText += temp2[i];
-                        if (i != temp2.Count - 1)
-                        {
-                            AllText += ";";
-                        }
-                    }
-                    AllText += "\n";
-                }
-                catch
-                {
-                    ShowError += "Ошибка - " + item + "\n";
-                }
-            }
-            MessageBox.Show(ShowError);
-            File.WriteAllText("newText.txt", AllText);
-        }
-        void TestingConvert2()
-        {
-            var ttt = File.ReadAllLines("4word.txt");
-            List<string> TestWords = ttt.ToList();
-            //string AllText = "";
-            List<string> temp1;
-            string ShowError = "";
-            foreach (var item in TestWords)
-            {
-                temp1 = new List<string>(item.Split(';'));
-                ShowError += temp1[0] + " - ";
-            }
-            MessageBox.Show(ShowError);
-            //File.WriteAllText("newText.txt", AllText);
-        }
-        //void SaveJPG()
-        //{
-        //    Visual target;
-        //    string fileName;
-
-        //    Rect bounds = VisualTreeHelper.GetDescendantBounds(target);
-
-        //    RenderTargetBitmap renderTarget = new RenderTargetBitmap((Int32)bounds.Width, (Int32)bounds.Height, 96, 96, PixelFormats.Pbgra32);
-
-        //    DrawingVisual visual = new DrawingVisual();
-
-        //    using (DrawingContext context = visual.RenderOpen())
-        //    {
-        //        VisualBrush visualBrush = new VisualBrush(target);
-        //        context.DrawRectangle(visualBrush, null, new Rect(new Point(), bounds.Size));
-        //    }
-
-        //    renderTarget.Render(visual);
-        //    PngBitmapEncoder bitmapEncoder = new PngBitmapEncoder();
-        //    bitmapEncoder.Frames.Add(BitmapFrame.Create(renderTarget));
-        //    using (Stream stm = File.Create(fileName))
-        //    {
-        //        bitmapEncoder.Save(stm);
-        //    }
-        //}
         void CreateGrid()
         {
             for (int y = 0; y < 30; y++)
@@ -155,6 +77,66 @@ namespace Crossword
         {
             Gen.Visibility = Visibility.Hidden;
             await Task.Delay(500);
+            listWhiteBorder.Clear();
+            ListWord.Clear();
+            listWhiteLabel.Clear();
+            foreach (Border border in listBorder)
+            {
+                if (border.Background == Brushes.Transparent)
+                {
+                    listWhiteBorder.Add(border);
+                    int column = Grid.GetColumn(border);
+                    int row = Grid.GetRow(border);
+                    foreach (var label in listLabel)
+                    {
+                        if (column == Grid.GetColumn(label))
+                        {
+                            if (row == Grid.GetRow(label))
+                            {
+                                listWhiteLabel.Add(label);
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (var label in listLabel)
+            {
+                label.Content = null;
+            }
+            // Поиск начало и длинну всех слов
+            foreach (Border whiteBorder in listWhiteBorder)
+            {
+                int numberColumn = Grid.GetColumn(whiteBorder);
+                int numberRow = Grid.GetRow(whiteBorder);
+                bool black = true;
+                foreach (Border whiteLeftBorder in listWhiteBorder)
+                {
+                    if (Grid.GetColumn(whiteLeftBorder) == numberColumn - 1 && Grid.GetRow(whiteLeftBorder) == numberRow)
+                    {
+                        black = false;
+                        break;
+                    }
+                }
+                if (black == true)
+                {
+                    SaveWordRight(numberColumn, numberRow);
+                }
+
+                black = true;
+                foreach (Border whiteLeftBorder in listWhiteBorder)
+                {
+                    if (Grid.GetColumn(whiteLeftBorder) == numberColumn && Grid.GetRow(whiteLeftBorder) == numberRow - 1)
+                    {
+                        black = false;
+                        break;
+                    }
+                }
+                if (black == true)
+                {
+                    SaveWordDown(numberColumn, numberRow);
+                }
+            }
+            //Подбор слов
             int countGen = 0;
             try
             {
@@ -164,94 +146,196 @@ namespace Crossword
             {
                 MessageBox.Show("Вводите только цифры в количество генераций");
             }
+            for (int i = 0; i < ListWord.Count; i++)
+            {
+                Word newWord = ListWord[i];
+                ListWord.RemoveAt(i);
+                if (newWord.GetRight() == true)
+                {
+                    List<string> listString = new List<string>();
+                    int letterCount = newWord.GetRightLetterCount();
+                    foreach (string word in words)
+                    {
+                        if (word.Length == letterCount)
+                        {
+                            listString.Add(word);
+                        }
+                    }
+                    newWord.AddWordsRight(listString);
+                }
+                if (newWord.GetDown() == true)
+                {
+                    List<string> listString = new List<string>();
+                    int letterCount = newWord.GetDownLetterCount();
+                    foreach (string word in words)
+                    {
+                        if (word.Length == letterCount)
+                        {
+                            listString.Add(word);
+                        }
+                    }
+                    newWord.AddWordsDown(listString);
+                }
+                ListWord.Insert(i, newWord);
+            }
             bool error = false;
             while (countGen > 0)
             {
-                countGen--;
-                Worlds.Content = "";
-                listWhiteBorder.Clear();
-                foreach (Border border in listBorder)
-                {
-                    if (border.Background == Brushes.Transparent)
-                    {
-                        listWhiteBorder.Add(border);
-                    }
-                }
                 foreach (var label in listLabel)
                 {
                     label.Content = null;
                 }
-                foreach (Border whiteBorder in listWhiteBorder)
+                countGen--;
+                WindowsText.Content = "";
+                foreach (var emptyWord in ListWord)
                 {
-
-                    int numberColumn = Grid.GetColumn(whiteBorder);
-                    int numberRow = Grid.GetRow(whiteBorder);
-                    bool black = true;
-                    foreach (Border whiteLeftBorder in listWhiteBorder)
+                    bool right = emptyWord.GetRight();
+                    bool down = emptyWord.GetDown();
+                    if (right == true)
                     {
-                        if (Grid.GetColumn(whiteLeftBorder) == numberColumn - 1 && Grid.GetRow(whiteLeftBorder) == numberRow)
-                        {
-                            black = false;
-                            break;
-                        }
+                        error = generationWord.InsertWord(true, emptyWord.GetFirstLabel(), listWhiteBorder, listWhiteLabel, emptyWord.GetRightListWords(), WindowsText);
                     }
-                    if (black == true)
+                    if (down == true && error == false)
                     {
-                        bool right = true;
-                        error = classMove.InsertWord(right, whiteBorder, listWhiteBorder, listLabel, words, Worlds);
-                        if (error)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            await Task.Delay(1);
-                        }
+                        error = generationWord.InsertWord(false, emptyWord.GetFirstLabel(), listWhiteBorder, listWhiteLabel, emptyWord.GetDownListWords(), WindowsText);
                     }
-
-
-
-                    black = true;
-                    foreach (Border whiteLeftBorder in listWhiteBorder)
+                    if (error)
                     {
-                        if (Grid.GetColumn(whiteLeftBorder) == numberColumn && Grid.GetRow(whiteLeftBorder) == numberRow - 1)
-                        {
-                            black = false;
-                            break;
-                        }
+                        break;
                     }
-                    if (black == true)
+                    else
                     {
-                        bool right = false;
-                        error = classMove.InsertWord(right, whiteBorder, listWhiteBorder, listLabel, words, Worlds);
-                        if (error)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            await Task.Delay(1);
-                        }
+                        await Task.Delay(1);
                     }
                 }
                 if (error == false)
                 {
-
                     break;
                 }
                 else if (countGen == 0)
                 {
-                    Worlds.Content = "Ошибка в генерации";
+                    WindowsText.Content = "Ошибка в генерации";
                 }
             }
             Gen.Visibility = Visibility.Visible;
         }
+        void SaveWordRight(int firstNumColumn, int firstNumRow)
+        {
+            int letterСount = 0;
+            for (int i = firstNumColumn; i < 30; i++)
+            {
+                bool black = true;
+                foreach (Border border in listWhiteBorder)
+                {
+                    if (Grid.GetRow(border) == firstNumRow && Grid.GetColumn(border) == i)
+                    {
+                        letterСount++;
+                        black = false;
+                        break;
+                    }
+                }
+                if (black == true)
+                {
+                    break;
+                }
+            }
+            List<Label> newListLabel = new List<Label>();
+            for (int i = firstNumColumn; i < firstNumColumn + letterСount; i++)
+            {
+                foreach (Label label in listWhiteLabel)
+                {
+                    if (Grid.GetRow(label) == firstNumRow && Grid.GetColumn(label) == i)
+                    {
+                        newListLabel.Add(label);
+                    }
+                }
+            }
+            if (newListLabel.Count > 1)
+            {
+                bool match = false;
+                for (int i = 0; i < ListWord.Count; i++)
+                {
+                    if (newListLabel[0] == ListWord[i].GetFirstLabel())
+                    {
+                        Word newWord = ListWord[i];
+                        ListWord.RemoveAt(i);
+                        newWord.SetListLabelRight(newListLabel);
+                        newWord.ChangeRight();
+                        ListWord.Insert(i, newWord);
+                        match = true;
+                        break;
+                    }
+                }
+                if (match == false)
+                {
+                    Word newWord = new Word();
+                    newWord.SetListLabelRight(newListLabel);
+                    newWord.ChangeRight();
+                    ListWord.Add(newWord);
+                }
+            }
+        }
+        void SaveWordDown(int firstNumColumn, int firstNumRow)
+        {
+            int letterСount = 0;
+            for (int i = firstNumRow; i < 30; i++)
+            {
+                bool black = true;
+                foreach (Border border in listWhiteBorder)
+                {
+                    if (Grid.GetRow(border) == i && Grid.GetColumn(border) == firstNumColumn)
+                    {
+                        letterСount++;
+                        black = false;
+                        break;
+                    }
+                }
+                if (black == true)
+                {
+                    break;
+                }
+            }
+            List<Label> newListLabel = new List<Label>();
+            for (int i = firstNumRow; i < firstNumRow + letterСount; i++)
+            {
+                foreach (Label label in listWhiteLabel)
+                {
+                    if (Grid.GetColumn(label) == firstNumColumn && Grid.GetRow(label) == i)
+                    {
+                        newListLabel.Add(label);
+                    }
+                }
+            }
+            if (newListLabel.Count > 1)
+            {
+
+                bool match = false;
+                for (int i = 0; i < ListWord.Count; i++)
+                {
+                    if (newListLabel[0] == ListWord[i].GetFirstLabel())
+                    {
+                        Word newWord = ListWord[i];
+                        ListWord.RemoveAt(i);
+                        newWord.SetListLabelDown(newListLabel);
+                        newWord.ChangeDown();
+                        ListWord.Insert(i, newWord);
+                        match = true;
+                        break;
+                    }
+                }
+                if (match == false)
+                {
+                    Word newWord = new Word();
+
+                    newWord.SetListLabelDown(newListLabel);
+                    newWord.ChangeDown();
+                    ListWord.Add(newWord);
+                }
+            }
+        }
         private void MoveChangeColor(object sender, MouseEventArgs e)
         {
-            if (Mouse.LeftButton == MouseButtonState.Pressed)
-            {
-                ChangeColorBlackWhite(sender);
-            }
+            ChangeColorBlackWhite(sender);
         }
         private void ClickChangeColor(object sender, MouseButtonEventArgs e)
         {
@@ -259,15 +343,17 @@ namespace Crossword
         }
         void ChangeColorBlackWhite(object sender)
         {
-            Border myBorder = (Border)sender;
-            if (myBorder.Background == Brushes.Transparent)
+            if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
-                myBorder.Background = Brushes.Black;
-            }
-            else
-            {
+                Border myBorder = (Border)sender;
                 myBorder.Background = Brushes.Transparent;
             }
+            else if (Mouse.RightButton == MouseButtonState.Pressed)
+            {
+                Border myBorder = (Border)sender;
+                myBorder.Background = Brushes.Black;
+            }
+
         }
         private void Button_ClickGen(object sender, RoutedEventArgs e)
         {

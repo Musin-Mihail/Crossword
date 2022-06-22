@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Crossword"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1000" Width="1200">
+        Title="Crossword" Height="1000" Width="1200">
     <Grid x:Name="TheGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="30"></ColumnDefinition>
@@ -75,7 +75,7 @@
         </Grid.RowDefinitions>
         <Button x:Name="Gen" Content="Генерация" Click="Button_ClickGen" Margin="54,0,71,0" Grid.Column="30" Grid.RowSpan="2" Grid.Row="11"/>
         <TextBox x:Name="CountGen" TextWrapping="Wrap" Text="10" Width="120" Grid.Column="30" Margin="88,10,0,0" Grid.Row="9" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.RowSpan="2"/>
-        <Label x:Name="Worlds" Content="" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="187" FontSize="10" Height="234" Grid.Column="30" Grid.RowSpan="9"/>
+        <Label x:Name="WindowsText" Content="" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="187" FontSize="10" Height="1000" Grid.Column="30" Grid.RowSpan="9"/>
         <Label Grid.Column="30" Content="Количество попыток" HorizontalAlignment="Center" Grid.Row="8" VerticalAlignment="Center" Width="188" FontSize="18"/>
         <Button Content="Сохранить сетку" Click="Button_ClickSaveGrid"   Height="50" VerticalAlignment="Top" Margin="54,25,94,0" Grid.Column="30" Grid.RowSpan="3" Grid.Row="16"/>
         <Button Content="Загрузить сетку" Click="Button_ClickLoadGrid"  Grid.Row="19" Grid.Column="30" Height="50" VerticalAlignment="Top" Margin="54,0,86,0" Grid.RowSpan="2"/>
