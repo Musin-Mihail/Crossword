@@ -15,6 +15,7 @@ namespace Crossword
         List<Label> listLabelDown;
         bool right;
         bool down;
+        int count;
         Label firstLabel;
         List<string> listWordsRight;
         List<string> listWordsDown;
@@ -27,6 +28,15 @@ namespace Crossword
             down = false;
             listWordsRight = new List<string>();
             listWordsDown = new List<string>();
+            count = 999;
+        }
+        public void SetCount(int count)
+        {
+            this.count = count;
+        }
+        public int GetCount()
+        {
+            return count;
         }
         public void ChangeRight()
         {
@@ -67,6 +77,38 @@ namespace Crossword
         public int GetRightLetterCount()
         {
             return listLabelRight.Count;
+        }
+        public List<Label> GetRightLabel()
+        {
+            return listLabelRight;
+        }
+        public bool SearchForMatchesRight(Label firstLabel)
+        {
+            bool match = false;
+            foreach (Label label in listLabelRight)
+            {
+                if (firstLabel == label)
+                {
+                    match = true;
+                }
+            }
+            return match;
+        }
+        public bool SearchForMatchesDown(Label firstLabel)
+        {
+            bool match = false;
+            foreach (Label label in listLabelDown)
+            {
+                if (firstLabel == label)
+                {
+                    match = true;
+                }
+            }
+            return match;
+        }
+        public List<Label> GetDownLabel()
+        {
+            return listLabelDown;
         }
         public int GetDownLetterCount()
         {
