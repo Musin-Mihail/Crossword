@@ -74,7 +74,7 @@ namespace Crossword
             
             return newListLabel;
         }
-        public bool InsertWord(bool right, Label label1, List<Border> listBorder, List<Label> listLabel, List<string> words, Label label)
+        public bool InsertWord(bool right, Label label1, List<Border> listBorder, List<Label> listLabel, List<string> words, ref List<string> wordsGrid, ref Word word)
         {
             int numColumn = Grid.GetColumn(label1);
             int numRow = Grid.GetRow(label1);
@@ -90,7 +90,7 @@ namespace Crossword
             
             if (newListLabel.Count < 16)
             {
-                if (newListLabel.Count >= 2)
+                if (newListLabel.Count > 1)
                 {
                     List<string> listWords = new List<string>(words);
                     List<string> tempListString = new List<string>();
@@ -98,7 +98,14 @@ namespace Crossword
                     {
                         if (newListLabel[i].Content != null)
                         {
-                            
+                            if(right == true)
+                            {
+                                word.AddConnectionPointRight(newListLabel[i]);
+                            }
+                            else
+                            {
+                                word.AddConnectionPointDown(newListLabel[i]);
+                            }
                             foreach (string item in listWords)
                             {
                                 string tempString = newListLabel[i].Content.ToString();
@@ -121,7 +128,16 @@ namespace Crossword
                     }
                     Random rnd = new Random();
                     string newWord = listWords[rnd.Next(0, listWords.Count - 1)];
-                    label.Content += newWord + "\n";
+                    if (right == true)
+                    {
+                        word.DeleteWordRight(newWord);
+                    }
+                    else
+                    {
+                        word.DeleteWordDown(newWord);
+                    }
+                    wordsGrid.Add(newWord);
+                    //label.Content += newWord + "\n";
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
                         newListLabel[i].Content = newWord[i];

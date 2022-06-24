@@ -21,19 +21,21 @@ namespace Crossword
     {
         List<Label> listLabel = new List<Label>();
         List<Border> listBorder = new List<Border>();
-        List<Border> listWhiteBorder = new List<Border>();
-        List<Label> listWhiteLabel = new List<Label>();
-        List<string> words;
+        List<string> words = new List<string>();
         GenerationWord generationWord = new GenerationWord();
-        List<Border> saveYellowListborder = new List<Border>();
-        List<Border> saveWhiteListborder = new List<Border>();
+        SaveLoad saveLoad = new SaveLoad();
         bool STOP = false;
+        bool success = false;
         public MainWindow()
         {
             InitializeComponent();
+            CreateDictionary();
+            CreateGrid();
+        }
+        void CreateDictionary()
+        {
             string[] array = File.ReadAllLines("dict.txt");
             words = array.ToList();
-            CreateGrid();
         }
         void CreateGrid()
         {
@@ -54,6 +56,8 @@ namespace Crossword
                     Grid.SetRow(myBorder, y);
                 }
             }
+            saveLoad.AddAllBorder(listBorder);
+            saveLoad.AddAllLabel(listLabel);
         }
         Border CreateBorder()
         {
@@ -75,14 +79,15 @@ namespace Crossword
         async void Generation()
         {
             Gen.Visibility = Visibility.Hidden;
+
             if (Visual.IsChecked == true)
             {
                 GenStop.Visibility = Visibility.Visible;
             }
             await Task.Delay(100);
-            listWhiteBorder.Clear();
             List<Word> ListWord = new List<Word>();
-            listWhiteLabel.Clear();
+            List<Border> listWhiteBorder = new List<Border>();
+            List<Label> listWhiteLabel = new List<Label>();
             foreach (Border border in listBorder)
             {
                 if (border.Background == Brushes.Transparent)
@@ -102,10 +107,10 @@ namespace Crossword
                     }
                 }
             }
-            foreach (var label in listLabel)
-            {
-                label.Content = null;
-            }
+
+
+
+
             // Поиск начало и длинну всех слов
             int count = 0;
             foreach (Border whiteBorder in listWhiteBorder)
@@ -124,10 +129,8 @@ namespace Crossword
                 }
                 if (black == true)
                 {
-                    SaveWordRight(ref ListWord, ref count, numberColumn, numberRow);
-
+                    SaveWordRight(ref ListWord, ref count, numberColumn, numberRow, listWhiteBorder, listWhiteLabel);
                 }
-
                 black = true;
                 foreach (Border whiteLeftBorder in listWhiteBorder)
                 {
@@ -139,29 +142,23 @@ namespace Crossword
                 }
                 if (black == true)
                 {
-                    SaveWordDown(ref ListWord, ref count, numberColumn, numberRow);
-
+                    SaveWordDown(ref ListWord, ref count, numberColumn, numberRow, listWhiteBorder, listWhiteLabel);
                 }
             }
-            //Поиск соединённых слов
-            List<Word> listMatchWord = new List<Word>();
-            List<Word> tempListWord = new List<Word>(ListWord);
-            Word newWord2 = tempListWord[0];
-            listMatchWord.Add(newWord2);
-            tempListWord.RemoveAt(0);
-            SearchMatch(ref listMatchWord, ref tempListWord, newWord2);
-            ListWord = listMatchWord;
 
-            //Подбор слов
-            int countGen = 0;
-            try
+            //Поиск соединённых слов
+            if (ListWord.Count > 0)
             {
-                countGen = Int32.Parse(CountGen.Text);
+                List<Word> listMatchWord = new List<Word>();
+                List<Word> tempListWord = new List<Word>(ListWord);
+                Word newWord2 = tempListWord[0];
+                listMatchWord.Add(newWord2);
+                tempListWord.RemoveAt(0);
+                SearchMatch(ref listMatchWord, ref tempListWord, newWord2);
+                ListWord = listMatchWord;
             }
-            catch
-            {
-                MessageBox.Show("Вводите только цифры в количество генераций");
-            }
+
+            //Подбор слов по длине
             for (int i = 0; i < ListWord.Count; i++)
             {
                 Word newWord = ListWord[i];
@@ -194,7 +191,117 @@ namespace Crossword
                 }
                 ListWord.Insert(i, newWord);
             }
+
+            //Расстановка слов
+            //OldGen(ListWord, listWhiteBorder, listWhiteLabel);
+
+            //success = false;
+            //int count2 = 0;
+            //while (count2 < 10 && success == false)
+            //{
+            //    WindowsText.Content = "";
+            //    count2++;
+            foreach (var label in listLabel)
+            {
+                label.Content = null;
+            }
+            NewGen(ListWord, listWhiteBorder, listWhiteLabel);
+            //}
+        }
+        async void NewGen(List<Word> ListWord, List<Border> listWhiteBorder, List<Label> listWhiteLabel)
+        {
+            WindowsText.Content = "";
+            int count = ListWord.Count;
+            List<string> wordsGrid = new List<string>();
+            int countGen = 0;
+            int maxGen = 0;
+            try
+            {
+                maxGen = Int32.Parse(CountGen.Text);
+            }
+            catch
+            {
+                MessageBox.Show("Вводите только цифры в количество генераций");
+            }
+            for (int i = 0; i < count; i++)
+            {
+                countGen++;
+                if (countGen > maxGen)
+                {
+                    WindowsText.Content = "Генерация не удалась";
+                    GenStop.Visibility = Visibility.Hidden;
+                    Gen.Visibility = Visibility.Visible;
+                    return;
+                }
+                if (STOP == true)
+                {
+                    STOP = false;
+                    WindowsText.Content = "Генерация остановлена";
+                    GenStop.Visibility = Visibility.Hidden;
+                    Gen.Visibility = Visibility.Visible;
+                    return;
+                }
+                bool right = ListWord[i].GetRight();
+                bool down = ListWord[i].GetDown();
+                Word newWord = ListWord[i];
+                bool firstWordError = false;
+                bool secondWordError = false;
+                if (right == true)
+                {
+                    firstWordError = generationWord.InsertWord(true, ListWord[i].GetFirstLabel(), listWhiteBorder, listWhiteLabel, ListWord[i].GetRightListWords(), ref wordsGrid, ref newWord);
+                }
+                if (down == true && firstWordError == false)
+                {
+                    secondWordError = generationWord.InsertWord(false, ListWord[i].GetFirstLabel(), listWhiteBorder, listWhiteLabel, ListWord[i].GetDownListWords(), ref wordsGrid, ref newWord);
+                }
+                ListWord.RemoveAt(i);
+                ListWord.Insert(i, newWord);
+                if (firstWordError || secondWordError)
+                {
+                    // Ошибка лишние слова в списке
+                    //await Task.Delay(1000);
+                    if (firstWordError == true)
+                    {
+                        wordsGrid.RemoveAt(wordsGrid.Count - 1);
+                    }
+                    if (secondWordError == true)
+                    {
+                        wordsGrid.RemoveAt(wordsGrid.Count - 1);
+                        //wordsGrid.RemoveAt(wordsGrid.Count - 1);
+                    }
+                    ListWord[i].ClearLabel();
+                    i--;
+                    ListWord[i].ClearLabel();
+                    i--;
+                }
+                else if (Visual.IsChecked == true)
+                {
+                    await Task.Delay(1);
+                }
+                CountGoodGen.Content = countGen;
+            }
+            foreach (var item in wordsGrid)
+            {
+                WindowsText.Content += item + "\n";
+            }
+            CountGoodGen.Content = countGen;
+            //success = true;
+            GenStop.Visibility = Visibility.Hidden;
+            Gen.Visibility = Visibility.Visible;
+        }
+        async void OldGen(List<Word> ListWord, List<Border> listWhiteBorder, List<Label> listWhiteLabel)
+        {
+            int countGen = 0;
+            try
+            {
+                countGen = Int32.Parse(CountGen.Text);
+            }
+            catch
+            {
+                MessageBox.Show("Вводите только цифры в количество генераций");
+            }
             int allGen = countGen;
+            List<string> wordsGrid = new List<string>();
             while (countGen > 0)
             {
                 if (STOP == true)
@@ -215,13 +322,14 @@ namespace Crossword
                 {
                     bool right = emptyWord.GetRight();
                     bool down = emptyWord.GetDown();
+                    Word newWord = emptyWord;
                     if (right == true)
                     {
-                        error = generationWord.InsertWord(true, emptyWord.GetFirstLabel(), listWhiteBorder, listWhiteLabel, emptyWord.GetRightListWords(), WindowsText);
+                        error = generationWord.InsertWord(true, emptyWord.GetFirstLabel(), listWhiteBorder, listWhiteLabel, emptyWord.GetRightListWords(), ref wordsGrid, ref newWord);
                     }
                     if (down == true && error == false)
                     {
-                        error = generationWord.InsertWord(false, emptyWord.GetFirstLabel(), listWhiteBorder, listWhiteLabel, emptyWord.GetDownListWords(), WindowsText);
+                        error = generationWord.InsertWord(false, emptyWord.GetFirstLabel(), listWhiteBorder, listWhiteLabel, emptyWord.GetDownListWords(), ref wordsGrid, ref newWord);
                     }
                     if (error)
                     {
@@ -241,10 +349,7 @@ namespace Crossword
                     WindowsText.Content = "Ошибка в генерации";
                 }
             }
-
             CountGoodGen.Content = (allGen - countGen) + " Попыток";
-            GenStop.Visibility = Visibility.Hidden;
-            Gen.Visibility = Visibility.Visible;
         }
         void SearchMatch(ref List<Word> listMatchWord, ref List<Word> listWord, Word word)
         {
@@ -272,7 +377,6 @@ namespace Crossword
                                         SearchMatch(ref listMatchWord, ref listWord, newWord);
                                     }
                                     break;
-                                    //i++;
                                 }
                             }
                         }
@@ -303,7 +407,6 @@ namespace Crossword
                                         SearchMatch(ref listMatchWord, ref listWord, newWord);
                                     }
                                     break;
-                                    //i++;
                                 }
                             }
                         }
@@ -311,7 +414,7 @@ namespace Crossword
                 }
             }
         }
-        void SaveWordRight(ref List<Word> listWord, ref int count, int firstNumColumn, int firstNumRow)
+        void SaveWordRight(ref List<Word> listWord, ref int count, int firstNumColumn, int firstNumRow, List<Border> listWhiteBorder, List<Label> listWhiteLabel)
         {
             int letterСount = 0;
             for (int i = firstNumColumn; i < 30; i++)
@@ -371,7 +474,7 @@ namespace Crossword
                 }
             }
         }
-        void SaveWordDown(ref List<Word> listWord, ref int count, int firstNumColumn, int firstNumRow)
+        void SaveWordDown(ref List<Word> listWord, ref int count, int firstNumColumn, int firstNumRow, List<Border> listWhiteBorder, List<Label> listWhiteLabel)
         {
             int letterСount = 0;
             for (int i = firstNumRow; i < 30; i++)
@@ -459,40 +562,14 @@ namespace Crossword
         }
         private void Button_ClickSaveGrid(object sender, RoutedEventArgs e)
         {
-            foreach (var border in listBorder)
-            {
-                if (border.Background == Brushes.Transparent)
-                {
-                    saveWhiteListborder.Add(border);
-                }
-                else if (border.Background == Brushes.Yellow)
-                {
-                    saveYellowListborder.Add(border);
-                }
-            }
+            saveLoad.Save();
             SaveGrid.Content = "Сетка сохранена";
         }
         private void Button_ClickLoadGrid(object sender, RoutedEventArgs e)
         {
-            foreach (var label in listLabel)
-            {
-                label.Content = "";
-            }
-            foreach (var border in listBorder)
-            {
-                border.Background = Brushes.Black;
-            }
-            foreach (var border in saveWhiteListborder)
-            {
-                border.Background = Brushes.Transparent;
-            }
-            foreach (var border in saveYellowListborder)
-            {
-                border.Background = Brushes.Yellow;
-            }
+            saveLoad.Load();
             SaveGrid.Content = "Сетка загружена";
         }
-
         private void Button_ClickStop(object sender, RoutedEventArgs e)
         {
             STOP = true;
