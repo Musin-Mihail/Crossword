@@ -46,10 +46,9 @@ namespace Crossword
         {
             ConnectionPointDown.Add(point);
         }
-        public void ClearLabel()
+        public void ClearLabelRight()
         {
             listTempWordsRight = new List<string>(listWordsRight);
-            listTempWordsDown = new List<string>(listWordsDown);
             foreach (var item in listLabelRight)
             {
                 bool Match = false;
@@ -66,6 +65,10 @@ namespace Crossword
                     item.Content = null;
                 }
             }
+        }
+        public void ClearLabelDown()
+        {
+            listTempWordsDown = new List<string>(listWordsDown);
             foreach (var item in listLabelDown)
             {
                 bool Match = false;

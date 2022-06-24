@@ -74,15 +74,15 @@
             <RowDefinition ></RowDefinition>
         </Grid.RowDefinitions>
         <Label x:Name="WindowsText" Content="" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="120" FontSize="10" Height="1000" Grid.Column="30" Grid.RowSpan="31"/>
-        <Button x:Name="Gen" Content="Генерация" Click="Button_ClickGen" Margin="54,0,71,0" Grid.Column="30" Grid.RowSpan="2" Grid.Row="11"/>
+        <Button x:Name="GenButton" Content="Генерация" Click="Button_ClickGen" Margin="54,0,71,0" Grid.Column="30" Grid.RowSpan="2" Grid.Row="11"/>
         <TextBox x:Name="CountGen" TextWrapping="Wrap" Text="10" Width="120" Grid.Column="30" Margin="88,10,0,0" Grid.Row="9" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.RowSpan="2"/>
         <Label Grid.Column="30" Content="Количество попыток" HorizontalAlignment="Center" Grid.Row="8" VerticalAlignment="Center" Width="188" FontSize="18"/>
         <Button Content="Сохранить сетку" Click="Button_ClickSaveGrid"   Height="50" VerticalAlignment="Top" Margin="54,25,94,0" Grid.Column="30" Grid.RowSpan="3" Grid.Row="16"/>
         <Button Content="Загрузить сетку" Click="Button_ClickLoadGrid"  Grid.Row="19" Grid.Column="30" Height="50" VerticalAlignment="Top" Margin="54,0,86,0" Grid.RowSpan="2"/>
         <Label x:Name="SaveGrid" Grid.Column="30" Content="Нет сохранения" HorizontalAlignment="Left" Margin="54,26,0,0" Grid.Row="21" VerticalAlignment="Top" Width="188" FontSize="18" Grid.RowSpan="2"/>
         <Label x:Name="CountGoodGen" Grid.Column="30" Content="Количество попыток" HorizontalAlignment="Left" Grid.Row="13" VerticalAlignment="Top" Width="188" FontSize="18" Margin="41,20,0,0" Grid.RowSpan="2"/>
-        <Button x:Name="GenStop" Content="Стоп" Click="Button_ClickStop"  Margin="54,0,71,0" Grid.Column="30" Grid.RowSpan="2" Grid.Row="11" Visibility="Hidden"/>
-        <CheckBox x:Name="Visual"  Grid.Column="30" Content="Визуализация" HorizontalAlignment="Left" Margin="88,10,0,0" Grid.Row="15" VerticalAlignment="Top" FontSize="18" ClickMode="Release" FontWeight="Normal" IsChecked="True"/>
+        <Button x:Name="GenStopButton" Content="Стоп" Click="Button_ClickStop"  Margin="54,0,71,0" Grid.Column="30" Grid.RowSpan="2" Grid.Row="11" Visibility="Hidden"/>
+        <CheckBox x:Name="VisualCheckBox"  Grid.Column="30" Content="Визуализация" HorizontalAlignment="Left" Margin="88,10,0,0" Grid.Row="15" VerticalAlignment="Top" FontSize="18" ClickMode="Release" FontWeight="Normal" IsChecked="True"/>
 
 
     </Grid>

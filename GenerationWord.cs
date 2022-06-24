@@ -137,6 +137,7 @@ namespace Crossword
                         word.DeleteWordDown(newWord);
                     }
                     wordsGrid.Add(newWord);
+                    MessageBox.Show(newWord);
                     //label.Content += newWord + "\n";
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
