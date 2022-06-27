@@ -56,7 +56,10 @@ namespace Crossword
                 }
                 if (Match == false)
                 {
-                    item.Content = null;
+                    if (item.Content != null)
+                    {
+                        item.Content = null;
+                    }
                 }
             }
         }
@@ -82,23 +85,20 @@ namespace Crossword
                 }
             }
         }
-        public void DeleteWordRight(string word)
-        {
-            for (int i = 0; i < listTempWordsRight.Count; i++)
-            {
-                if (word == listTempWordsRight[i])
-                {
-                    listTempWordsRight.RemoveAt(i);
-                }
-            }
-        }
-        public void DeleteWordDown(string word)
+        public void DeleteWord(string word)
         {
             for (int i = 0; i < listTempWordsDown.Count; i++)
             {
                 if (word == listTempWordsDown[i])
                 {
                     listTempWordsDown.RemoveAt(i);
+                }
+            }
+            for (int i = 0; i < listTempWordsRight.Count; i++)
+            {
+                if (word == listTempWordsRight[i])
+                {
+                    listTempWordsRight.RemoveAt(i);
                 }
             }
         }
@@ -159,7 +159,8 @@ namespace Crossword
             listLabelRight = new List<Label>(listLabel);
             foreach (var item in listLabelRight)
             {
-                if (item.Content != null)
+                string tempString = item.Content.ToString();
+                if (tempString.Length == 1)
                 {
                     ConnectionPointRight.Add(item);
                 }
@@ -171,12 +172,33 @@ namespace Crossword
             listLabelDown = new List<Label>(listLabel);
             foreach (var item in listLabelDown)
             {
-                if (item.Content != null)
+                string tempString = item.Content.ToString();
+                if (tempString.Length == 1)
                 {
                     ConnectionPointDown.Add(item);
                 }
             }
             firstLabel = listLabel[0];
+        }
+        public void RefreshListLabelRight()
+        {
+            foreach (var item in listLabelRight)
+            {
+                if (item.Content != null)
+                {
+                    ConnectionPointRight.Add(item);
+                }
+            }
+        }
+        public void RefreshListLabelDown()
+        {
+            foreach (var item in listLabelDown)
+            {
+                if (item.Content != null)
+                {
+                    ConnectionPointDown.Add(item);
+                }
+            }
         }
     }
 }

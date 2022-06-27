@@ -224,12 +224,11 @@ namespace Crossword
                     if (newListLabel[0] == listWord[i].firstLabel)
                     {
                         Word newWord = listWord[i];
-                        listWord.RemoveAt(i);
                         newWord.SetListLabelRight(newListLabel);
                         count++;
                         newWord.count = count;
                         newWord.right = true;
-                        listWord.Insert(i, newWord);
+                        RefreshWord(i, newWord);
                         match = true;
                         break;
                     }
@@ -284,12 +283,13 @@ namespace Crossword
                     if (newListLabel[0] == listWord[i].firstLabel)
                     {
                         Word newWord = listWord[i];
-                        listWord.RemoveAt(i);
                         newWord.SetListLabelDown(newListLabel);
                         count++;
                         newWord.count = count;
                         newWord.down = true;
-                        listWord.Insert(i, newWord);
+                        RefreshWord(i, newWord);
+
+
                         match = true;
                         break;
                     }
@@ -388,7 +388,6 @@ namespace Crossword
             for (int i = 0; i < listWord.Count; i++)
             {
                 Word newWord = listWord[i];
-                listWord.RemoveAt(i);
                 if (newWord.right == true)
                 {
                     List<string> listString = new List<string>();
@@ -415,7 +414,7 @@ namespace Crossword
                     }
                     newWord.AddWordsDown(listString);
                 }
-                listWord.Insert(i, newWord);
+                RefreshWord(i, newWord);
             }
             foreach (var word in listWord)
             {
@@ -438,7 +437,7 @@ namespace Crossword
                 FirsLabel.Background = Brushes.Yellow;
 
                 Word newWord = listWord[index];
-                int error = InsertWord(listEmptyBorder, listEmptyLabel, ref newWord);
+                int error = InsertWord(listEmptyLabel, ref newWord);
                 FirsLabel.Background = Brushes.White;
 
                 if (error == 0)
@@ -451,61 +450,64 @@ namespace Crossword
                     // Нужно в слова добавить слова с пересечением. И обращаться к ним напрямую.
                     if (index > 0)
                     {
-                        Word newWord2 = listWord[index];
-                        listWord.RemoveAt(index);
-                        newWord2.ClearLabelRight();
-                        newWord2.ClearLabelDown();
-                        newWord2.RestoreDictionary();
-                        listWord.Insert(index, newWord2);
+                        listWord[index].RefreshListLabelRight();
+                        listWord[index].RefreshListLabelDown();
+                        listWord[index].ClearLabelRight();
+                        listWord[index].ClearLabelDown();
+                        listWord[index].RestoreDictionary();
+                        RefreshWord(index, listWord[index]);
 
-                        if (error == 1)
-                        {
-                            MessageBox.Show(error + " 1");
-                            List<Word> newListWord = newWord2.ConnectionWordsRight;
-                            foreach (Word word in newListWord)
-                            {
-                                int index2 = listWord.IndexOf(word);
-                                newWord2 = listWord[index2];
-                                listWord.RemoveAt(index2);
-                                //newWord2.ClearLabelRight();
-                                newWord2.ClearLabelDown();
-                                listWord.Insert(index2, newWord2);
-                            }
+                        listWord[index - 1].ClearLabelDown();
+                        listWord[index - 1].ClearLabelRight();
+                        MessageBox.Show("Error  -  " + error);
+                        //if (error == 1)
+                        //{
+                        //MessageBox.Show(error + " 1");
+                        //List<Word> newListWord = newWord2.ConnectionWordsRight;
+                        //foreach (Word word in newListWord)
+                        //{
+                        //int index2 = listWord.IndexOf(word);
+                        //newWord2 = listWord[index2];
+                        //newWord2.ClearLabelRight();
+                        //listWord[index - 1].ClearLabelDown();
+                        //listWord[index - 1].ClearLabelRight();
+                        //RefreshWord(index - 1, listWord[index - 1]);
 
-                        }
-                        if (error == 2)
-                        {
-                            MessageBox.Show(error + " 2");
-                            List<Word> newListWord = newWord2.ConnectionWordsDown;
-                            foreach (Word word in newListWord)
-                            {
-                                //int index2 = ListWord.IndexOf(word);
-                                //newWord2 = ListWord[index2];
-                                //ListWord.RemoveAt(index2);
-                                word.ClearLabelRight();
-                                //newWord2.ClearLabelDown();
-                                //ListWord.Insert(index2, newWord2);
-                            }
+                        //}
+                        //}
+                        //if (error == 2)
+                        //{
+                        //MessageBox.Show(error + " 2");
+                        //List<Word> newListWord = newWord2.ConnectionWordsDown;
+                        //foreach (Word word in newListWord)
+                        //{
+                        //int index2 = listWord.IndexOf(word);
+                        //newWord2 = listWord[index2];
+                        //word.ClearLabelRight();
+                        //newWord2.ClearLabelDown();
+                        //RefreshWord(index2, word);
 
-                        }
+                        //listWord[index - 1].ClearLabelRight();
+                        //RefreshWord(index - 1, listWord[index - 1]);
+                        //}
+                        //}
                         NewGen2(index - 1);
                     }
                     else
                     {
-                        Word newWord2 = listWord[index];
-                        listWord.RemoveAt(index);
-                        newWord2.ClearLabelRight();
-                        newWord2.ClearLabelDown();
+                        //Word newWord2 = listWord[index];
+                        listWord[index].ClearLabelRight();
+                        listWord[index].ClearLabelDown();
                         //newWord2.RestoreDictionary();
-                        listWord.Insert(index, newWord2);
+                        RefreshWord(index, listWord[index]);
                         NewGen2(index);
-                        MessageBox.Show(error + " 0");
+                        MessageBox.Show("Error  -  " + error);
                     }
                 }
 
             }
         }
-        int InsertWord(List<Border> listBorder, List<Label> listLabel, ref Word word)
+        int InsertWord(List<Label> listLabel, ref Word word)
         {
             bool right = word.right;
             bool down = word.down;
@@ -521,14 +523,14 @@ namespace Crossword
             {
                 MessageBox.Show("Вправо");
                 List<string> words = word.listTempWordsRight;
-                List<Label> newListLabelRight = SearchEmptyLineRight(numColumn, numRow, listBorder, listLabel);
+                List<Label> newListLabelRight = SearchEmptyLineRight(numColumn, numRow, listLabel);
                 errorRight = SearchWord(true, newListLabelRight, words, ref word);
             }
             if (down == true)
             {
                 MessageBox.Show("Вниз");
                 List<string> words = word.listTempWordsDown;
-                List<Label> newListLabelDown = SearchEmptyLineDown(numColumn, numRow, listBorder, listLabel);
+                List<Label> newListLabelDown = SearchEmptyLineDown(numColumn, numRow, listLabel);
                 errorDown = SearchWord(false, newListLabelDown, words, ref word);
             }
             if (errorRight == true && errorDown == true)
@@ -549,52 +551,18 @@ namespace Crossword
             // 2 - ошибка во влево
             // 3 - ошибка в обоих словах
         }
-        List<Label> SearchEmptyLineRight(int firstNumColumn, int firstNumRow, List<Border> listBorder, List<Label> listLabel)
+        List<Label> SearchEmptyLineRight(int firstNumColumn, int firstNumRow, List<Label> listLabel)
         {
-            //Поиск место под слово по горизонтали. И возрат списка клеток.
-            int letterСount = 0;
+            //Подсчёт пустых клеток вправо
+            List<Label> newListLabel = new List<Label>();
             for (int i = firstNumColumn; i < 30; i++)
             {
                 bool black = true;
-                foreach (Border border in listBorder)
-                {
-                    if (Grid.GetRow(border) == firstNumRow && Grid.GetColumn(border) == i)
-                    {
-                        letterСount++;
-                        black = false;
-                        break;
-                    }
-                }
-                if (black == true)
-                {
-                    break;
-                }
-            }
-            List<Label> newListLabel = new List<Label>();
-            for (int i = firstNumColumn; i < firstNumColumn + letterСount; i++)
-            {
                 foreach (Label label in listLabel)
                 {
                     if (Grid.GetRow(label) == firstNumRow && Grid.GetColumn(label) == i)
                     {
                         newListLabel.Add(label);
-                    }
-                }
-            }
-            return newListLabel;
-        }
-        List<Label> SearchEmptyLineDown(int firstNumColumn, int firstNumRow, List<Border> listBorder, List<Label> listLabel)
-        {
-            //Поиск место под слово по вертикали. И возрат списка клеток.
-            int letterСount = 0;
-            for (int i = firstNumRow; i < 30; i++)
-            {
-                bool black = true;
-                foreach (Border border in listBorder)
-                {
-                    if (Grid.GetRow(border) == i && Grid.GetColumn(border) == firstNumColumn)
-                    {
-                        letterСount++;
                         black = false;
                         break;
                     }
@@ -604,15 +572,27 @@ namespace Crossword
                     break;
                 }
             }
+            return newListLabel;
+        }
+        List<Label> SearchEmptyLineDown(int firstNumColumn, int firstNumRow, List<Label> listLabel)
+        {
+            //Подсчёт пустых клеток вправо
             List<Label> newListLabel = new List<Label>();
-            for (int i = firstNumRow; i < firstNumRow + letterСount; i++)
+            for (int i = firstNumRow; i < 30; i++)
             {
+                bool black = true;
                 foreach (Label label in listLabel)
                 {
                     if (Grid.GetColumn(label) == firstNumColumn && Grid.GetRow(label) == i)
                     {
                         newListLabel.Add(label);
+                        black = false;
+                        break;
                     }
+                }
+                if (black == true)
+                {
+                    break;
                 }
             }
             return newListLabel;
@@ -667,16 +647,8 @@ namespace Crossword
                             }
                         }
                     }
-
                     string newWord = listWordsString[0];
-                    if (right == true)
-                    {
-                        word.DeleteWordRight(newWord);
-                    }
-                    else
-                    {
-                        word.DeleteWordDown(newWord);
-                    }
+                    word.DeleteWord(newWord);
                     MessageBox.Show(newWord);
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
@@ -736,9 +708,13 @@ namespace Crossword
                 }
             }
         }
+        void RefreshWord(int index, Word word)
+        {
+            listWord.RemoveAt(index);
+            listWord.Insert(index, word);
+        }
 
-
-        //Сохраненние и загрузка
+        //Сохранение и загрузка
         private void Button_ClickSaveGrid(object sender, RoutedEventArgs e)
         {
             Save();
