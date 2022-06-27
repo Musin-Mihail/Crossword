@@ -44,6 +44,7 @@ namespace Crossword
             }
             saveLoad.AddAllBorder(listBorder);
             saveLoad.AddAllLabel(listLabel);
+            gridGeneration.AddBorderLabelUI(listBorder, listLabel, uiElements);
         }
         Border CreateBorder()
         {
@@ -86,7 +87,7 @@ namespace Crossword
         }
         private void Button_ClickGen(object sender, RoutedEventArgs e)
         {
-            gridGeneration.Generation(uiElements, listLabel, listBorder);
+            gridGeneration.Generation();
         }
         private void Button_ClickSaveGrid(object sender, RoutedEventArgs e)
         {

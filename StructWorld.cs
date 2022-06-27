@@ -23,6 +23,8 @@ namespace Crossword
         List<string> listTempWordsDown;
         List<Label> ConnectionPointRight;
         List<Label> ConnectionPointDown;
+        List<Word> ConnectionWordsRight;
+        List<Word> ConnectionWordsDown;
         public Word()
         {
             listLabelRight = new List<Label>();
@@ -37,6 +39,32 @@ namespace Crossword
             count = 999;
             ConnectionPointRight = new List<Label>();
             ConnectionPointDown = new List<Label>();
+            ConnectionWordsRight = new List<Word>();
+            ConnectionWordsDown = new List<Word>();
+        }
+        public void AddConnectionWordsRight(Word word)
+        {
+            ConnectionWordsRight.Add(word);
+        }
+        public void AddConnectionWordsDown(Word word)
+        {
+            ConnectionWordsDown.Add(word);
+        }
+        public List<Word> GetConnectionWordsRight()
+        {
+            return ConnectionWordsRight;
+        }
+        public List<Word> GetConnectionWordsDown()
+        {
+            return ConnectionWordsDown;
+        }
+        public void ClearConnectionPointRight()
+        {
+            ConnectionPointRight.Clear();
+        }
+        public void ClearConnectionPointDown()
+        {
+            ConnectionPointDown.Clear();
         }
         public void AddConnectionPointRight(Label point)
         {
@@ -46,9 +74,21 @@ namespace Crossword
         {
             ConnectionPointDown.Add(point);
         }
-        public void ClearLabelRight()
+        public List<Label> GetConnectionPointRight()
+        {
+            return ConnectionPointRight;
+        }
+        public List<Label> GetConnectionPointDown()
+        {
+            return ConnectionPointDown;
+        }
+        public void RestoreDictionary()
         {
             listTempWordsRight = new List<string>(listWordsRight);
+            listTempWordsDown = new List<string>(listWordsDown);
+        }
+        public void ClearLabelRight()
+        {
             foreach (var item in listLabelRight)
             {
                 bool Match = false;
@@ -68,7 +108,6 @@ namespace Crossword
         }
         public void ClearLabelDown()
         {
-            listTempWordsDown = new List<string>(listWordsDown);
             foreach (var item in listLabelDown)
             {
                 bool Match = false;
@@ -82,7 +121,10 @@ namespace Crossword
                 }
                 if (Match == false)
                 {
-                    item.Content = null;
+                    if (item.Content != null)
+                    {
+                        item.Content = null;
+                    }
                 }
             }
         }
@@ -159,6 +201,24 @@ namespace Crossword
         public List<Label> GetRightLabel()
         {
             return listLabelRight;
+        }
+        public void ListWordsRandomization()
+        {
+            Random rnd = new Random();
+            for (int i = 0; i < listTempWordsRight.Count; i++)
+            {
+                string temp = listTempWordsRight[i];
+                int randomIndex = rnd.Next(0, listTempWordsRight.Count - 1);
+                listTempWordsRight[i] = listTempWordsRight[randomIndex];
+                listTempWordsRight[randomIndex] = temp;
+            }
+            for (int i = 0; i < listTempWordsDown.Count; i++)
+            {
+                string temp = listTempWordsDown[i];
+                int randomIndex = rnd.Next(0, listTempWordsDown.Count - 1);
+                listTempWordsDown[i] = listTempWordsDown[randomIndex];
+                listTempWordsDown[randomIndex] = temp;
+            }
         }
         public bool SearchForMatchesRight(Label firstLabel)
         {

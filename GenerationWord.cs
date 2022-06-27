@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows;
+
 namespace Crossword
 {
     internal class GenerationWord
     {
-        List<Label> LoopsRight(int firstNumColumn, int firstNumRow, List<Border> listBorder, List<Label> listLabel)
+        List<Label> SearchEmptyLineRight(int firstNumColumn, int firstNumRow, List<Border> listBorder, List<Label> listLabel)
         {
+            //Поиск место под слово по горизонтали. И возрат списка клеток.
             int letterСount = 0;
             for (int i = firstNumColumn; i < 30; i++)
             {
@@ -40,8 +40,9 @@ namespace Crossword
             }
             return newListLabel;
         }
-        List<Label> LoopsDown(int firstNumColumn, int firstNumRow, List<Border> listBorder, List<Label> listLabel)
+        List<Label> SearchEmptyLineDown(int firstNumColumn, int firstNumRow, List<Border> listBorder, List<Label> listLabel)
         {
+            //Поиск место под слово по вертикали. И возрат списка клеток.
             int letterСount = 0;
             for (int i = firstNumRow; i < 30; i++)
             {
@@ -71,34 +72,74 @@ namespace Crossword
                     }
                 }
             }
-            
             return newListLabel;
         }
-        public bool InsertWord(bool right, Label label1, List<Border> listBorder, List<Label> listLabel, List<string> words, ref List<string> wordsGrid, ref Word word)
+        public int InsertWord(List<Border> listBorder, List<Label> listLabel, ref Word word)
         {
-            int numColumn = Grid.GetColumn(label1);
-            int numRow = Grid.GetRow(label1);
-            List<Label> newListLabel;
+            bool right = word.GetRight();
+            bool down = word.GetDown();
+
+            bool errorRight = false;
+            bool errorDown = false;
+
+            Label FirsLabel = word.GetFirstLabel();
+            int numColumn = Grid.GetColumn(FirsLabel);
+            int numRow = Grid.GetRow(FirsLabel);
+
             if (right == true)
             {
-                newListLabel = LoopsRight(numColumn, numRow, listBorder, listLabel);
+                MessageBox.Show("Вправо");
+                List<string> words = word.GetRightListWords();
+                List<Label> newListLabelRight = SearchEmptyLineRight(numColumn, numRow, listBorder, listLabel);
+                errorRight = SearchWord(true, newListLabelRight, words, ref word);
             }
-            else
+            if (down == true)
             {
-                newListLabel = LoopsDown(numColumn, numRow, listBorder, listLabel);
+                MessageBox.Show("Вниз");
+                List<string> words = word.GetDownListWords();
+                List<Label> newListLabelDown = SearchEmptyLineDown(numColumn, numRow, listBorder, listLabel);
+                errorDown = SearchWord(false, newListLabelDown, words, ref word);
             }
-            
+            if (errorRight == true && errorDown == true)
+            {
+                return 3;
+            }
+            else if (errorRight == true)
+            {
+                return 1;
+            }
+            else if (errorDown == true)
+            {
+                return 2;
+            }
+            return 0;
+            // 0 - нет ошибок
+            // 1 - ошибка в вправа
+            // 2 - ошибка во влево
+            // 3 - ошибка в обоих словах
+        }
+        bool SearchWord(bool right, List<Label> newListLabel, List<string> words, ref Word word)
+        {
             if (newListLabel.Count < 16)
             {
                 if (newListLabel.Count > 1)
                 {
-                    List<string> listWords = new List<string>(words);
+                    List<string> listWordsString = new List<string>(words);
                     List<string> tempListString = new List<string>();
+                    if (right == true)
+                    {
+                        word.ClearConnectionPointRight();
+                    }
+                    else
+                    {
+                        word.ClearConnectionPointDown();
+                    }
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
                         if (newListLabel[i].Content != null)
                         {
-                            if(right == true)
+                            // Нужно добавить эти точки в обо слова. А лучше добавить сразу все слова.
+                            if (right == true)
                             {
                                 word.AddConnectionPointRight(newListLabel[i]);
                             }
@@ -106,7 +147,7 @@ namespace Crossword
                             {
                                 word.AddConnectionPointDown(newListLabel[i]);
                             }
-                            foreach (string item in listWords)
+                            foreach (string item in listWordsString)
                             {
                                 string tempString = newListLabel[i].Content.ToString();
                                 string tempString2 = item[i].ToString();
@@ -117,17 +158,18 @@ namespace Crossword
                             }
                             if (tempListString.Count > 0)
                             {
-                                listWords = new List<string>(tempListString);
+                                listWordsString = new List<string>(tempListString);
                                 tempListString.Clear();
                             }
                             else
                             {
+                                MessageBox.Show("Не нашёл слово");
                                 return true;
                             }
                         }
                     }
-                    Random rnd = new Random();
-                    string newWord = listWords[rnd.Next(0, listWords.Count - 1)];
+
+                    string newWord = listWordsString[0];
                     if (right == true)
                     {
                         word.DeleteWordRight(newWord);
@@ -136,9 +178,7 @@ namespace Crossword
                     {
                         word.DeleteWordDown(newWord);
                     }
-                    wordsGrid.Add(newWord);
                     MessageBox.Show(newWord);
-                    //label.Content += newWord + "\n";
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
                         newListLabel[i].Content = newWord[i];

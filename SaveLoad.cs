@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.IO;
+
 
 namespace Crossword
 {
@@ -12,17 +14,19 @@ namespace Crossword
     {
         List<Border> listAllBorder = new List<Border>();
         List<Label> listAllLabel = new List<Label>();
-        List<Border> listWhiteBorder = new List<Border>();
         public void Save()
         {
-            listWhiteBorder.Clear();
+            string saveFile = "";
             foreach (var border in listAllBorder)
             {
                 if (border.Background == Brushes.Transparent)
                 {
-                    listWhiteBorder.Add(border);
+                    int Column = Grid.GetColumn(border);
+                    int Row = Grid.GetRow(border);
+                    saveFile += Column + ";" + Row +"\n";
                 }
             }
+            File.WriteAllText("SaveGrid.txt", saveFile);
         }
         public void Load()
         {
@@ -34,9 +38,22 @@ namespace Crossword
             {
                 border.Background = Brushes.Black;
             }
-            foreach (var border in listWhiteBorder)
+            var test = File.ReadAllLines("SaveGrid.txt");
+            foreach (var item in test)
             {
-                border.Background = Brushes.Transparent;
+                List<string> strings = new List<string>(item.Split(';'));
+                int Column = Int32.Parse(strings[0]);
+                int Row = Int32.Parse(strings[1]);
+                foreach (var item2 in listAllBorder)
+                {
+                    if(Grid.GetColumn(item2) == Column)
+                    {
+                        if(Grid.GetRow(item2) == Row)
+                        {
+                            item2.Background = Brushes.Transparent;
+                        }
+                    }
+                }
             }
         }
         public void AddAllBorder(List<Border> listBorder)
