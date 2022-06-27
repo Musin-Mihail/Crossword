@@ -5,20 +5,20 @@ namespace Crossword
 {
     struct Word
     {
-        List<Label> listLabelRight;
-        List<Label> listLabelDown;
-        bool right;
-        bool down;
-        int count;
-        Label firstLabel;
+        public List<Label> listLabelRight;
+        public List<Label> listLabelDown;
+        public bool right;
+        public bool down;
+        public int count;
+        public Label firstLabel;
         List<string> listWordsRight;
         List<string> listWordsDown;
-        List<string> listTempWordsRight;
-        List<string> listTempWordsDown;
-        List<Label> ConnectionPointRight;
-        List<Label> ConnectionPointDown;
-        List<Word> ConnectionWordsRight;
-        List<Word> ConnectionWordsDown;
+        public List<string> listTempWordsRight;
+        public List<string> listTempWordsDown;
+        public List<Label> ConnectionPointRight;
+        public List<Label> ConnectionPointDown;
+        public List<Word> ConnectionWordsRight;
+        public List<Word> ConnectionWordsDown;
         public Word()
         {
             listLabelRight = new List<Label>();
@@ -35,46 +35,6 @@ namespace Crossword
             ConnectionPointDown = new List<Label>();
             ConnectionWordsRight = new List<Word>();
             ConnectionWordsDown = new List<Word>();
-        }
-        public void AddConnectionWordsRight(Word word)
-        {
-            ConnectionWordsRight.Add(word);
-        }
-        public void AddConnectionWordsDown(Word word)
-        {
-            ConnectionWordsDown.Add(word);
-        }
-        public List<Word> GetConnectionWordsRight()
-        {
-            return ConnectionWordsRight;
-        }
-        public List<Word> GetConnectionWordsDown()
-        {
-            return ConnectionWordsDown;
-        }
-        public void ClearConnectionPointRight()
-        {
-            ConnectionPointRight.Clear();
-        }
-        public void ClearConnectionPointDown()
-        {
-            ConnectionPointDown.Clear();
-        }
-        public void AddConnectionPointRight(Label point)
-        {
-            ConnectionPointRight.Add(point);
-        }
-        public void AddConnectionPointDown(Label point)
-        {
-            ConnectionPointDown.Add(point);
-        }
-        public List<Label> GetConnectionPointRight()
-        {
-            return ConnectionPointRight;
-        }
-        public List<Label> GetConnectionPointDown()
-        {
-            return ConnectionPointDown;
         }
         public void RestoreDictionary()
         {
@@ -122,34 +82,6 @@ namespace Crossword
                 }
             }
         }
-        public void SetCount(int count)
-        {
-            this.count = count;
-        }
-        public int GetCount()
-        {
-            return count;
-        }
-        public void ChangeRight()
-        {
-            right = true;
-        }
-        public void ChangeDown()
-        {
-            down = true;
-        }
-        public Label GetFirstLabel()
-        {
-            return firstLabel;
-        }
-        public bool GetRight()
-        {
-            return right;
-        }
-        public bool GetDown()
-        {
-            return down;
-        }
         public void DeleteWordRight(string word)
         {
             for (int i = 0; i < listTempWordsRight.Count; i++)
@@ -179,22 +111,6 @@ namespace Crossword
         {
             listWordsDown = new List<string>(listWords);
             listTempWordsDown = new List<string>(listWords);
-        }
-        public List<string> GetRightListWords()
-        {
-            return listTempWordsRight;
-        }
-        public List<string> GetDownListWords()
-        {
-            return listTempWordsDown;
-        }
-        public int GetRightLetterCount()
-        {
-            return listLabelRight.Count;
-        }
-        public List<Label> GetRightLabel()
-        {
-            return listLabelRight;
         }
         public void ListWordsRandomization()
         {
@@ -237,14 +153,6 @@ namespace Crossword
                 }
             }
             return match;
-        }
-        public List<Label> GetDownLabel()
-        {
-            return listLabelDown;
-        }
-        public int GetDownLetterCount()
-        {
-            return listLabelDown.Count;
         }
         public void SetListLabelRight(List<Label> listLabel)
         {

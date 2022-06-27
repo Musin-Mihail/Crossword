@@ -221,14 +221,14 @@ namespace Crossword
                 bool match = false;
                 for (int i = 0; i < listWord.Count; i++)
                 {
-                    if (newListLabel[0] == listWord[i].GetFirstLabel())
+                    if (newListLabel[0] == listWord[i].firstLabel)
                     {
                         Word newWord = listWord[i];
                         listWord.RemoveAt(i);
                         newWord.SetListLabelRight(newListLabel);
                         count++;
-                        newWord.SetCount(count);
-                        newWord.ChangeRight();
+                        newWord.count = count;
+                        newWord.right = true;
                         listWord.Insert(i, newWord);
                         match = true;
                         break;
@@ -239,8 +239,8 @@ namespace Crossword
                     Word newWord = new Word();
                     newWord.SetListLabelRight(newListLabel);
                     count++;
-                    newWord.SetCount(count);
-                    newWord.ChangeRight();
+                    newWord.count = count;
+                    newWord.right = true;
                     listWord.Add(newWord);
                 }
             }
@@ -281,14 +281,14 @@ namespace Crossword
                 bool match = false;
                 for (int i = 0; i < listWord.Count; i++)
                 {
-                    if (newListLabel[0] == listWord[i].GetFirstLabel())
+                    if (newListLabel[0] == listWord[i].firstLabel)
                     {
                         Word newWord = listWord[i];
                         listWord.RemoveAt(i);
                         newWord.SetListLabelDown(newListLabel);
                         count++;
-                        newWord.SetCount(count);
-                        newWord.ChangeDown();
+                        newWord.count = count;
+                        newWord.down = true;
                         listWord.Insert(i, newWord);
                         match = true;
                         break;
@@ -299,8 +299,8 @@ namespace Crossword
                     Word newWord = new Word();
                     newWord.SetListLabelDown(newListLabel);
                     count++;
-                    newWord.SetCount(count);
-                    newWord.ChangeDown();
+                    newWord.count = count;
+                    newWord.down = true;
                     listWord.Add(newWord);
                 }
             }
@@ -320,15 +320,15 @@ namespace Crossword
         }
         void SearchMatch(ref List<Word> listMatchWord, ref List<Word> tempListWord, Word word)
         {
-            if (word.GetRight() == true)
+            if (word.right == true)
             {
-                List<Label> tempListLabel = word.GetRightLabel();
+                List<Label> tempListLabel = word.listLabelRight;
                 foreach (Label label in tempListLabel)
                 {
                     int listCount = tempListWord.Count;
                     for (int i = 0; i < listCount; i++)
                     {
-                        if (tempListWord[i].GetDown() == true)
+                        if (tempListWord[i].down == true)
                         {
                             bool match = tempListWord[i].SearchForMatchesDown(label);
                             if (match)
@@ -351,15 +351,15 @@ namespace Crossword
                     }
                 }
             }
-            if (word.GetDown() == true)
+            if (word.down == true)
             {
-                List<Label> tempListLabel = word.GetDownLabel();
+                List<Label> tempListLabel = word.listLabelDown;
                 foreach (Label label in tempListLabel)
                 {
                     int listCount = tempListWord.Count;
                     for (int i = 0; i < listCount; i++)
                     {
-                        if (tempListWord[i].GetRight() == true)
+                        if (tempListWord[i].right == true)
                         {
                             bool match = tempListWord[i].SearchForMatchesRight(label);
                             if (match)
@@ -389,10 +389,10 @@ namespace Crossword
             {
                 Word newWord = listWord[i];
                 listWord.RemoveAt(i);
-                if (newWord.GetRight() == true)
+                if (newWord.right == true)
                 {
                     List<string> listString = new List<string>();
-                    int letterCount = newWord.GetRightLetterCount();
+                    int letterCount = newWord.listLabelRight.Count;
                     foreach (string word in listWordsString)
                     {
                         if (word.Length == letterCount)
@@ -402,10 +402,10 @@ namespace Crossword
                     }
                     newWord.AddWordsRight(listString);
                 }
-                if (newWord.GetDown() == true)
+                if (newWord.down == true)
                 {
                     List<string> listString = new List<string>();
-                    int letterCount = newWord.GetDownLetterCount();
+                    int letterCount = newWord.listLabelDown.Count;
                     foreach (string word in listWordsString)
                     {
                         if (word.Length == letterCount)
@@ -434,7 +434,7 @@ namespace Crossword
         {
             if (index < listWord.Count)
             {
-                Label FirsLabel = listWord[index].GetFirstLabel();
+                Label FirsLabel = listWord[index].firstLabel;
                 FirsLabel.Background = Brushes.Yellow;
 
                 Word newWord = listWord[index];
@@ -461,7 +461,7 @@ namespace Crossword
                         if (error == 1)
                         {
                             MessageBox.Show(error + " 1");
-                            List<Word> newListWord = newWord2.GetConnectionWordsRight();
+                            List<Word> newListWord = newWord2.ConnectionWordsRight;
                             foreach (Word word in newListWord)
                             {
                                 int index2 = listWord.IndexOf(word);
@@ -476,7 +476,7 @@ namespace Crossword
                         if (error == 2)
                         {
                             MessageBox.Show(error + " 2");
-                            List<Word> newListWord = newWord2.GetConnectionWordsDown();
+                            List<Word> newListWord = newWord2.ConnectionWordsDown;
                             foreach (Word word in newListWord)
                             {
                                 //int index2 = ListWord.IndexOf(word);
@@ -507,27 +507,27 @@ namespace Crossword
         }
         int InsertWord(List<Border> listBorder, List<Label> listLabel, ref Word word)
         {
-            bool right = word.GetRight();
-            bool down = word.GetDown();
+            bool right = word.right;
+            bool down = word.down;
 
             bool errorRight = false;
             bool errorDown = false;
 
-            Label FirsLabel = word.GetFirstLabel();
+            Label FirsLabel = word.firstLabel;
             int numColumn = Grid.GetColumn(FirsLabel);
             int numRow = Grid.GetRow(FirsLabel);
 
             if (right == true)
             {
                 MessageBox.Show("Вправо");
-                List<string> words = word.GetRightListWords();
+                List<string> words = word.listTempWordsRight;
                 List<Label> newListLabelRight = SearchEmptyLineRight(numColumn, numRow, listBorder, listLabel);
                 errorRight = SearchWord(true, newListLabelRight, words, ref word);
             }
             if (down == true)
             {
                 MessageBox.Show("Вниз");
-                List<string> words = word.GetDownListWords();
+                List<string> words = word.listTempWordsDown;
                 List<Label> newListLabelDown = SearchEmptyLineDown(numColumn, numRow, listBorder, listLabel);
                 errorDown = SearchWord(false, newListLabelDown, words, ref word);
             }
@@ -627,11 +627,11 @@ namespace Crossword
                     List<string> tempListString = new List<string>();
                     if (right == true)
                     {
-                        word.ClearConnectionPointRight();
+                        word.ConnectionPointRight.Clear();
                     }
                     else
                     {
-                        word.ClearConnectionPointDown();
+                        word.ConnectionPointDown.Clear();
                     }
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
@@ -640,11 +640,11 @@ namespace Crossword
                             // Нужно добавить эти точки в обо слова. А лучше добавить сразу все слова.
                             if (right == true)
                             {
-                                word.AddConnectionPointRight(newListLabel[i]);
+                                word.ConnectionPointRight.Add(newListLabel[i]);
                             }
                             else
                             {
-                                word.AddConnectionPointDown(newListLabel[i]);
+                                word.ConnectionPointDown.Add(newListLabel[i]);
                             }
                             foreach (string item in listWordsString)
                             {
@@ -698,7 +698,7 @@ namespace Crossword
             // Есть пустые слова. Нужно найти как они добавляються
             foreach (var word in listWord)
             {
-                var test = word.GetRightLabel();
+                var test = word.listLabelRight;
                 if (test.Count > 1)
                 {
                     foreach (var label in test)
@@ -718,7 +718,7 @@ namespace Crossword
             WindowsText.Content += "\nПо вертикали\n";
             foreach (var word in listWord)
             {
-                var test = word.GetDownLabel();
+                var test = word.listLabelDown;
                 if (test.Count > 1)
                 {
                     foreach (var label in test)
