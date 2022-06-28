@@ -12,38 +12,51 @@ namespace Crossword
 {
     public partial class MainWindow : Window
     {
-        List<string> listWordsString = new List<string>();
+        List<List<string>> listWordsList = new List<List<string>>();
 
         int cellSize = 30;
         int numberOfCellsHorizontally = 30;
         int numberOfCellsVertically = 30;
 
-        List<Cell> listCell = new List<Cell>();
+        List<Cell> listAllCellStruct = new List<Cell>();
+        List<Cell> listEmptyCellStruct = new List<Cell>();
 
-        List<Word> listWord = new List<Word>();
-        List<Border> listEmptyBorder = new List<Border>();
-        //List<Label> listEmptyLabel = new List<Label>();
+        List<Word> listWordStruct = new List<Word>();
         bool STOP = false;
 
         public MainWindow()
         {
             InitializeComponent();
+            AddingMatermarks();
             CreateDictionary();
             CreateUIGrid();
-            for (int i = 0; i < 40; i++)
+        }
+
+        //Создание основы
+        void AddingMatermarks()
+        {
+            for (int i = 0; i < 50; i++)
             {
-                for (int y = 0; y < 5; y++)
+                for (int y = 0; y < 6; y++)
                 {
                     MusinMihail.Content += "Разработчик Мусин Михаил. ";
                 }
                 MusinMihail.Content += "\n";
             }
         }
-        //Создание основы
         public void CreateDictionary()
         {
             string[] array = File.ReadAllLines("dict.txt");
-            listWordsString = array.ToList();
+            List<string> listWordsString = array.ToList();
+            for (int i = 0; i < 20; i++)
+            {
+                List<string> list = new List<string>();
+                listWordsList.Add(list);
+            }
+            foreach (string word in listWordsString)
+            {
+                listWordsList[word.Length].Add(word);
+            }
         }
         void CreateUIGrid()
         {
@@ -61,7 +74,7 @@ namespace Crossword
                     border.Child = label;
                     label.Margin = new Thickness(0, -4, 0, 0);
                     cell.AddBorderLabelXY(border, label, x, y);
-                    listCell.Add(cell);
+                    listAllCellStruct.Add(cell);
                 }
             }
         }
@@ -82,7 +95,7 @@ namespace Crossword
         }
         int GetXCellBorder(Border border)
         {
-            foreach (Cell cell in listCell)
+            foreach (Cell cell in listAllCellStruct)
             {
                 if (border == cell.border)
                 {
@@ -93,7 +106,7 @@ namespace Crossword
         }
         int GetYCellBorder(Border border)
         {
-            foreach (Cell cell in listCell)
+            foreach (Cell cell in listAllCellStruct)
             {
                 if (border == cell.border)
                 {
@@ -104,7 +117,7 @@ namespace Crossword
         }
         int GetXCellLabel(Label label)
         {
-            foreach (Cell cell in listCell)
+            foreach (Cell cell in listAllCellStruct)
             {
                 if (label == cell.label)
                 {
@@ -115,7 +128,7 @@ namespace Crossword
         }
         int GetYCellLabel(Label label)
         {
-            foreach (Cell cell in listCell)
+            foreach (Cell cell in listAllCellStruct)
             {
                 if (label == cell.label)
                 {
@@ -154,7 +167,6 @@ namespace Crossword
 
         }
 
-
         //Подбор слов
         private void Button_ClickGen(object sender, RoutedEventArgs e)
         {
@@ -168,8 +180,8 @@ namespace Crossword
         {
             GenButton.Visibility = Visibility.Hidden;
             GenStopButton.Visibility = Visibility.Visible;
-            listWord.Clear();
-            listEmptyBorder.Clear();
+            listWordStruct.Clear();
+            listEmptyCellStruct.Clear();
 
             SearchForEmptyCells();
 
@@ -188,26 +200,26 @@ namespace Crossword
         }
         void SearchForEmptyCells()
         {
-            foreach (Cell cell in listCell)
+            foreach (Cell cell in listAllCellStruct)
             {
                 if (cell.border.Background == Brushes.Transparent)
                 {
-                    listEmptyBorder.Add(cell.border);
+                    listEmptyCellStruct.Add(cell);
                 }
             }
         }
         void SearchForTheBeginningAndLengthOfAllWords()
         {
             int count = 0;
-            foreach (Border whiteBorder in listEmptyBorder)
+            foreach (Cell cell in listEmptyCellStruct)
             {
-                int x = GetXCellBorder(whiteBorder);
-                int y = GetYCellBorder(whiteBorder);
+                int x = cell.x;
+                int y = cell.y;
                 bool black = true;
 
-                foreach (Border whiteLeftBorder in listEmptyBorder)
+                foreach (Cell cell2 in listEmptyCellStruct)
                 {
-                    if (GetXCellBorder(whiteLeftBorder) == x - 1 && GetYCellBorder(whiteLeftBorder) == y)
+                    if (cell2.x == x - 1 && cell2.y == y)
                     {
                         black = false;
                         break;
@@ -218,9 +230,9 @@ namespace Crossword
                     SaveWordRight(ref count, x, y);
                 }
                 black = true;
-                foreach (Border whiteLeftBorder in listEmptyBorder)
+                foreach (Cell cell2 in listEmptyCellStruct)
                 {
-                    if (GetXCellBorder(whiteLeftBorder) == x && GetYCellBorder(whiteLeftBorder) == y - 1)
+                    if (cell2.x == x && cell2.y == y - 1)
                     {
                         black = false;
                         break;
@@ -238,7 +250,7 @@ namespace Crossword
             for (int i = firstNumColumn; i < 30; i++)
             {
                 bool black = true;
-                foreach (Cell cell in listCell)
+                foreach (Cell cell in listAllCellStruct)
                 {
                     if (cell.y == firstNumRow && cell.x == i)
                     {
@@ -259,11 +271,11 @@ namespace Crossword
             if (newListLabel.Count > 1)
             {
                 bool match = false;
-                for (int i = 0; i < listWord.Count; i++)
+                for (int i = 0; i < listWordStruct.Count; i++)
                 {
-                    if (newListLabel[0] == listWord[i].firstLabel)
+                    if (newListLabel[0] == listWordStruct[i].firstLabel)
                     {
-                        Word newWord = listWord[i];
+                        Word newWord = listWordStruct[i];
                         newWord.SetListLabelRight(newListLabel);
                         count++;
                         newWord.count = count;
@@ -280,7 +292,7 @@ namespace Crossword
                     count++;
                     newWord.count = count;
                     newWord.right = true;
-                    listWord.Add(newWord);
+                    listWordStruct.Add(newWord);
                 }
             }
         }
@@ -290,7 +302,7 @@ namespace Crossword
             for (int i = firstNumRow; i < 30; i++)
             {
                 bool black = true;
-                foreach (Cell cell in listCell)
+                foreach (Cell cell in listAllCellStruct)
                 {
                     if (cell.y == i && cell.x == firstNumColumn)
                     {
@@ -311,11 +323,11 @@ namespace Crossword
             if (newListLabel.Count > 1)
             {
                 bool match = false;
-                for (int i = 0; i < listWord.Count; i++)
+                for (int i = 0; i < listWordStruct.Count; i++)
                 {
-                    if (newListLabel[0] == listWord[i].firstLabel)
+                    if (newListLabel[0] == listWordStruct[i].firstLabel)
                     {
-                        Word newWord = listWord[i];
+                        Word newWord = listWordStruct[i];
                         newWord.SetListLabelDown(newListLabel);
                         count++;
                         newWord.count = count;
@@ -332,21 +344,108 @@ namespace Crossword
                     count++;
                     newWord.count = count;
                     newWord.down = true;
-                    listWord.Add(newWord);
+                    listWordStruct.Add(newWord);
                 }
             }
         }
         void SearchForConnectedWords()
         {
-            if (listWord.Count > 0)
+            if (listWordStruct.Count > 0)
             {
                 List<Word> listMatchWord = new List<Word>();
-                List<Word> tempListWord = new List<Word>(listWord);
-                Word word = tempListWord[0];
-                listMatchWord.Add(word);
-                tempListWord.RemoveAt(0);
-                SearchMatch(ref listMatchWord, ref tempListWord, word);
-                listWord = listMatchWord;
+                List<Word> tempListWord = new List<Word>();
+                //первым добавить самое сложное слово.
+                tempListWord.Add(listWordStruct[0]);
+                while (tempListWord.Count > 0)
+                {
+                    Word word = tempListWord[0];
+                    //listMatchWord.Add(word);
+                    tempListWord.RemoveAt(0);
+                    if (word.right == true)
+                    {
+                        List<Label> tempListLabel = word.listLabelRight;
+                        foreach (Label label in tempListLabel)
+                        {
+                            foreach (var word2 in listWordStruct)
+                            {
+                                if (word.count != word2.count)
+                                {
+                                    if (word2.SearchForMatchesDown(label) == true)
+                                    {
+                                        if (listMatchWord.Contains(word2) == false)
+                                        {
+                                            tempListWord.Add(word2);
+                                            listMatchWord.Add(word2);
+                                            break;
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (word.down == true)
+                    {
+                        List<Label> tempListLabel = word.listLabelDown;
+                        foreach (Label label in tempListLabel)
+                        {
+                            foreach (var word2 in listWordStruct)
+                            {
+                                if (word.count != word2.count)
+                                {
+                                    if (word2.SearchForMatchesRight(label) == true)
+                                    {
+                                        if (listMatchWord.Contains(word2) == false)
+                                        {
+                                            tempListWord.Add(word2);
+                                            listMatchWord.Add(word2);
+                                            break;
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                listWordStruct = listMatchWord;
+                //foreach (var item in listWordStruct)
+                //{
+                //    foreach (var item2 in listWordStruct)
+                //    {
+                //        if(item.count == item2.count)
+                //        {
+                //            MessageBox.Show(item.count +" - "+ item2.count);
+                //        }
+                //    }
+                //}
+                //foreach (var item in listWordStruct)
+                //{
+                //    if (item.right)
+                //    {
+                //        foreach (var item2 in item.listLabelRight)
+                //        {
+                //            item2.Background = Brushes.Yellow;
+                //        }
+                //        MessageBox.Show("listLabelRight");
+                //        foreach (var item2 in item.listLabelRight)
+                //        {
+                //            item2.Background = Brushes.Red;
+                //        }
+                //    }
+                //    if (item.down)
+                //    {
+                //        foreach (var item2 in item.listLabelDown)
+                //        {
+                //            item2.Background = Brushes.Yellow;
+                //        }
+                //        MessageBox.Show("listLabelDown");
+                //        foreach (var item2 in item.listLabelDown)
+                //        {
+                //            item2.Background = Brushes.Red;
+                //        }
+                //    }
+                //}
             }
         }
         void SearchMatch(ref List<Word> listMatchWord, ref List<Word> tempListWord, Word word)
@@ -414,45 +513,29 @@ namespace Crossword
         }
         void SearchForWordsByLength()
         {
-            for (int i = 0; i < listWord.Count; i++)
+            for (int i = 0; i < listWordStruct.Count; i++)
             {
-                Word newWord = listWord[i];
+                Word newWord = listWordStruct[i];
                 if (newWord.right == true)
                 {
-                    List<string> listString = new List<string>();
                     int letterCount = newWord.listLabelRight.Count;
-                    foreach (string word in listWordsString)
-                    {
-                        if (word.Length == letterCount)
-                        {
-                            listString.Add(word);
-                        }
-                    }
-                    newWord.AddWordsRight(listString);
+                    newWord.AddWordsRight(listWordsList[letterCount]);
                 }
                 if (newWord.down == true)
                 {
-                    List<string> listString = new List<string>();
                     int letterCount = newWord.listLabelDown.Count;
-                    foreach (string word in listWordsString)
-                    {
-                        if (word.Length == letterCount)
-                        {
-                            listString.Add(word);
-                        }
-                    }
-                    newWord.AddWordsDown(listString);
+                    newWord.AddWordsDown(listWordsList[letterCount]);
                 }
                 RefreshWord(i, newWord);
             }
-            foreach (var word in listWord)
+            foreach (var word in listWordStruct)
             {
                 word.ListWordsRandomization();
             }
         }
         void SelectionAndInstallationOfWords()
         {
-            foreach (Cell cell in listCell)
+            foreach (Cell cell in listAllCellStruct)
             {
                 cell.label.Content = null;
             }
@@ -465,7 +548,7 @@ namespace Crossword
             int count = 0;
             int countGen = 0;
             int maxCountGen = 0;
-            int maxCountWord = 200;
+            int maxCountWord = 0;
             try
             {
                 maxCountWord = Int32.Parse(CountGenWord.Text);
@@ -486,18 +569,19 @@ namespace Crossword
                 return;
             }
 
-            while (index < listWord.Count)
+            while (index < listWordStruct.Count)
             {
                 count++;
-                Word newWord = listWord[index];
+                Word newWord = listWordStruct[index];
                 int error = InsertWord(ref newWord);
                 if (count > maxCountWord)
                 {
                     if (countGen < maxCountGen)
                     {
-                        for (int i = 0; i < listWord.Count; i++)
+                        MessageBox.Show("");
+                        for (int i = 0; i < listWordStruct.Count; i++)
                         {
-                            Word newWord2 = listWord[i];
+                            Word newWord2 = listWordStruct[i];
                             newWord2.Reset();
                             RefreshWord(i, newWord2);
                         }
@@ -505,6 +589,7 @@ namespace Crossword
                         index = 0;
                         count = 0;
                         stop = 0;
+                        
                         continue;
                     }
                     else
@@ -528,23 +613,23 @@ namespace Crossword
                 {
                     if (index > 0)
                     {
-                        listWord[index].RefreshListLabelRight();
-                        listWord[index].RefreshListLabelDown();
-                        listWord[index].ClearLabelRight();
-                        listWord[index].ClearLabelDown();
-                        listWord[index].RestoreDictionary();
-                        RefreshWord(index, listWord[index]);
+                        listWordStruct[index].RefreshListLabelRight();
+                        listWordStruct[index].RefreshListLabelDown();
+                        listWordStruct[index].ClearLabelRight();
+                        listWordStruct[index].ClearLabelDown();
+                        listWordStruct[index].RestoreDictionary();
+                        RefreshWord(index, listWordStruct[index]);
 
-                        listWord[index - 1].ClearLabelDown();
-                        listWord[index - 1].ClearLabelRight();
+                        listWordStruct[index - 1].ClearLabelDown();
+                        listWordStruct[index - 1].ClearLabelRight();
                         index--;
                         continue;
                     }
                     else
                     {
-                        listWord[index].ClearLabelRight();
-                        listWord[index].ClearLabelDown();
-                        RefreshWord(index, listWord[index]);
+                        listWordStruct[index].ClearLabelRight();
+                        listWordStruct[index].ClearLabelDown();
+                        RefreshWord(index, listWordStruct[index]);
                         continue;
                     }
                 }
@@ -612,7 +697,7 @@ namespace Crossword
             for (int i = firstNumColumn; i < 30; i++)
             {
                 bool black = true;
-                foreach (Cell cell in listCell)
+                foreach (Cell cell in listAllCellStruct)
                 {
                     if (cell.y == firstNumRow && cell.x == i)
                     {
@@ -639,7 +724,7 @@ namespace Crossword
             for (int i = firstNumRow; i < 30; i++)
             {
                 bool black = true;
-                foreach (Cell cell in listCell)
+                foreach (Cell cell in listAllCellStruct)
                 {
                     if (cell.y == i && cell.x == firstNumColumn)
                     {
@@ -724,7 +809,7 @@ namespace Crossword
         {
             WindowsText.Content += "По горизонтали\n";
             string newText = "";
-            foreach (var word in listWord)
+            foreach (var word in listWordStruct)
             {
                 var test = word.listLabelRight;
                 if (test.Count > 1)
@@ -744,7 +829,7 @@ namespace Crossword
                 }
             }
             WindowsText.Content += "\nПо вертикали\n";
-            foreach (var word in listWord)
+            foreach (var word in listWordStruct)
             {
                 var test = word.listLabelDown;
                 if (test.Count > 1)
@@ -766,8 +851,8 @@ namespace Crossword
         }
         void RefreshWord(int index, Word word)
         {
-            listWord.RemoveAt(index);
-            listWord.Insert(index, word);
+            listWordStruct.RemoveAt(index);
+            listWordStruct.Insert(index, word);
         }
 
         //Сохранение и загрузка
@@ -782,7 +867,7 @@ namespace Crossword
         public void Save()
         {
             string saveFile = "";
-            foreach (Cell cell in listCell)
+            foreach (Cell cell in listAllCellStruct)
             {
                 if (cell.border.Background == Brushes.Transparent)
                 {
@@ -793,11 +878,11 @@ namespace Crossword
         }
         public void Load()
         {
-            foreach (Cell cell in listCell)
+            foreach (Cell cell in listAllCellStruct)
             {
                 cell.label.Content = null;
             }
-            foreach (Cell cell in listCell)
+            foreach (Cell cell in listAllCellStruct)
             {
                 cell.border.Background = Brushes.Black;
             }
@@ -807,7 +892,7 @@ namespace Crossword
                 List<string> strings = new List<string>(item.Split(';'));
                 int x = Int32.Parse(strings[0]);
                 int y = Int32.Parse(strings[1]);
-                foreach (Cell cell in listCell)
+                foreach (Cell cell in listAllCellStruct)
                 {
                     if (cell.x == x)
                     {
