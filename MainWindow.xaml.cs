@@ -24,6 +24,7 @@ namespace Crossword
         List<Word> listWordStruct = new List<Word>();
         bool STOP = false;
 
+
         public MainWindow()
         {
             InitializeComponent();
@@ -186,8 +187,8 @@ namespace Crossword
             SearchForEmptyCells();
 
             SearchForTheBeginningAndLengthOfAllWords();
-
             SearchForConnectedWords();
+            DefiningTheGenerationQueue();
 
             SearchForWordsByLength();
 
@@ -210,7 +211,6 @@ namespace Crossword
         }
         void SearchForTheBeginningAndLengthOfAllWords()
         {
-            int count = 0;
             foreach (Cell cell in listEmptyCellStruct)
             {
                 int x = cell.x;
@@ -227,7 +227,7 @@ namespace Crossword
                 }
                 if (black == true)
                 {
-                    SaveWordRight(ref count, x, y);
+                    SaveWordRight(x, y);
                 }
                 black = true;
                 foreach (Cell cell2 in listEmptyCellStruct)
@@ -240,19 +240,19 @@ namespace Crossword
                 }
                 if (black == true)
                 {
-                    SaveWordDown(ref count, x, y);
+                    SaveWordDown(x, y);
                 }
             }
         }
-        void SaveWordRight(ref int count, int firstNumColumn, int firstNumRow)
+        void SaveWordRight(int x, int y)
         {
             List<Label> newListLabel = new List<Label>();
-            for (int i = firstNumColumn; i < 30; i++)
+            for (int i = x; i < 30; i++)
             {
                 bool black = true;
                 foreach (Cell cell in listAllCellStruct)
                 {
-                    if (cell.y == firstNumRow && cell.x == i)
+                    if (cell.y == y && cell.x == i)
                     {
                         if (cell.border.Background == Brushes.Transparent)
                         {
@@ -267,44 +267,22 @@ namespace Crossword
                     break;
                 }
             }
-
             if (newListLabel.Count > 1)
             {
-                bool match = false;
-                for (int i = 0; i < listWordStruct.Count; i++)
-                {
-                    if (newListLabel[0] == listWordStruct[i].firstLabel)
-                    {
-                        Word newWord = listWordStruct[i];
-                        newWord.SetListLabelRight(newListLabel);
-                        count++;
-                        newWord.count = count;
-                        newWord.right = true;
-                        RefreshWord(i, newWord);
-                        match = true;
-                        break;
-                    }
-                }
-                if (match == false)
-                {
-                    Word newWord = new Word();
-                    newWord.SetListLabelRight(newListLabel);
-                    count++;
-                    newWord.count = count;
-                    newWord.right = true;
-                    listWordStruct.Add(newWord);
-                }
+                Word newWord = new Word();
+                newWord.SetListLabel(newListLabel);
+                listWordStruct.Add(newWord);
             }
         }
-        void SaveWordDown(ref int count, int firstNumColumn, int firstNumRow)
+        void SaveWordDown(int x, int y)
         {
             List<Label> newListLabel = new List<Label>();
-            for (int i = firstNumRow; i < 30; i++)
+            for (int i = y; i < 30; i++)
             {
                 bool black = true;
                 foreach (Cell cell in listAllCellStruct)
                 {
-                    if (cell.y == i && cell.x == firstNumColumn)
+                    if (cell.y == i && cell.x == x)
                     {
                         if (cell.border.Background == Brushes.Transparent)
                         {
@@ -319,213 +297,162 @@ namespace Crossword
                     break;
                 }
             }
-
             if (newListLabel.Count > 1)
             {
-                bool match = false;
-                for (int i = 0; i < listWordStruct.Count; i++)
-                {
-                    if (newListLabel[0] == listWordStruct[i].firstLabel)
-                    {
-                        Word newWord = listWordStruct[i];
-                        newWord.SetListLabelDown(newListLabel);
-                        count++;
-                        newWord.count = count;
-                        newWord.down = true;
-                        RefreshWord(i, newWord);
-                        match = true;
-                        break;
-                    }
-                }
-                if (match == false)
-                {
-                    Word newWord = new Word();
-                    newWord.SetListLabelDown(newListLabel);
-                    count++;
-                    newWord.count = count;
-                    newWord.down = true;
-                    listWordStruct.Add(newWord);
-                }
+                Word newWord = new Word();
+                newWord.SetListLabel(newListLabel);
+                listWordStruct.Add(newWord);
             }
         }
         void SearchForConnectedWords()
         {
             if (listWordStruct.Count > 0)
             {
-                List<Word> listMatchWord = new List<Word>();
-                List<Word> tempListWord = new List<Word>();
-                //первым добавить самое сложное слово.
-                tempListWord.Add(listWordStruct[0]);
-                while (tempListWord.Count > 0)
+                for (int i = 0; i < listWordStruct.Count; i++)
                 {
-                    Word word = tempListWord[0];
-                    //listMatchWord.Add(word);
-                    tempListWord.RemoveAt(0);
-                    if (word.right == true)
+                    Word word = listWordStruct[i];
+                    List<Label> tempListLabel = word.listLabel;
+                    int count = 0;
+                    foreach (Label label in tempListLabel)
                     {
-                        List<Label> tempListLabel = word.listLabelRight;
-                        foreach (Label label in tempListLabel)
+                        foreach (var word2 in listWordStruct)
                         {
-                            foreach (var word2 in listWordStruct)
+                            if (word.listLabel != word2.listLabel && word2.SearchForMatches(label) == true)
                             {
-                                if (word.count != word2.count)
-                                {
-                                    if (word2.SearchForMatchesDown(label) == true)
-                                    {
-                                        if (listMatchWord.Contains(word2) == false)
-                                        {
-                                            tempListWord.Add(word2);
-                                            listMatchWord.Add(word2);
-                                            break;
-                                        }
-                                        break;
-                                    }
-                                }
+                                count++;
                             }
                         }
                     }
-                    if (word.down == true)
+                    word.difficulty = (float)count / tempListLabel.Count;
+                    RefreshWord(i, word);
+                }
+                for (int i = 0; i < listWordStruct.Count; i++)
+                {
+                    Word word = listWordStruct[i];
+                    List<Label> tempListLabel = word.listLabel;
+                    foreach (Label label in tempListLabel)
                     {
-                        List<Label> tempListLabel = word.listLabelDown;
-                        foreach (Label label in tempListLabel)
+                        foreach (var word2 in listWordStruct)
                         {
-                            foreach (var word2 in listWordStruct)
+                            if (word.listLabel != word2.listLabel && word2.SearchForMatches(label) == true)
                             {
-                                if (word.count != word2.count)
-                                {
-                                    if (word2.SearchForMatchesRight(label) == true)
-                                    {
-                                        if (listMatchWord.Contains(word2) == false)
-                                        {
-                                            tempListWord.Add(word2);
-                                            listMatchWord.Add(word2);
-                                            break;
-                                        }
-                                        break;
-                                    }
-                                }
+                                word.ConnectionWords.Add(word2);
                             }
                         }
                     }
                 }
-                listWordStruct = listMatchWord;
+            }
+        }
+        void DefiningTheGenerationQueue()
+        {
+            if (listWordStruct.Count > 0)
+            {
+                Word theHardestWord = FindingTheHardestWord(listWordStruct);
+
+                List<Word> listMatchWord = new List<Word>();
+                List<Word> listAllMatchWord = new List<Word>();
+                List<Word> listAllHardestWord = new List<Word>();
+                List<Word> tempListWord = new List<Word>();
+                List<Word> allRightWord = new List<Word>();
+
+                listAllHardestWord.Add(theHardestWord);
+                listAllMatchWord.Add(theHardestWord);
+
+                tempListWord.Add(theHardestWord);
+
+                while (tempListWord.Count > 0)
+                {
+                    Word word = tempListWord[0];
+                    tempListWord.RemoveAt(0);
+
+                    if (allRightWord.Contains(word) == false)
+                    {
+                        allRightWord.Add(word);
+                        foreach (Word word2 in word.ConnectionWords)
+                        {
+                            bool match = false;
+                            foreach (Word word3 in listAllMatchWord)
+                            {
+                                if (word2.listLabel == word3.listLabel)
+                                {
+                                    match = true;
+                                    break;
+                                }
+                            }
+                            if (match == false)
+                            {
+                                foreach (Word word3 in listMatchWord)
+                                {
+                                    if (word2.listLabel == word3.listLabel)
+                                    {
+                                        match = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (match == false)
+                            {
+                                listAllMatchWord.Add(word2);
+                                listMatchWord.Add(word2);
+                            }
+                        }
+                    }
+
+                    if (listMatchWord.Count > 0)
+                    {
+                        theHardestWord = FindingTheHardestWord(listMatchWord);
+
+                        int index = listMatchWord.IndexOf(theHardestWord);
+                        listMatchWord.RemoveAt(index);
+
+                        tempListWord.Add(theHardestWord);
+                        listAllHardestWord.Add(theHardestWord);
+                    }
+
+                }
+                listWordStruct = listAllHardestWord;
+
+                //НЕ УДАЛЯТЬ
                 //foreach (var item in listWordStruct)
                 //{
-                //    foreach (var item2 in listWordStruct)
+                //    foreach (var item2 in item.listLabel)
                 //    {
-                //        if(item.count == item2.count)
-                //        {
-                //            MessageBox.Show(item.count +" - "+ item2.count);
-                //        }
+                //        item2.Background = Brushes.Yellow;
                 //    }
-                //}
-                //foreach (var item in listWordStruct)
-                //{
-                //    if (item.right)
+                //    MessageBox.Show(item.difficulty + " listLabelRight");
+                //    foreach (var item2 in item.listLabel)
                 //    {
-                //        foreach (var item2 in item.listLabelRight)
-                //        {
-                //            item2.Background = Brushes.Yellow;
-                //        }
-                //        MessageBox.Show("listLabelRight");
-                //        foreach (var item2 in item.listLabelRight)
-                //        {
-                //            item2.Background = Brushes.Red;
-                //        }
-                //    }
-                //    if (item.down)
-                //    {
-                //        foreach (var item2 in item.listLabelDown)
-                //        {
-                //            item2.Background = Brushes.Yellow;
-                //        }
-                //        MessageBox.Show("listLabelDown");
-                //        foreach (var item2 in item.listLabelDown)
-                //        {
-                //            item2.Background = Brushes.Red;
-                //        }
+                //        item2.Background = Brushes.Red;
                 //    }
                 //}
             }
         }
-        void SearchMatch(ref List<Word> listMatchWord, ref List<Word> tempListWord, Word word)
+        Word FindingTheHardestWord(List<Word> listWords)
         {
-            if (word.right == true)
+            Word theHardestWord = listWords[0];
+            float maxDifficulty = 0;
+            int maxWordCount = 0;
+            foreach (Word word in listWords)
             {
-                List<Label> tempListLabel = word.listLabelRight;
-                foreach (Label label in tempListLabel)
+                if (word.difficulty >= maxDifficulty)
                 {
-                    int listCount = tempListWord.Count;
-                    for (int i = 0; i < listCount; i++)
+                    maxDifficulty = word.difficulty;
+                    if (word.listLabel.Count > maxWordCount)
                     {
-                        if (tempListWord[i].down == true)
-                        {
-                            bool match = tempListWord[i].SearchForMatchesDown(label);
-                            if (match)
-                            {
-                                if (listMatchWord.Contains(tempListWord[i]) == false)
-                                {
-                                    listMatchWord.Add(tempListWord[i]);
-                                    Word newWord = tempListWord[i];
-                                    int index = tempListWord.IndexOf(tempListWord[i]);
-                                    tempListWord.RemoveAt(index);
-                                    if (tempListWord.Count > 0)
-                                    {
-                                        SearchMatch(ref listMatchWord, ref tempListWord, newWord);
-                                    }
-                                    break;
-                                }
-                            }
-                        }
+                        maxWordCount = word.listLabel.Count;
+                        theHardestWord = word;
                     }
                 }
             }
-            if (word.down == true)
-            {
-                List<Label> tempListLabel = word.listLabelDown;
-                foreach (Label label in tempListLabel)
-                {
-                    int listCount = tempListWord.Count;
-                    for (int i = 0; i < listCount; i++)
-                    {
-                        if (tempListWord[i].right == true)
-                        {
-                            bool match = tempListWord[i].SearchForMatchesRight(label);
-                            if (match)
-                            {
-                                if (listMatchWord.Contains(tempListWord[i]) == false)
-                                {
-                                    listMatchWord.Add(tempListWord[i]);
-                                    Word newWord = tempListWord[i];
-                                    int index = tempListWord.IndexOf(tempListWord[i]);
-                                    tempListWord.RemoveAt(index);
-                                    if (tempListWord.Count > 0)
-                                    {
-                                        SearchMatch(ref listMatchWord, ref tempListWord, newWord);
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            return theHardestWord;
         }
         void SearchForWordsByLength()
         {
             for (int i = 0; i < listWordStruct.Count; i++)
             {
                 Word newWord = listWordStruct[i];
-                if (newWord.right == true)
-                {
-                    int letterCount = newWord.listLabelRight.Count;
-                    newWord.AddWordsRight(listWordsList[letterCount]);
-                }
-                if (newWord.down == true)
-                {
-                    int letterCount = newWord.listLabelDown.Count;
-                    newWord.AddWordsDown(listWordsList[letterCount]);
-                }
+                int letterCount = newWord.listLabel.Count;
+                newWord.AddWords(listWordsList[letterCount]);
                 RefreshWord(i, newWord);
             }
             foreach (var word in listWordStruct)
@@ -578,7 +505,6 @@ namespace Crossword
                 {
                     if (countGen < maxCountGen)
                     {
-                        MessageBox.Show("");
                         for (int i = 0; i < listWordStruct.Count; i++)
                         {
                             Word newWord2 = listWordStruct[i];
@@ -589,7 +515,7 @@ namespace Crossword
                         index = 0;
                         count = 0;
                         stop = 0;
-                        
+
                         continue;
                     }
                     else
@@ -613,22 +539,18 @@ namespace Crossword
                 {
                     if (index > 0)
                     {
-                        listWordStruct[index].RefreshListLabelRight();
-                        listWordStruct[index].RefreshListLabelDown();
-                        listWordStruct[index].ClearLabelRight();
-                        listWordStruct[index].ClearLabelDown();
+                        listWordStruct[index].RefreshListLabel();
+                        listWordStruct[index].ClearLabel();
                         listWordStruct[index].RestoreDictionary();
                         RefreshWord(index, listWordStruct[index]);
 
-                        listWordStruct[index - 1].ClearLabelDown();
-                        listWordStruct[index - 1].ClearLabelRight();
+                        listWordStruct[index - 1].ClearLabel();
                         index--;
                         continue;
                     }
                     else
                     {
-                        listWordStruct[index].ClearLabelRight();
-                        listWordStruct[index].ClearLabelDown();
+                        listWordStruct[index].ClearLabel();
                         RefreshWord(index, listWordStruct[index]);
                         continue;
                     }
@@ -637,53 +559,38 @@ namespace Crossword
         }
         int InsertWord(ref Word word)
         {
-            bool right = word.right;
-            bool down = word.down;
 
-            bool errorRight = false;
-            bool errorDown = false;
+            bool error = false;
 
             Label firstLabel = word.firstLabel;
             int x = GetXCellLabel(firstLabel);
             int y = GetYCellLabel(firstLabel);
 
-            if (right == true)
+            List<string> words = word.listTempWords;
+            if (words.Count == 0)
             {
-                List<string> words = word.listTempWordsRight;
-                if (words.Count == 0)
-                {
-                    errorRight = true;
-                }
-                else
-                {
-                    List<Label> newListLabelRight = SearchEmptyLineRight(x, y);
-                    errorRight = SearchWord(true, newListLabelRight, words, ref word);
-                }
+                error = true;
             }
-            if (down == true)
+            else
             {
-                List<string> words = word.listTempWordsDown;
-                if (words.Count == 0)
+                List<Label> newListLabelRight = SearchEmptyLineRight(x, y);
+                if (newListLabelRight.Count > 0)
                 {
-                    errorRight = true;
+                    error = SearchWord(newListLabelRight, words, ref word);
                 }
-                else
+                if (error == false)
                 {
                     List<Label> newListLabelDown = SearchEmptyLineDown(x, y);
-                    errorDown = SearchWord(false, newListLabelDown, words, ref word);
+                    if (newListLabelDown.Count > 0)
+                    {
+                        error = SearchWord(newListLabelDown, words, ref word);
+                    }
                 }
             }
-            if (errorRight == true && errorDown == true)
-            {
-                return 3;
-            }
-            else if (errorRight == true)
+
+            if (error == true)
             {
                 return 1;
-            }
-            else if (errorDown == true)
-            {
-                return 2;
             }
             return 0;
             // 0 - нет ошибок
@@ -691,42 +598,25 @@ namespace Crossword
             // 2 - ошибка во влево
             // 3 - ошибка в обоих словах
         }
-        List<Label> SearchEmptyLineRight(int firstNumColumn, int firstNumRow)
+        List<Label> SearchEmptyLineRight(int x, int y)
         {
             List<Label> newListLabel = new List<Label>();
-            for (int i = firstNumColumn; i < 30; i++)
+            foreach (Cell cell in listAllCellStruct)
             {
-                bool black = true;
-                foreach (Cell cell in listAllCellStruct)
+                if (cell.y == y - 1 && cell.x == x)
                 {
-                    if (cell.y == firstNumRow && cell.x == i)
+                    if (cell.border.Background == Brushes.Black)
                     {
-                        if (cell.border.Background == Brushes.Transparent)
-                        {
-                            newListLabel.Add(cell.label);
-                            black = false;
-                            //cell.border.Background = Brushes.Yellow;
-                            //MessageBox.Show("");
-                            break;
-                        }
+                        return newListLabel;
                     }
                 }
-                if (black == true)
-                {
-                    break;
-                }
             }
-            return newListLabel;
-        }
-        List<Label> SearchEmptyLineDown(int firstNumColumn, int firstNumRow)
-        {
-            List<Label> newListLabel = new List<Label>();
-            for (int i = firstNumRow; i < 30; i++)
+            for (int i = x; i < 30; i++)
             {
                 bool black = true;
                 foreach (Cell cell in listAllCellStruct)
                 {
-                    if (cell.y == i && cell.x == firstNumColumn)
+                    if (cell.y == y && cell.x == i)
                     {
                         if (cell.border.Background == Brushes.Transparent)
                         {
@@ -743,37 +633,64 @@ namespace Crossword
             }
             return newListLabel;
         }
-        bool SearchWord(bool right, List<Label> newListLabel, List<string> words, ref Word word)
+        List<Label> SearchEmptyLineDown(int x, int y)
+        {
+            List<Label> newListLabel = new List<Label>();
+            foreach (Cell cell in listAllCellStruct)
+            {
+                if (cell.y == y && cell.x == x - 1)
+                {
+                    if (cell.border.Background == Brushes.Black)
+                    {
+                        return newListLabel;
+                    }
+                }
+            }
+            for (int i = y; i < 30; i++)
+            {
+                bool black = true;
+                foreach (Cell cell in listAllCellStruct)
+                {
+                    if (cell.y == i && cell.x == x)
+                    {
+                        if (cell.border.Background == Brushes.Transparent)
+                        {
+                            newListLabel.Add(cell.label);
+                            black = false;
+                            break;
+                        }
+                    }
+                }
+                if (black == true)
+                {
+                    break;
+                }
+            }
+            return newListLabel;
+        }
+        bool SearchWord(List<Label> newListLabel, List<string> words, ref Word word)
         {
             if (newListLabel.Count < 16)
             {
                 if (newListLabel.Count > 1)
                 {
+                    string test = words[0];
                     List<string> listWordsString = new List<string>(words);
                     List<string> tempListString = new List<string>();
-                    if (right == true)
-                    {
-                        word.ConnectionPointRight.Clear();
-                    }
-                    else
-                    {
-                        word.ConnectionPointDown.Clear();
-                    }
+
+                    word.ConnectionLabel.Clear();
+
+                    //Поиск слов с теми же буквами
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
                         if (newListLabel[i].Content != null)
                         {
-                            if (right == true)
-                            {
-                                word.ConnectionPointRight.Add(newListLabel[i]);
-                            }
-                            else
-                            {
-                                word.ConnectionPointDown.Add(newListLabel[i]);
-                            }
+
+                            word.ConnectionLabel.Add(newListLabel[i]);
+
+                            string tempString = newListLabel[i].Content.ToString();
                             foreach (string item in listWordsString)
                             {
-                                string tempString = newListLabel[i].Content.ToString();
                                 string tempString2 = item[i].ToString();
                                 if (tempString2 == tempString)
                                 {
@@ -787,6 +704,7 @@ namespace Crossword
                             }
                             else
                             {
+                                //Если нет подходящего слова
                                 return true;
                             }
                         }
@@ -797,6 +715,7 @@ namespace Crossword
                     {
                         newListLabel[i].Content = newWord[i];
                     }
+                    MessageBox.Show(newWord);
                 }
             }
             else
@@ -811,7 +730,7 @@ namespace Crossword
             string newText = "";
             foreach (var word in listWordStruct)
             {
-                var test = word.listLabelRight;
+                var test = word.listLabel;
                 if (test.Count > 1)
                 {
                     foreach (var label in test)
@@ -828,26 +747,8 @@ namespace Crossword
                     WindowsText.Content += "\n";
                 }
             }
-            WindowsText.Content += "\nПо вертикали\n";
-            foreach (var word in listWordStruct)
-            {
-                var test = word.listLabelDown;
-                if (test.Count > 1)
-                {
-                    foreach (var label in test)
-                    {
-                        if (label.Content != null)
-                        {
-                            newText = label.Content.ToString();
-                            if (newText.Length == 1)
-                            {
-                                WindowsText.Content += label.Content.ToString();
-                            }
-                        }
-                    }
-                    WindowsText.Content += "\n";
-                }
-            }
+
+
         }
         void RefreshWord(int index, Word word)
         {

@@ -5,70 +5,33 @@ namespace Crossword
 {
     struct Word
     {
-        public List<Label> listLabelRight;
-        public List<Label> listLabelDown;
-        public bool right;
-        public bool down;
-        public int count;
+        public List<Label> listLabel;
+        public float difficulty;
         public Label firstLabel;
-        List<string> listWordsRight;
-        List<string> listWordsDown;
-        public List<string> listTempWordsRight;
-        public List<string> listTempWordsDown;
-        public List<Label> ConnectionPointRight;
-        public List<Label> ConnectionPointDown;
-        public List<Word> ConnectionWordsRight;
-        public List<Word> ConnectionWordsDown;
+        List<string> listWords;
+        public List<string> listTempWords;
+        public List<Label> ConnectionLabel;
+        public List<Word> ConnectionWords;
         public Word()
         {
-            listLabelRight = new List<Label>();
-            listLabelDown = new List<Label>();
+            listLabel = new List<Label>();
+            difficulty = 0;
             firstLabel = new Label();
-            right = false;
-            down = false;
-            listWordsRight = new List<string>();
-            listWordsDown = new List<string>();
-            listTempWordsRight = new List<string>();
-            listTempWordsDown = new List<string>();
-            count = 999;
-            ConnectionPointRight = new List<Label>();
-            ConnectionPointDown = new List<Label>();
-            ConnectionWordsRight = new List<Word>();
-            ConnectionWordsDown = new List<Word>();
+            listWords = new List<string>();
+            listTempWords = new List<string>();
+            ConnectionLabel = new List<Label>();
+            ConnectionWords = new List<Word>();
         }
         public void RestoreDictionary()
         {
-            listTempWordsRight = new List<string>(listWordsRight);
-            listTempWordsDown = new List<string>(listWordsDown);
+            listTempWords = new List<string>(listWords);
         }
-        public void ClearLabelRight()
+        public void ClearLabel()
         {
-            foreach (var item in listLabelRight)
+            foreach (var item in listLabel)
             {
                 bool Match = false;
-                foreach (var item2 in ConnectionPointRight)
-                {
-                    if (item == item2)
-                    {
-                        Match = true;
-                        break;
-                    }
-                }
-                if (Match == false)
-                {
-                    if (item.Content != null)
-                    {
-                        item.Content = null;
-                    }
-                }
-            }
-        }
-        public void ClearLabelDown()
-        {
-            foreach (var item in listLabelDown)
-            {
-                bool Match = false;
-                foreach (var item2 in ConnectionPointDown)
+                foreach (var item2 in ConnectionLabel)
                 {
                     if (item == item2)
                     {
@@ -87,53 +50,34 @@ namespace Crossword
         }
         public void DeleteWord(string word)
         {
-            for (int i = 0; i < listTempWordsDown.Count; i++)
+            for (int i = 0; i < listTempWords.Count; i++)
             {
-                if (word == listTempWordsDown[i])
+                if (word == listTempWords[i])
                 {
-                    listTempWordsDown.RemoveAt(i);
-                }
-            }
-            for (int i = 0; i < listTempWordsRight.Count; i++)
-            {
-                if (word == listTempWordsRight[i])
-                {
-                    listTempWordsRight.RemoveAt(i);
+                    listTempWords.RemoveAt(i);
                 }
             }
         }
-        public void AddWordsRight(List<string> listWords)
+        public void AddWords(List<string> listWords)
         {
-            listWordsRight = new List<string>(listWords);
-            listTempWordsRight = new List<string>(listWords);
-        }
-        public void AddWordsDown(List<string> listWords)
-        {
-            listWordsDown = new List<string>(listWords);
-            listTempWordsDown = new List<string>(listWords);
+            listWords = new List<string>(listWords);
+            listTempWords = new List<string>(listWords);
         }
         public void ListWordsRandomization()
         {
             Random rnd = new Random();
-            for (int i = 0; i < listTempWordsRight.Count; i++)
+            for (int i = 0; i < listTempWords.Count; i++)
             {
-                string temp = listTempWordsRight[i];
-                int randomIndex = rnd.Next(0, listTempWordsRight.Count - 1);
-                listTempWordsRight[i] = listTempWordsRight[randomIndex];
-                listTempWordsRight[randomIndex] = temp;
-            }
-            for (int i = 0; i < listTempWordsDown.Count; i++)
-            {
-                string temp = listTempWordsDown[i];
-                int randomIndex = rnd.Next(0, listTempWordsDown.Count - 1);
-                listTempWordsDown[i] = listTempWordsDown[randomIndex];
-                listTempWordsDown[randomIndex] = temp;
+                string temp = listTempWords[i];
+                int randomIndex = rnd.Next(0, listTempWords.Count - 1);
+                listTempWords[i] = listTempWords[randomIndex];
+                listTempWords[randomIndex] = temp;
             }
         }
-        public bool SearchForMatchesRight(Label firstLabel)
+        public bool SearchForMatches(Label firstLabel)
         {
             bool match = false;
-            foreach (Label label in listLabelRight)
+            foreach (Label label in listLabel)
             {
                 if (firstLabel == label)
                 {
@@ -142,88 +86,41 @@ namespace Crossword
             }
             return match;
         }
-        public bool SearchForMatchesDown(Label firstLabel)
+        public void SetListLabel(List<Label> listLabel)
         {
-            bool match = false;
-            foreach (Label label in listLabelDown)
-            {
-                if (firstLabel == label)
-                {
-                    match = true;
-                }
-            }
-            return match;
-        }
-        public void SetListLabelRight(List<Label> listLabel)
-        {
-            listLabelRight = new List<Label>(listLabel);
-            foreach (var item in listLabelRight)
+            this.listLabel = new List<Label>(listLabel);
+            foreach (var item in listLabel)
             {
                 if (item.Content != null)
                 {
                     string tempString = item.Content.ToString();
                     if (tempString.Length == 1)
                     {
-                        ConnectionPointRight.Add(item);
+                        ConnectionLabel.Add(item);
                     }
                 }
             }
             firstLabel = listLabel[0];
         }
-        public void SetListLabelDown(List<Label> listLabel)
+        public void RefreshListLabel()
         {
-            listLabelDown = new List<Label>(listLabel);
-            foreach (var item in listLabelDown)
+            foreach (var item in listLabel)
             {
                 if (item.Content != null)
                 {
                     string tempString = item.Content.ToString();
                     if (tempString.Length == 1)
                     {
-                        ConnectionPointDown.Add(item);
-                    }
-                }
-            }
-            firstLabel = listLabel[0];
-        }
-        public void RefreshListLabelRight()
-        {
-            foreach (var item in listLabelRight)
-            {
-                if (item.Content != null)
-                {
-                    string tempString = item.Content.ToString();
-                    if (tempString.Length == 1)
-                    {
-                        ConnectionPointRight.Add(item);
-                    }
-                }
-            }
-        }
-        public void RefreshListLabelDown()
-        {
-            foreach (var item in listLabelDown)
-            {
-                if (item.Content != null)
-                {
-                    string tempString = item.Content.ToString();
-                    if (tempString.Length == 1)
-                    {
-                        ConnectionPointDown.Add(item);
+                        ConnectionLabel.Add(item);
                     }
                 }
             }
         }
         public void Reset()
         {
-            ConnectionPointDown.Clear();
-            ConnectionPointRight.Clear();
+            ConnectionLabel.Clear();
             RestoreDictionary();
-            foreach (var item in listLabelRight)
-            {
-                item.Content = null;
-            }
-            foreach (var item in listLabelDown)
+            foreach (var item in listLabel)
             {
                 item.Content = null;
             }
