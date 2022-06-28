@@ -159,10 +159,13 @@ namespace Crossword
             listLabelRight = new List<Label>(listLabel);
             foreach (var item in listLabelRight)
             {
-                string tempString = item.Content.ToString();
-                if (tempString.Length == 1)
+                if (item.Content != null)
                 {
-                    ConnectionPointRight.Add(item);
+                    string tempString = item.Content.ToString();
+                    if (tempString.Length == 1)
+                    {
+                        ConnectionPointRight.Add(item);
+                    }
                 }
             }
             firstLabel = listLabel[0];
@@ -172,10 +175,13 @@ namespace Crossword
             listLabelDown = new List<Label>(listLabel);
             foreach (var item in listLabelDown)
             {
-                string tempString = item.Content.ToString();
-                if (tempString.Length == 1)
+                if (item.Content != null)
                 {
-                    ConnectionPointDown.Add(item);
+                    string tempString = item.Content.ToString();
+                    if (tempString.Length == 1)
+                    {
+                        ConnectionPointDown.Add(item);
+                    }
                 }
             }
             firstLabel = listLabel[0];
@@ -186,7 +192,11 @@ namespace Crossword
             {
                 if (item.Content != null)
                 {
-                    ConnectionPointRight.Add(item);
+                    string tempString = item.Content.ToString();
+                    if (tempString.Length == 1)
+                    {
+                        ConnectionPointRight.Add(item);
+                    }
                 }
             }
         }
@@ -196,9 +206,28 @@ namespace Crossword
             {
                 if (item.Content != null)
                 {
-                    ConnectionPointDown.Add(item);
+                    string tempString = item.Content.ToString();
+                    if (tempString.Length == 1)
+                    {
+                        ConnectionPointDown.Add(item);
+                    }
                 }
             }
+        }
+        public void Reset()
+        {
+            ConnectionPointDown.Clear();
+            ConnectionPointRight.Clear();
+            RestoreDictionary();
+            foreach (var item in listLabelRight)
+            {
+                item.Content = null;
+            }
+            foreach (var item in listLabelDown)
+            {
+                item.Content = null;
+            }
+            ListWordsRandomization();
         }
     }
 }

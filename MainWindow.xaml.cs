@@ -6,20 +6,23 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 namespace Crossword
 {
-    // Установка цифр в начале слов. скриншоты заполненной и пустой сетки с определениями
-    // Создать структуру которая будет ставить слово, потом перебирать все слова, если не подходит, менять предыдущее и пробовать снова
     public partial class MainWindow : Window
     {
         List<string> listWordsString = new List<string>();
 
-        List<Label> listLabel = new List<Label>();
-        List<Border> listBorder = new List<Border>();
+        int cellSize = 30;
+        int numberOfCellsHorizontally = 30;
+        int numberOfCellsVertically = 30;
+
+        List<Cell> listCell = new List<Cell>();
 
         List<Word> listWord = new List<Word>();
         List<Border> listEmptyBorder = new List<Border>();
-        List<Label> listEmptyLabel = new List<Label>();
+        //List<Label> listEmptyLabel = new List<Label>();
         bool STOP = false;
 
         public MainWindow()
@@ -27,6 +30,14 @@ namespace Crossword
             InitializeComponent();
             CreateDictionary();
             CreateUIGrid();
+            for (int i = 0; i < 40; i++)
+            {
+                for (int y = 0; y < 5; y++)
+                {
+                    MusinMihail.Content += "Разработчик Мусин Михаил. ";
+                }
+                MusinMihail.Content += "\n";
+            }
         }
         //Создание основы
         public void CreateDictionary()
@@ -36,25 +47,25 @@ namespace Crossword
         }
         void CreateUIGrid()
         {
-            for (int y = 0; y < 30; y++)
+            for (int x = 0; x < numberOfCellsHorizontally; x++)
             {
-                for (int x = 0; x < 30; x++)
+                for (int y = 0; y < numberOfCellsVertically; y++)
                 {
-                    Label myLabel = CreateLabel();
-                    listLabel.Add(myLabel);
-                    TheGrid.Children.Add(myLabel);
-                    Grid.SetColumn(myLabel, x);
-                    Grid.SetRow(myLabel, y);
-
-                    Border myBorder = CreateBorder();
-                    listBorder.Add(myBorder);
-                    TheGrid.Children.Add(myBorder);
-                    Grid.SetColumn(myBorder, x);
-                    Grid.SetRow(myBorder, y);
+                    Cell cell = new Cell();
+                    Border border = CreateBorder(x, y);
+                    TheGrid.Children.Add(border);
+                    Label label = CreateLabel();
+                    //label.HorizontalAlignment = HorizontalAlignment.Center;
+                    //label.VerticalAlignment = VerticalAlignment.Top;
+                    label.FontSize = 20;
+                    border.Child = label;
+                    label.Margin = new Thickness(0, -4, 0, 0);
+                    cell.AddBorderLabelXY(border, label, x, y);
+                    listCell.Add(cell);
                 }
             }
         }
-        private Border CreateBorder()
+        private Border CreateBorder(int x, int y)
         {
             Border myBorder = new Border();
             myBorder.Background = Brushes.Black;
@@ -62,7 +73,56 @@ namespace Crossword
             myBorder.BorderThickness = new Thickness(0.5);
             myBorder.MouseEnter += new MouseEventHandler(MoveChangeColor);
             myBorder.MouseDown += new MouseButtonEventHandler(ClickChangeColor);
+            myBorder.Margin = new Thickness(x * cellSize, y * cellSize, 0, 0);
+            myBorder.Width = cellSize;
+            myBorder.Height = cellSize;
+            myBorder.HorizontalAlignment = HorizontalAlignment.Left;
+            myBorder.VerticalAlignment = VerticalAlignment.Top;
             return myBorder;
+        }
+        int GetXCellBorder(Border border)
+        {
+            foreach (Cell cell in listCell)
+            {
+                if (border == cell.border)
+                {
+                    return cell.x;
+                }
+            }
+            return -1;
+        }
+        int GetYCellBorder(Border border)
+        {
+            foreach (Cell cell in listCell)
+            {
+                if (border == cell.border)
+                {
+                    return cell.y;
+                }
+            }
+            return -1;
+        }
+        int GetXCellLabel(Label label)
+        {
+            foreach (Cell cell in listCell)
+            {
+                if (label == cell.label)
+                {
+                    return cell.x;
+                }
+            }
+            return -1;
+        }
+        int GetYCellLabel(Label label)
+        {
+            foreach (Cell cell in listCell)
+            {
+                if (label == cell.label)
+                {
+                    return cell.y;
+                }
+            }
+            return -1;
         }
         private void MoveChangeColor(object sender, MouseEventArgs e)
         {
@@ -110,7 +170,6 @@ namespace Crossword
             GenStopButton.Visibility = Visibility.Visible;
             listWord.Clear();
             listEmptyBorder.Clear();
-            listEmptyLabel.Clear();
 
             SearchForEmptyCells();
 
@@ -129,23 +188,11 @@ namespace Crossword
         }
         void SearchForEmptyCells()
         {
-            foreach (Border border in listBorder)
+            foreach (Cell cell in listCell)
             {
-                if (border.Background == Brushes.Transparent)
+                if (cell.border.Background == Brushes.Transparent)
                 {
-                    listEmptyBorder.Add(border);
-                    int column = Grid.GetColumn(border);
-                    int row = Grid.GetRow(border);
-                    foreach (var label in listLabel)
-                    {
-                        if (column == Grid.GetColumn(label))
-                        {
-                            if (row == Grid.GetRow(label))
-                            {
-                                listEmptyLabel.Add(label);
-                            }
-                        }
-                    }
+                    listEmptyBorder.Add(cell.border);
                 }
             }
         }
@@ -154,13 +201,13 @@ namespace Crossword
             int count = 0;
             foreach (Border whiteBorder in listEmptyBorder)
             {
-                int numberColumn = Grid.GetColumn(whiteBorder);
-                int numberRow = Grid.GetRow(whiteBorder);
+                int x = GetXCellBorder(whiteBorder);
+                int y = GetYCellBorder(whiteBorder);
                 bool black = true;
 
                 foreach (Border whiteLeftBorder in listEmptyBorder)
                 {
-                    if (Grid.GetColumn(whiteLeftBorder) == numberColumn - 1 && Grid.GetRow(whiteLeftBorder) == numberRow)
+                    if (GetXCellBorder(whiteLeftBorder) == x - 1 && GetYCellBorder(whiteLeftBorder) == y)
                     {
                         black = false;
                         break;
@@ -168,12 +215,12 @@ namespace Crossword
                 }
                 if (black == true)
                 {
-                    SaveWordRight(ref count, numberColumn, numberRow);
+                    SaveWordRight(ref count, x, y);
                 }
                 black = true;
                 foreach (Border whiteLeftBorder in listEmptyBorder)
                 {
-                    if (Grid.GetColumn(whiteLeftBorder) == numberColumn && Grid.GetRow(whiteLeftBorder) == numberRow - 1)
+                    if (GetXCellBorder(whiteLeftBorder) == x && GetYCellBorder(whiteLeftBorder) == y - 1)
                     {
                         black = false;
                         break;
@@ -181,23 +228,26 @@ namespace Crossword
                 }
                 if (black == true)
                 {
-                    SaveWordDown(ref count, numberColumn, numberRow);
+                    SaveWordDown(ref count, x, y);
                 }
             }
         }
         void SaveWordRight(ref int count, int firstNumColumn, int firstNumRow)
         {
-            int letterСount = 0;
+            List<Label> newListLabel = new List<Label>();
             for (int i = firstNumColumn; i < 30; i++)
             {
                 bool black = true;
-                foreach (Border border in listEmptyBorder)
+                foreach (Cell cell in listCell)
                 {
-                    if (Grid.GetRow(border) == firstNumRow && Grid.GetColumn(border) == i)
+                    if (cell.y == firstNumRow && cell.x == i)
                     {
-                        letterСount++;
-                        black = false;
-                        break;
+                        if (cell.border.Background == Brushes.Transparent)
+                        {
+                            newListLabel.Add(cell.label);
+                            black = false;
+                            break;
+                        }
                     }
                 }
                 if (black == true)
@@ -205,17 +255,7 @@ namespace Crossword
                     break;
                 }
             }
-            List<Label> newListLabel = new List<Label>();
-            for (int i = firstNumColumn; i < firstNumColumn + letterСount; i++)
-            {
-                foreach (Label label in listEmptyLabel)
-                {
-                    if (Grid.GetRow(label) == firstNumRow && Grid.GetColumn(label) == i)
-                    {
-                        newListLabel.Add(label);
-                    }
-                }
-            }
+
             if (newListLabel.Count > 1)
             {
                 bool match = false;
@@ -246,17 +286,20 @@ namespace Crossword
         }
         void SaveWordDown(ref int count, int firstNumColumn, int firstNumRow)
         {
-            int letterСount = 0;
+            List<Label> newListLabel = new List<Label>();
             for (int i = firstNumRow; i < 30; i++)
             {
                 bool black = true;
-                foreach (Border border in listEmptyBorder)
+                foreach (Cell cell in listCell)
                 {
-                    if (Grid.GetRow(border) == i && Grid.GetColumn(border) == firstNumColumn)
+                    if (cell.y == i && cell.x == firstNumColumn)
                     {
-                        letterСount++;
-                        black = false;
-                        break;
+                        if (cell.border.Background == Brushes.Transparent)
+                        {
+                            newListLabel.Add(cell.label);
+                            black = false;
+                            break;
+                        }
                     }
                 }
                 if (black == true)
@@ -264,17 +307,7 @@ namespace Crossword
                     break;
                 }
             }
-            List<Label> newListLabel = new List<Label>();
-            for (int i = firstNumRow; i < firstNumRow + letterСount; i++)
-            {
-                foreach (Label label in listEmptyLabel)
-                {
-                    if (Grid.GetColumn(label) == firstNumColumn && Grid.GetRow(label) == i)
-                    {
-                        newListLabel.Add(label);
-                    }
-                }
-            }
+
             if (newListLabel.Count > 1)
             {
                 bool match = false;
@@ -288,8 +321,6 @@ namespace Crossword
                         newWord.count = count;
                         newWord.down = true;
                         RefreshWord(i, newWord);
-
-
                         match = true;
                         break;
                     }
@@ -333,7 +364,6 @@ namespace Crossword
                             bool match = tempListWord[i].SearchForMatchesDown(label);
                             if (match)
                             {
-                                //word.AddConnectionWordsDown(listWord[i]);
                                 if (listMatchWord.Contains(tempListWord[i]) == false)
                                 {
                                     listMatchWord.Add(tempListWord[i]);
@@ -364,7 +394,6 @@ namespace Crossword
                             bool match = tempListWord[i].SearchForMatchesRight(label);
                             if (match)
                             {
-                                //word.AddConnectionWordsRight(listWord[i]);
                                 if (listMatchWord.Contains(tempListWord[i]) == false)
                                 {
                                     listMatchWord.Add(tempListWord[i]);
@@ -423,31 +452,80 @@ namespace Crossword
         }
         void SelectionAndInstallationOfWords()
         {
-            foreach (var label in listLabel)
+            foreach (Cell cell in listCell)
             {
-                label.Content = null;
+                cell.label.Content = null;
             }
             NewGen2(0);
         }
         void NewGen2(int index)
         {
-            if (index < listWord.Count)
+            WindowsText.Content = "";
+            int stop = index;
+            int count = 0;
+            int countGen = 0;
+            int maxCountGen = 0;
+            int maxCountWord = 200;
+            try
             {
-                Label FirsLabel = listWord[index].firstLabel;
-                FirsLabel.Background = Brushes.Yellow;
+                maxCountWord = Int32.Parse(CountGenWord.Text);
+            }
+            catch
+            {
+                MessageBox.Show("Введите цифры в количество попыток для слова");
+                return;
+            }
 
+            try
+            {
+                maxCountGen = Int32.Parse(CountGen.Text);
+            }
+            catch
+            {
+                MessageBox.Show("Введите цифры в количество попыток для всей генерации");
+                return;
+            }
+
+            while (index < listWord.Count)
+            {
+                count++;
                 Word newWord = listWord[index];
-                int error = InsertWord(listEmptyLabel, ref newWord);
-                FirsLabel.Background = Brushes.White;
+                int error = InsertWord(ref newWord);
+                if (count > maxCountWord)
+                {
+                    if (countGen < maxCountGen)
+                    {
+                        for (int i = 0; i < listWord.Count; i++)
+                        {
+                            Word newWord2 = listWord[i];
+                            newWord2.Reset();
+                            RefreshWord(i, newWord2);
+                        }
+                        countGen++;
+                        index = 0;
+                        count = 0;
+                        stop = 0;
+                        continue;
+                    }
+                    else
+                    {
+                        WindowsText.Content = "ОШИБКА ГЕНЕРАЦИИ\nОШИБКА ГЕНЕРАЦИИ\nОШИБКА ГЕНЕРАЦИИ\n";
+                        break;
+                    }
+                }
+                if (index > stop)
+                {
+                    count = 0;
+                    stop = index;
+                }
 
                 if (error == 0)
                 {
-                    NewGen2(index + 1);
+                    index++;
+                    continue;
                 }
                 else
                 {
-                    // Программа зависает, если пересечение идёт не с предыдущим словом а со словом которое было раньше.
-                    // Нужно в слова добавить слова с пересечением. И обращаться к ним напрямую.
                     if (index > 0)
                     {
                         listWord[index].RefreshListLabelRight();
@@ -459,55 +537,20 @@ namespace Crossword
 
                         listWord[index - 1].ClearLabelDown();
                         listWord[index - 1].ClearLabelRight();
-                        MessageBox.Show("Error  -  " + error);
-                        //if (error == 1)
-                        //{
-                        //MessageBox.Show(error + " 1");
-                        //List<Word> newListWord = newWord2.ConnectionWordsRight;
-                        //foreach (Word word in newListWord)
-                        //{
-                        //int index2 = listWord.IndexOf(word);
-                        //newWord2 = listWord[index2];
-                        //newWord2.ClearLabelRight();
-                        //listWord[index - 1].ClearLabelDown();
-                        //listWord[index - 1].ClearLabelRight();
-                        //RefreshWord(index - 1, listWord[index - 1]);
-
-                        //}
-                        //}
-                        //if (error == 2)
-                        //{
-                        //MessageBox.Show(error + " 2");
-                        //List<Word> newListWord = newWord2.ConnectionWordsDown;
-                        //foreach (Word word in newListWord)
-                        //{
-                        //int index2 = listWord.IndexOf(word);
-                        //newWord2 = listWord[index2];
-                        //word.ClearLabelRight();
-                        //newWord2.ClearLabelDown();
-                        //RefreshWord(index2, word);
-
-                        //listWord[index - 1].ClearLabelRight();
-                        //RefreshWord(index - 1, listWord[index - 1]);
-                        //}
-                        //}
-                        NewGen2(index - 1);
+                        index--;
+                        continue;
                     }
                     else
                     {
-                        //Word newWord2 = listWord[index];
                         listWord[index].ClearLabelRight();
                         listWord[index].ClearLabelDown();
-                        //newWord2.RestoreDictionary();
                         RefreshWord(index, listWord[index]);
-                        NewGen2(index);
-                        MessageBox.Show("Error  -  " + error);
+                        continue;
                     }
                 }
-
             }
         }
-        int InsertWord(List<Label> listLabel, ref Word word)
+        int InsertWord(ref Word word)
         {
             bool right = word.right;
             bool down = word.down;
@@ -515,23 +558,35 @@ namespace Crossword
             bool errorRight = false;
             bool errorDown = false;
 
-            Label FirsLabel = word.firstLabel;
-            int numColumn = Grid.GetColumn(FirsLabel);
-            int numRow = Grid.GetRow(FirsLabel);
+            Label firstLabel = word.firstLabel;
+            int x = GetXCellLabel(firstLabel);
+            int y = GetYCellLabel(firstLabel);
 
             if (right == true)
             {
-                MessageBox.Show("Вправо");
                 List<string> words = word.listTempWordsRight;
-                List<Label> newListLabelRight = SearchEmptyLineRight(numColumn, numRow, listLabel);
-                errorRight = SearchWord(true, newListLabelRight, words, ref word);
+                if (words.Count == 0)
+                {
+                    errorRight = true;
+                }
+                else
+                {
+                    List<Label> newListLabelRight = SearchEmptyLineRight(x, y);
+                    errorRight = SearchWord(true, newListLabelRight, words, ref word);
+                }
             }
             if (down == true)
             {
-                MessageBox.Show("Вниз");
                 List<string> words = word.listTempWordsDown;
-                List<Label> newListLabelDown = SearchEmptyLineDown(numColumn, numRow, listLabel);
-                errorDown = SearchWord(false, newListLabelDown, words, ref word);
+                if (words.Count == 0)
+                {
+                    errorRight = true;
+                }
+                else
+                {
+                    List<Label> newListLabelDown = SearchEmptyLineDown(x, y);
+                    errorDown = SearchWord(false, newListLabelDown, words, ref word);
+                }
             }
             if (errorRight == true && errorDown == true)
             {
@@ -551,20 +606,24 @@ namespace Crossword
             // 2 - ошибка во влево
             // 3 - ошибка в обоих словах
         }
-        List<Label> SearchEmptyLineRight(int firstNumColumn, int firstNumRow, List<Label> listLabel)
+        List<Label> SearchEmptyLineRight(int firstNumColumn, int firstNumRow)
         {
-            //Подсчёт пустых клеток вправо
             List<Label> newListLabel = new List<Label>();
             for (int i = firstNumColumn; i < 30; i++)
             {
                 bool black = true;
-                foreach (Label label in listLabel)
+                foreach (Cell cell in listCell)
                 {
-                    if (Grid.GetRow(label) == firstNumRow && Grid.GetColumn(label) == i)
+                    if (cell.y == firstNumRow && cell.x == i)
                     {
-                        newListLabel.Add(label);
-                        black = false;
-                        break;
+                        if (cell.border.Background == Brushes.Transparent)
+                        {
+                            newListLabel.Add(cell.label);
+                            black = false;
+                            //cell.border.Background = Brushes.Yellow;
+                            //MessageBox.Show("");
+                            break;
+                        }
                     }
                 }
                 if (black == true)
@@ -574,20 +633,22 @@ namespace Crossword
             }
             return newListLabel;
         }
-        List<Label> SearchEmptyLineDown(int firstNumColumn, int firstNumRow, List<Label> listLabel)
+        List<Label> SearchEmptyLineDown(int firstNumColumn, int firstNumRow)
         {
-            //Подсчёт пустых клеток вправо
             List<Label> newListLabel = new List<Label>();
             for (int i = firstNumRow; i < 30; i++)
             {
                 bool black = true;
-                foreach (Label label in listLabel)
+                foreach (Cell cell in listCell)
                 {
-                    if (Grid.GetColumn(label) == firstNumColumn && Grid.GetRow(label) == i)
+                    if (cell.y == i && cell.x == firstNumColumn)
                     {
-                        newListLabel.Add(label);
-                        black = false;
-                        break;
+                        if (cell.border.Background == Brushes.Transparent)
+                        {
+                            newListLabel.Add(cell.label);
+                            black = false;
+                            break;
+                        }
                     }
                 }
                 if (black == true)
@@ -617,7 +678,6 @@ namespace Crossword
                     {
                         if (newListLabel[i].Content != null)
                         {
-                            // Нужно добавить эти точки в обо слова. А лучше добавить сразу все слова.
                             if (right == true)
                             {
                                 word.ConnectionPointRight.Add(newListLabel[i]);
@@ -642,14 +702,12 @@ namespace Crossword
                             }
                             else
                             {
-                                MessageBox.Show("Не нашёл слово");
                                 return true;
                             }
                         }
                     }
                     string newWord = listWordsString[0];
                     word.DeleteWord(newWord);
-                    MessageBox.Show(newWord);
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
                         newListLabel[i].Content = newWord[i];
@@ -664,10 +722,8 @@ namespace Crossword
         }
         void DisplayingWordsOnTheScreen()
         {
-            WindowsText.Content = "";
             WindowsText.Content += "По горизонтали\n";
             string newText = "";
-            // Есть пустые слова. Нужно найти как они добавляються
             foreach (var word in listWord)
             {
                 var test = word.listLabelRight;
@@ -718,50 +774,46 @@ namespace Crossword
         private void Button_ClickSaveGrid(object sender, RoutedEventArgs e)
         {
             Save();
-            SaveGrid.Content = "Сетка сохранена";
         }
         private void Button_ClickLoadGrid(object sender, RoutedEventArgs e)
         {
             Load();
-            SaveGrid.Content = "Сетка загружена";
         }
         public void Save()
         {
             string saveFile = "";
-            foreach (var border in listBorder)
+            foreach (Cell cell in listCell)
             {
-                if (border.Background == Brushes.Transparent)
+                if (cell.border.Background == Brushes.Transparent)
                 {
-                    int Column = Grid.GetColumn(border);
-                    int Row = Grid.GetRow(border);
-                    saveFile += Column + ";" + Row + "\n";
+                    saveFile += cell.x + ";" + cell.y + "\n";
                 }
             }
             File.WriteAllText("SaveGrid.txt", saveFile);
         }
         public void Load()
         {
-            foreach (var label in listLabel)
+            foreach (Cell cell in listCell)
             {
-                label.Content = "";
+                cell.label.Content = null;
             }
-            foreach (var border in listBorder)
+            foreach (Cell cell in listCell)
             {
-                border.Background = Brushes.Black;
+                cell.border.Background = Brushes.Black;
             }
             var test = File.ReadAllLines("SaveGrid.txt");
             foreach (var item in test)
             {
                 List<string> strings = new List<string>(item.Split(';'));
-                int Column = Int32.Parse(strings[0]);
-                int Row = Int32.Parse(strings[1]);
-                foreach (var item2 in listBorder)
+                int x = Int32.Parse(strings[0]);
+                int y = Int32.Parse(strings[1]);
+                foreach (Cell cell in listCell)
                 {
-                    if (Grid.GetColumn(item2) == Column)
+                    if (cell.x == x)
                     {
-                        if (Grid.GetRow(item2) == Row)
+                        if (cell.y == y)
                         {
-                            item2.Background = Brushes.Transparent;
+                            cell.border.Background = Brushes.Transparent;
                         }
                     }
                 }
