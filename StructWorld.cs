@@ -3,25 +3,15 @@ using System.Collections.Generic;
 using System.Windows.Controls;
 namespace Crossword
 {
-    struct Word
+    class Word
     {
-        public List<Label> listLabel;
-        public float difficulty;
-        public Label firstLabel;
-        List<string> listWords;
-        public List<string> listTempWords;
-        public List<Label> ConnectionLabel;
-        public List<Word> ConnectionWords;
-        public Word()
-        {
-            listLabel = new List<Label>();
-            difficulty = 0;
-            firstLabel = new Label();
-            listWords = new List<string>();
-            listTempWords = new List<string>();
-            ConnectionLabel = new List<Label>();
-            ConnectionWords = new List<Word>();
-        }
+        public List<Label> listLabel = new List<Label>();
+        public float difficulty = 0;
+        public Label firstLabel = new Label();
+        List<string> listWords = new List<string>();
+        public List<string> listTempWords = new List<string>();
+        public List<Label> ConnectionLabel = new List<Label>();
+        public List<Word> ConnectionWords = new List<Word>();
         public void RestoreDictionary()
         {
             listTempWords = new List<string>(listWords);
@@ -60,7 +50,7 @@ namespace Crossword
         }
         public void AddWords(List<string> listWords)
         {
-            listWords = new List<string>(listWords);
+            this.listWords = new List<string>(listWords);
             listTempWords = new List<string>(listWords);
         }
         public void ListWordsRandomization()
