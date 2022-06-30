@@ -10,14 +10,18 @@
         <Grid x:Name="TheGrid" >
             <Label x:Name="MusinMihail" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" Foreground="#FFEDEDED"/>
             <Label x:Name="WindowsText" Content="" HorizontalAlignment="Left" Margin="940,10,0,0" VerticalAlignment="Top" Width="120" FontSize="10"  />
-            <Label  Content="Попыток для всей генерации" HorizontalAlignment="Left" VerticalAlignment="Top" Width="260" FontSize="18" Margin="940,180,0,0" />
-            <Label  Content="Попыток на одно слово" HorizontalAlignment="Left" VerticalAlignment="Top" Width="212" FontSize="18" Margin="964,291,0,0" />
+            <Label  Content="Всего генераций" HorizontalAlignment="Left" VerticalAlignment="Top" Width="152" FontSize="18" Margin="991,114,0,0" />
+            <Label  Content="Количество циклов" HorizontalAlignment="Left" VerticalAlignment="Top" Width="176" FontSize="18" Margin="979,240,0,0" />
+            <Label  Content="На одну генерацию" HorizontalAlignment="Left" VerticalAlignment="Top" Width="178" FontSize="18" Margin="978,279,0,0" />
             <Button x:Name="GenButton" Content="Генерация" Click="Button_ClickGen" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,425,0,0"/>
-            <Button x:Name="GenStopButton" Content="Стоп" Click="Button_ClickStop" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120"  Margin="1010,492,0,0" Visibility="Hidden"/>
+            <Button x:Name="GenStopButton" Content="Стоп" Click="Button_ClickStop" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120"  Margin="1010,425,0,0" Visibility="Hidden"/>
             <Button Content="Сохранить сетку" Click="Button_ClickSaveGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,653,0,0" />
             <Button Content="Загрузить сетку" Click="Button_ClickLoadGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,730,0,0" />
-            <TextBox x:Name="CountGen" TextWrapping="Wrap" Text="10" Height="50" Width="120" Margin="1010,219,0,0"  FontSize="36" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
-            <TextBox x:Name="CountGenWord" TextWrapping="Wrap" Text="200" Height="50" Width="120"  Margin="1010,330,0,0"  FontSize="36" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
+            <TextBox x:Name="CountGen" TextWrapping="Wrap" Text="10" Height="50" Width="120" Margin="1010,153,0,0"  FontSize="36" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
+            <TextBox x:Name="CountGenWord" TextWrapping="Wrap" Text="200" Height="50" Width="120"  Margin="1007,330,0,0"  FontSize="36" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
+            <Button x:Name="Reset" Content="Очистить поле" Click="Button_Reset" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,504,0,0"/>
+            <CheckBox x:Name="Visualization" Content="Визуализация" HorizontalAlignment="Left" Margin="1042,399,0,0" VerticalAlignment="Top" IsChecked="True"/>
+
         </Grid>
     </ScrollViewer>
 </Window>

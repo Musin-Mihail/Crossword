@@ -12,31 +12,54 @@ namespace Crossword
         public List<string> listTempWords = new List<string>();
         public List<Label> ConnectionLabel = new List<Label>();
         public List<Word> ConnectionWords = new List<Word>();
+        public bool full = false;
+        public string wordString = "";
+        //public List<char> badChar = new List<char>();
         public void RestoreDictionary()
         {
             listTempWords = new List<string>(listWords);
         }
         public void ClearLabel()
         {
-            foreach (var item in listLabel)
+            foreach (Label label in listLabel)
             {
-                bool Match = false;
-                foreach (var item2 in ConnectionLabel)
+                if (label.Content != null)
                 {
-                    if (item == item2)
+                    if (SearchConnectWord1(label) == false)
                     {
-                        Match = true;
-                        break;
+                        label.Content = null;
                     }
-                }
-                if (Match == false)
-                {
-                    if (item.Content != null)
+                    else if (SearchConnectWord2(label) == true)
                     {
-                        item.Content = null;
+                        label.Content = null;
                     }
                 }
             }
+        }
+        bool SearchConnectWord1(Label label)
+        {
+            foreach (Word word in ConnectionWords)
+            {
+                if (word.ConnectionLabel.Contains(label) == true)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        bool SearchConnectWord2(Label label)
+        {
+            foreach (Word word in ConnectionWords)
+            {
+                if (word.ConnectionLabel.Contains(label) == true)
+                {
+                    if (word.full == false)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         public void DeleteWord(string word)
         {
@@ -45,12 +68,13 @@ namespace Crossword
                 if (word == listTempWords[i])
                 {
                     listTempWords.RemoveAt(i);
+                    return;
                 }
             }
         }
         public void AddWords(List<string> listWords)
         {
-            this.listWords = new List<string>(listWords);
+            this.listWords = listWords;
             listTempWords = new List<string>(listWords);
         }
         public void ListWordsRandomization()
@@ -64,57 +88,22 @@ namespace Crossword
                 listTempWords[randomIndex] = temp;
             }
         }
-        public bool SearchForMatches(Label firstLabel)
+        public bool SearchForMatches(Label matchLabel)
         {
-            bool match = false;
-            foreach (Label label in listLabel)
+            if (listLabel.Contains(matchLabel) == true)
             {
-                if (firstLabel == label)
-                {
-                    match = true;
-                }
+                return true;
             }
-            return match;
+            return false;
         }
-        public void SetListLabel(List<Label> listLabel)
+        public void ResetAllDelete()
         {
-            this.listLabel = new List<Label>(listLabel);
-            foreach (var item in listLabel)
-            {
-                if (item.Content != null)
-                {
-                    string tempString = item.Content.ToString();
-                    if (tempString.Length == 1)
-                    {
-                        ConnectionLabel.Add(item);
-                    }
-                }
-            }
-            firstLabel = listLabel[0];
-        }
-        public void RefreshListLabel()
-        {
-            foreach (var item in listLabel)
-            {
-                if (item.Content != null)
-                {
-                    string tempString = item.Content.ToString();
-                    if (tempString.Length == 1)
-                    {
-                        ConnectionLabel.Add(item);
-                    }
-                }
-            }
-        }
-        public void Reset()
-        {
-            ConnectionLabel.Clear();
             RestoreDictionary();
+            ListWordsRandomization();
             foreach (var item in listLabel)
             {
                 item.Content = null;
             }
-            ListWordsRandomization();
         }
     }
 }

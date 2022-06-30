@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System;
 namespace Crossword
 {
     public partial class MainWindow : Window
@@ -27,12 +28,25 @@ namespace Crossword
         }
         async void GridFill()
         {
+            Reset.Visibility = Visibility.Hidden;
             GenButton.Visibility = Visibility.Hidden;
             GenStopButton.Visibility = Visibility.Visible;
             listWordStruct.Clear();
             listEmptyCellStruct = playingField.SearchForEmptyCells();
-            gridFill.AddListAllEmptyWordsLabel(listAllCellStruct, listEmptyCellStruct, listWordsList, WindowsText);
-            await gridFill.Generation();
+            gridFill.AddListAllEmptyWordsLabelVisual(listAllCellStruct, listEmptyCellStruct, listWordsList, WindowsText, Visualization);
+            int maxCounGen = 0;
+            int maxCounWord = 0;
+            try
+            {
+                maxCounGen = Int32.Parse(CountGen.Text);
+                maxCounWord = Int32.Parse(CountGenWord.Text);
+            }
+            catch
+            {
+                MessageBox.Show("ОШИБКА. Водите только цифры");
+            }
+            await gridFill.Generation(maxCounGen, maxCounWord);
+            Reset.Visibility = Visibility.Visible;
             GenStopButton.Visibility = Visibility.Hidden;
             GenButton.Visibility = Visibility.Visible;
         }
@@ -84,6 +98,15 @@ namespace Crossword
         private void Button_ClickStop(object sender, RoutedEventArgs e)
         {
             gridFill.STOP = true;
+        }
+
+        private void Button_Reset(object sender, RoutedEventArgs e)
+        {
+            foreach (Cell cell in listAllCellStruct)
+            {
+                cell.label.Content = null;
+                cell.border.Background = Brushes.Black;
+            }
         }
     }
 }
