@@ -67,7 +67,6 @@ namespace Crossword
             }
             return listEmptyCellStruct;
         }
-
         public List<List<string>> CreateDictionary()
         {
             List<List<string>> listWordsList = new List<List<string>>();

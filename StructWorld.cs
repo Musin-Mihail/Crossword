@@ -6,7 +6,6 @@ namespace Crossword
     class Word
     {
         public List<Label> listLabel = new List<Label>();
-        public float difficulty = 0;
         public Label firstLabel = new Label();
         List<string> listWords = new List<string>();
         public List<string> listTempWords = new List<string>();
@@ -14,10 +13,10 @@ namespace Crossword
         public List<Word> ConnectionWords = new List<Word>();
         public bool full = false;
         public string wordString = "";
-        //public List<char> badChar = new List<char>();
         public void RestoreDictionary()
         {
             listTempWords = new List<string>(listWords);
+            ListWordsRandomization();
         }
         public void ClearLabel()
         {
@@ -96,14 +95,11 @@ namespace Crossword
             }
             return false;
         }
-        public void ResetAllDelete()
+        public void Reset()
         {
-            RestoreDictionary();
-            ListWordsRandomization();
-            foreach (var item in listLabel)
-            {
-                item.Content = null;
-            }
+            ClearLabel();
+            full = false;
+            wordString = "";
         }
     }
 }

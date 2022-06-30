@@ -2,13 +2,10 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 
-using System.Windows;
-
 namespace Crossword
 {
     internal class FormationOfAQueue
     {
-
         List<Cell> listAllCellStruct = new List<Cell>();
         List<Cell> listEmptyCellStruct = new List<Cell>();
         List<Word> listWordStruct = new List<Word>();
@@ -19,9 +16,9 @@ namespace Crossword
             listWordStruct.Clear();
             SearchForTheBeginningAndLengthOfAllWords();
             SearchForConnectedWords();
+            Sorting();
             //DefiningTheGenerationQueue();
             return listWordStruct;
-
         }
         public void SearchForTheBeginningAndLengthOfAllWords()
         {
@@ -158,31 +155,58 @@ namespace Crossword
                         }
                     }
                     index++;
-                    word.difficulty = (float)count / tempListLabel.Count;
                 }
             }
             listWordStruct = newListWordStruct;
+        }
+        public void Sorting()
+        {
+            List<Word> OldList = new List<Word>(listWordStruct);
+            List<Word> NewList = new List<Word>();
+            while (OldList.Count > 0)
+            {
+                float max = 0;
+                int index = 0;
+                int words = 0;
+                for (int i = 0; i < OldList.Count; i++)
+                {
+                    if (OldList[i].ConnectionLabel.Count == max)
+                    {
+                        if (OldList[i].listLabel.Count > words)
+                        {
+                            max = OldList[i].ConnectionLabel.Count;
+                            index = i;
+                            words = OldList[i].listLabel.Count;
+                        }
+                    }
+                    else if (OldList[i].ConnectionLabel.Count > max)
+                    {
+                        max = OldList[i].ConnectionLabel.Count;
+                        index = i;
+                        words = OldList[i].listLabel.Count;
+                    }
+
+                }
+                NewList.Add(OldList[index]);
+                OldList.RemoveAt(index);
+            }
+            listWordStruct = NewList;
         }
         public void DefiningTheGenerationQueue()
         {
             if (listWordStruct.Count > 0)
             {
                 Word theHardestWord = FindingTheHardestWord(listWordStruct);
-
                 List<Word> listMatchWord = new List<Word>();
                 List<Word> listAllHardestWord = new List<Word>();
                 List<Word> tempListWord = new List<Word>();
                 List<Word> allRightWord = new List<Word>();
-
                 listAllHardestWord.Add(theHardestWord);
-
                 tempListWord.Add(theHardestWord);
-
                 while (tempListWord.Count > 0)
                 {
                     Word word = tempListWord[0];
                     tempListWord.RemoveAt(0);
-
                     if (allRightWord.Contains(word) == false)
                     {
                         allRightWord.Add(word);
@@ -211,7 +235,6 @@ namespace Crossword
                             }
                         }
                     }
-
                     if (listMatchWord.Count > 0)
                     {
                         theHardestWord = FindingTheHardestWord(listMatchWord);
@@ -224,17 +247,16 @@ namespace Crossword
                     }
                 }
                 listWordStruct = listAllHardestWord;
-
             }
         }
         public Word FindingTheHardestWord(List<Word> listWords)
         {
             Word theHardestWord = listWords[0];
-            float maxDifficulty = 0;
+            int maxDifficulty = 0;
             int maxWordCount = 0;
             foreach (Word word in listWords)
             {
-                if (word.difficulty == maxDifficulty)
+                if (word.ConnectionLabel.Count == maxDifficulty)
                 {
                     if (word.listLabel.Count > maxWordCount)
                     {
@@ -242,9 +264,9 @@ namespace Crossword
                         theHardestWord = word;
                     }
                 }
-                else if (word.difficulty > maxDifficulty)
+                else if (word.ConnectionLabel.Count > maxDifficulty)
                 {
-                    maxDifficulty = word.difficulty;
+                    maxDifficulty = word.ConnectionLabel.Count;
                     theHardestWord = word;
                     maxWordCount = word.listLabel.Count;
                 }

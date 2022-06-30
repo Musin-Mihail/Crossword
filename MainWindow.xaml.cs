@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System;
+using System.Threading.Tasks;
 namespace Crossword
 {
     public partial class MainWindow : Window
@@ -30,7 +31,16 @@ namespace Crossword
         {
             Reset.Visibility = Visibility.Hidden;
             GenButton.Visibility = Visibility.Hidden;
-            GenStopButton.Visibility = Visibility.Visible;
+            if(Visualization.IsChecked == false)
+            {
+                GenStopButton.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                GenStopButton.Visibility = Visibility.Visible;
+
+            }
+            await Task.Delay(100);
             listWordStruct.Clear();
             listEmptyCellStruct = playingField.SearchForEmptyCells();
             gridFill.AddListAllEmptyWordsLabelVisual(listAllCellStruct, listEmptyCellStruct, listWordsList, WindowsText, Visualization);

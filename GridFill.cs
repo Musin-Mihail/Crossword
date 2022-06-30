@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.IO;
-using System.Threading;
 
 namespace Crossword
 {
@@ -60,18 +54,18 @@ namespace Crossword
             for (int i = 0; i < maxCounGen; i++)
             {
                 int counWord = 0;
+                foreach (Word word in listWordStruct)
+                {
+                    word.Reset();
+                    word.RestoreDictionary();
+                }
                 foreach (Cell cell in listAllCellStruct)
                 {
                     cell.label.Content = null;
                     cell.label.Background = Brushes.Transparent;
                 }
-                foreach (Word word in listWordStruct)
-                {
-                    word.full = false;
-                    word.wordString = "";
-                }
-                WindowsText.Content = "";
                 int index = 0;
+                WindowsText.Content = "";
                 while (index < listWordStruct.Count)
                 {
                     if (Visualization.IsChecked == true)
@@ -86,7 +80,6 @@ namespace Crossword
                     }
                     bool error = false;
                     Word newWord = listWordStruct[index];
-                    // НУжно перебрать всле лейблы. выйти из цикла только года лейбылы закончаться или не произоёдт ошибки подбора
                     if (newWord.full == false)
                     {
                         error = InsertWord(newWord);
@@ -99,11 +92,25 @@ namespace Crossword
                     else
                     {
                         counWord++;
+
                         if (counWord > maxCounWord)
                         {
                             break;
                         }
-                        index = SearchConnect(newWord);
+                        for (int t = 0; t < newWord.ConnectionWords.Count; t++)
+                        {
+                            int newindex = listWordStruct.IndexOf(newWord.ConnectionWords[t]);
+                            if (newindex < index)
+                            {
+                                index = newindex;
+                            }
+                            newWord.ConnectionWords[t].Reset();
+                            error = InsertWord(newWord);
+                            if (error == false)
+                            {
+                                break;
+                            }
+                        }
                         if (index != 999 && index >= 0)
                         {
                             continue;
@@ -116,14 +123,19 @@ namespace Crossword
                         }
                     }
                 }
-
                 if (index >= listWordStruct.Count)
                 {
+                    WindowsText.Content = "ГЕНЕРАЦИЯ УДАЛАСЬ\n";
+                    WindowsText.Content += "Было " + i + " попыток генерации\n";
+                    WindowsText.Content += "Максимум " + counWord + " циклов за генерацию\n";
                     return;
+                }
+                else
+                {
+                    WindowsText.Content = "ОШИБКА ГЕНЕРАЦИИ\n";
                 }
             }
         }
-
         bool InsertWord(Word word)
         {
             List<string> words = word.listTempWords;
@@ -142,30 +154,6 @@ namespace Crossword
             }
             return false;
         }
-        int SearchConnect(Word newWord)
-        {
-            for (int i = 0; i < newWord.ConnectionLabel.Count; i++)
-            {
-                foreach (Word word in listWordStruct)
-                {
-                    if (word != newWord)
-                    {
-                        foreach (Label label in word.ConnectionLabel)
-                        {
-                            if (newWord.ConnectionLabel[i] == label)
-                            {
-                                newWord.RestoreDictionary();
-                                label.Content = null;
-                                word.ClearLabel();
-                                word.full = false;
-                                return listWordStruct.IndexOf(word);
-                            }
-                        }
-                    }
-                }
-            }
-            return 999;
-        }
         bool SearchWord(List<Label> newListLabel, List<string> words, Word word)
         {
             if (newListLabel.Count < 16)
@@ -174,7 +162,6 @@ namespace Crossword
                 {
                     List<string> listWordsString = new List<string>(words);
                     List<string> tempListString = new List<string>();
-
                     //Поиск слов с теми же буквами
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
@@ -218,7 +205,6 @@ namespace Crossword
         }
         void DisplayingWordsOnTheScreen()
         {
-            //WindowsText.Content = "";
             foreach (var word in listWordStruct)
             {
                 WindowsText.Content += word.wordString + "\n";
