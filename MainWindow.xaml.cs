@@ -12,10 +12,10 @@ namespace Crossword
         List<List<string>> listWordsList = new List<List<string>>();
         List<Cell> listAllCellStruct = new List<Cell>();
         List<Cell> listEmptyCellStruct = new List<Cell>();
-        List<Word> listWordStruct = new List<Word>();
         PlayingField playingField = new PlayingField();
         SaveLoad saveLoad = new SaveLoad();
         GridFill gridFill = new GridFill();
+        Screenshot screenshot = new Screenshot();
         public MainWindow()
         {
             InitializeComponent();
@@ -31,31 +31,25 @@ namespace Crossword
         {
             Reset.Visibility = Visibility.Hidden;
             GenButton.Visibility = Visibility.Hidden;
-            if(Visualization.IsChecked == false)
-            {
-                GenStopButton.Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                GenStopButton.Visibility = Visibility.Visible;
-
-            }
+            GenStopButton.Visibility = Visibility.Visible;
             await Task.Delay(100);
-            listWordStruct.Clear();
             listEmptyCellStruct = playingField.SearchForEmptyCells();
-            gridFill.AddListAllEmptyWordsLabelVisual(listAllCellStruct, listEmptyCellStruct, listWordsList, WindowsText, Visualization);
-            int maxCounGen = 0;
-            int maxCounWord = 0;
-            try
+            if (listEmptyCellStruct.Count > 0)
             {
-                maxCounGen = Int32.Parse(CountGen.Text);
-                maxCounWord = Int32.Parse(CountGenWord.Text);
+                gridFill.AddListAllEmptyWordsLabelVisual(listAllCellStruct, listEmptyCellStruct, listWordsList, WindowsText, Visualization);
+                int maxCounGen = 0;
+                int maxCounWord = 0;
+                try
+                {
+                    maxCounGen = Int32.Parse(CountGen.Text);
+                    maxCounWord = Int32.Parse(CountGenWord.Text);
+                }
+                catch
+                {
+                    MessageBox.Show("ОШИБКА. Водите только цифры");
+                }
+                await gridFill.Generation(maxCounGen, maxCounWord);
             }
-            catch
-            {
-                MessageBox.Show("ОШИБКА. Водите только цифры");
-            }
-            await gridFill.Generation(maxCounGen, maxCounWord);
             Reset.Visibility = Visibility.Visible;
             GenStopButton.Visibility = Visibility.Hidden;
             GenButton.Visibility = Visibility.Visible;
@@ -117,6 +111,11 @@ namespace Crossword
                 cell.label.Content = null;
                 cell.border.Background = Brushes.Black;
             }
+        }
+
+        private void Button_Screenshot(object sender, RoutedEventArgs e)
+        {
+            screenshot.CreateImage(listAllCellStruct, gridFill.listWordStruct);
         }
     }
 }

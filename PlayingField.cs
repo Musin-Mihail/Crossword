@@ -16,9 +16,9 @@ namespace Crossword
         List<Cell> listAllCellStruct = new List<Cell>();
         public List<Cell> CreateUIGrid(Grid TheGrid, MouseEventHandler MoveChangeColor, MouseButtonEventHandler ClickChangeColor)
         {
-            for (int x = 0; x < numberOfCellsHorizontally; x++)
+            for (int y = 0; y < numberOfCellsHorizontally; y++)
             {
-                for (int y = 0; y < numberOfCellsVertically; y++)
+                for (int x = 0; x < numberOfCellsVertically; x++)
                 {
                     Cell cell = new Cell();
                     Border border = CreateBorder(x, y, MoveChangeColor, ClickChangeColor);
@@ -77,9 +77,30 @@ namespace Crossword
                 List<string> list = new List<string>();
                 listWordsList.Add(list);
             }
+            string error = "";
             foreach (string word in listWordsString)
             {
-                listWordsList[word.Length].Add(word);
+                try
+                {
+                    string newWord = word.Split(';')[0];
+                    if (word.Split(';')[1].Length > 2)
+                    {
+                        int count = newWord.Length;
+                        listWordsList[count].Add(newWord);
+                    }
+                    else
+                    {
+                        error += word + "\n";
+                    }
+                }
+                catch
+                {
+                    error += word + "\n";
+                }
+            }
+            if (error.Length > 2)
+            {
+                MessageBox.Show(error);
             }
             return listWordsList;
         }

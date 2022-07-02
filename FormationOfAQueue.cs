@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media;
-
+using System.Windows;
 namespace Crossword
 {
     internal class FormationOfAQueue
@@ -11,13 +11,22 @@ namespace Crossword
         List<Word> listWordStruct = new List<Word>();
         public List<Word> FormationQueue(List<Cell> listAllCellStruct, List<Cell> listEmptyCellStruct)
         {
+
             this.listAllCellStruct = listAllCellStruct;
             this.listEmptyCellStruct = listEmptyCellStruct;
             listWordStruct.Clear();
             SearchForTheBeginningAndLengthOfAllWords();
-            SearchForConnectedWords();
+            try
+            {
+                SearchForConnectedWords();
+            }
+            catch
+            {
+                MessageBox.Show("SearchForConnectedWords");
+            }
             Sorting();
             //DefiningTheGenerationQueue();
+
             return listWordStruct;
         }
         public void SearchForTheBeginningAndLengthOfAllWords()
@@ -82,6 +91,7 @@ namespace Crossword
             {
                 Word newWord = new Word();
                 newWord.listLabel = newListLabel;
+                newWord.right = true;
                 listWordStruct.Add(newWord);
             }
         }
@@ -117,24 +127,17 @@ namespace Crossword
         }
         public void SearchForConnectedWords()
         {
-            List<Word> newListWordStruct = new List<Word>();
-            int index = 0;
-
-            if (listWordStruct.Count > 0)
+            foreach (Word word in listWordStruct)
             {
-                newListWordStruct.Add(listWordStruct[0]);
-                while (index < listWordStruct.Count)
+                if (listWordStruct.Count > 0)
                 {
-                    Word word = newListWordStruct[index];
                     List<Label> tempListLabel = word.listLabel;
-                    int count = 0;
                     foreach (Label label in tempListLabel)
                     {
                         foreach (Word word2 in listWordStruct)
                         {
                             if (word.listLabel != word2.listLabel && word2.SearchForMatches(label) == true)
                             {
-                                count++;
                                 if (word.ConnectionWords.Contains(word2) == false)
                                 {
                                     word.ConnectionWords.Add(word2);
@@ -147,50 +150,87 @@ namespace Crossword
                                 {
                                     word2.ConnectionLabel.Add(label);
                                 }
-                                if (newListWordStruct.Contains(word2) == false)
-                                {
-                                    newListWordStruct.Add(word2);
-                                }
+
                             }
                         }
                     }
-                    index++;
                 }
             }
-            listWordStruct = newListWordStruct;
         }
         public void Sorting()
         {
-            List<Word> OldList = new List<Word>(listWordStruct);
-            List<Word> NewList = new List<Word>();
-            while (OldList.Count > 0)
+            try
             {
-                float max = 0;
+                // Хранить оставшеся слова, если они не соединены. И запускать по новой. Если соединённые закончились.
+                // Добавить цикла на стырый списко. Удалять в процессе. Искать совпадение при добавлении в темп
+                List<Word> OldList = new List<Word>(listWordStruct);
+                List<Word> tempList = new List<Word>();
+                List<Word> NewList = new List<Word>();
+                List<Word> matchList = new List<Word>();
+                float maxD = 0;
                 int index = 0;
-                int words = 0;
-                for (int i = 0; i < OldList.Count; i++)
+                for (int i = 0; i < listWordStruct.Count; i++)
                 {
-                    if (OldList[i].ConnectionLabel.Count == max)
+                    float D = (float)listWordStruct[i].ConnectionLabel.Count / listWordStruct[i].listLabel.Count;
+                    if (D > maxD)
                     {
-                        if (OldList[i].listLabel.Count > words)
+                        maxD = D;
+                        index = i;
+                    }
+                }
+                tempList.Add(listWordStruct[index]);
+                matchList.Add(listWordStruct[index]);
+                OldList.RemoveAt(index);
+
+                while (tempList.Count > 0)
+                {
+                    maxD = 0;
+                    index = 0;
+                    for (int i = 0; i < tempList.Count; i++)
+                    {
+                        float D = (float)tempList[i].ConnectionLabel.Count / tempList[i].listLabel.Count;
+                        if (D > maxD)
                         {
-                            max = OldList[i].ConnectionLabel.Count;
+                            maxD = D;
                             index = i;
-                            words = OldList[i].listLabel.Count;
                         }
                     }
-                    else if (OldList[i].ConnectionLabel.Count > max)
+                    foreach (var item in tempList[index].ConnectionWords)
                     {
-                        max = OldList[i].ConnectionLabel.Count;
-                        index = i;
-                        words = OldList[i].listLabel.Count;
+                        if (matchList.Contains(item) == false)
+                        {
+                            int index2 = OldList.IndexOf(item);
+                            OldList.RemoveAt(index2);
+                            tempList.Add(item);
+                            matchList.Add(item);
+                        }
                     }
-
+                    NewList.Add(tempList[index]);
+                    tempList.RemoveAt(index);
+                    if (tempList.Count == 0 && OldList.Count > 0)
+                    {
+                        maxD = 0;
+                        index = 0;
+                        for (int i = 0; i < OldList.Count; i++)
+                        {
+                            float D = (float)OldList[i].ConnectionLabel.Count / OldList[i].listLabel.Count;
+                            if (D > maxD)
+                            {
+                                maxD = D;
+                                index = i;
+                            }
+                        }
+                        tempList.Add(OldList[index]);
+                        matchList.Add(OldList[index]);
+                        OldList.RemoveAt(index);
+                    }
                 }
-                NewList.Add(OldList[index]);
-                OldList.RemoveAt(index);
+                listWordStruct = NewList;
             }
-            listWordStruct = NewList;
+            catch
+            {
+                MessageBox.Show("Error");
+            }
         }
         public void DefiningTheGenerationQueue()
         {

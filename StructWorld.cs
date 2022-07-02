@@ -13,6 +13,8 @@ namespace Crossword
         public List<Word> ConnectionWords = new List<Word>();
         public bool full = false;
         public string wordString = "";
+        public List<string> insertedWords = new List<string>();
+        public bool right = false;
         public void RestoreDictionary()
         {
             listTempWords = new List<string>(listWords);
@@ -99,6 +101,15 @@ namespace Crossword
         {
             ClearLabel();
             full = false;
+            for (int i = 0; i < insertedWords.Count; i++)
+            {
+                if (insertedWords[i] == wordString)
+                {
+                    insertedWords.RemoveAt(i);
+                   
+                    break;
+                }
+            }
             wordString = "";
         }
     }

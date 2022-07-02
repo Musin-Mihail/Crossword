@@ -11,13 +11,14 @@ namespace Crossword
         FormationOfAQueue formationOfAQueue = new FormationOfAQueue();
         List<Cell> listAllCellStruct = new List<Cell>();
         List<Cell> listEmptyCellStruct = new List<Cell>();
-        List<Word> listWordStruct = new List<Word>();
+        public List<Word> listWordStruct = new List<Word>();
         List<List<string>> listWordsList = new List<List<string>>();
         Label WindowsText = new Label();
         CheckBox Visualization = new CheckBox();
         public bool STOP = false;
         int maxCounGen = 0;
         int maxCounWord = 0;
+        public List<string> insertedWords = new List<string>();
 
         public void AddListAllEmptyWordsLabelVisual(List<Cell> listAllCellStruct, List<Cell> listEmptyCellStruct, List<List<string>> listWordsList, Label WindowsText, CheckBox Visualization)
         {
@@ -32,9 +33,14 @@ namespace Crossword
             this.maxCounGen = maxCounGen;
             this.maxCounWord = maxCounWord;
             listWordStruct = formationOfAQueue.FormationQueue(listAllCellStruct, listEmptyCellStruct);
+            foreach (Word word in listWordStruct)
+            {
+                word.insertedWords = insertedWords;
+            }
             SearchForWordsByLength();
             await SelectionAndInstallationOfWords();
             DisplayingWordsOnTheScreen();
+
         }
         public void SearchForWordsByLength()
         {
@@ -53,7 +59,10 @@ namespace Crossword
         {
             for (int i = 0; i < maxCounGen; i++)
             {
+                WindowsText.Content = "Генерация - " + i;
+                await Task.Delay(50);
                 int counWord = 0;
+                insertedWords.Clear();
                 foreach (Word word in listWordStruct)
                 {
                     word.Reset();
@@ -65,7 +74,7 @@ namespace Crossword
                     cell.label.Background = Brushes.Transparent;
                 }
                 int index = 0;
-                WindowsText.Content = "";
+
                 while (index < listWordStruct.Count)
                 {
                     if (Visualization.IsChecked == true)
@@ -91,6 +100,7 @@ namespace Crossword
                     }
                     else
                     {
+                        newWord.RestoreDictionary();
                         counWord++;
 
                         if (counWord > maxCounWord)
@@ -187,12 +197,26 @@ namespace Crossword
                             }
                         }
                     }
-                    string newWord = listWordsString[0];
-                    word.DeleteWord(newWord);
+                    string newWord = "";
+                    foreach (string item in listWordsString)
+                    {
+                        if (insertedWords.Contains(item) == false)
+                        {
+                            newWord = item;
+                            insertedWords.Add(newWord);
+                            word.DeleteWord(newWord);
+                            break;
+                        }
+                    }
+                    if (newWord.Length < 2)
+                    {
+                        return true;
+                    }
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
                         newListLabel[i].Content = newWord[i];
                     }
+
                     word.full = true;
                     word.wordString = newWord;
                 }
