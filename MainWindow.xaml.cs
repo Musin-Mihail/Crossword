@@ -5,6 +5,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System;
 using System.Threading.Tasks;
+
+using System.Linq;
+using System.IO;
+
 namespace Crossword
 {
     public partial class MainWindow : Window
@@ -72,7 +76,12 @@ namespace Crossword
         }
         private void Button_ClickLoadGrid(object sender, RoutedEventArgs e)
         {
-            saveLoad.Load(listAllCellStruct);
+            var loadGrid = new LoadGrid();
+            loadGrid.ShowDialog();
+            if (loadGrid.ready == true)
+            {
+                saveLoad.Load(listAllCellStruct, loadGrid.listEmptyCellStruct);
+            }
         }
         private void MoveChangeColor(object sender, MouseEventArgs e)
         {

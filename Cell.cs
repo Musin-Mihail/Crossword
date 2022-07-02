@@ -2,7 +2,7 @@
 
 namespace Crossword
 {
-    class Cell
+    public class Cell
     {
         public Border border = new Border();
         public Label label = new Label();

@@ -14,17 +14,18 @@ namespace Crossword
             {
                 saveFile += cell.x + ";" + cell.y + "\n";
             }
-            File.WriteAllText("SaveGrid.txt", saveFile);
+            string name = DateTime.Now.ToString("MM_dd_yyyy-HH_mm_ss");
+            File.WriteAllText(@"SaveGrid\" + name+ ".grid", saveFile);
         }
-        public void Load(List<Cell> listAllCellStruct)
+        public void Load(List<Cell> listAllCellStruct, string[] listEmptyCellStruct)
         {
             foreach (Cell cell in listAllCellStruct)
             {
                 cell.label.Content = null;
                 cell.border.Background = Brushes.Black;
             }
-            var test = File.ReadAllLines("SaveGrid.txt");
-            foreach (var item in test)
+            //string[] listEmptyCellStruct = File.ReadAllLines("SaveGrid.txt");
+            foreach (var item in listEmptyCellStruct)
             {
                 List<string> strings = new List<string>(item.Split(';'));
                 int x = Int32.Parse(strings[0]);

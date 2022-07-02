@@ -83,7 +83,7 @@ namespace Crossword
                 try
                 {
                     string newWord = word.Split(';')[0];
-                    if (word.Split(';')[1].Length > 2)
+                    if (word.Split(';')[1].Length > 1)
                     {
                         int count = newWord.Length;
                         listWordsList[count].Add(newWord);
