@@ -15,36 +15,82 @@ namespace Crossword
         Bitmap img = new Bitmap(1150, 1150);
         Pen blackPen = new Pen(Color.Black, 1);
         SolidBrush blackBrush = new SolidBrush(Color.Black);
+        SolidBrush whiteBrush = new SolidBrush(Color.White);
         SolidBrush WatermarksBrush = new SolidBrush(Color.LightGray);
         Font drawFont1 = new Font("Arial", 16);
         Font drawFont2 = new Font("Arial", 8);
         List<string> listDefinitionRight = new List<string>();
         List<string> listDefinitionDown = new List<string>();
+        int topMaxX = 99;
+        int leftMaxY = 99;
+        int downMaxX = 99;
+        int rightMaxY = 99;
 
         float sizeCell = 37.938105f;
         public void CreateImage(List<Cell> listCell, List<Word> listWord)
         {
             Graphics graphics = Graphics.FromImage(img);
-
+            MaxCoordinateSearch(listCell);
             CreateEmptyDrid(graphics, listCell, listWord);
             CreateFillDrid(graphics, listCell, listWord);
             CreateDefinition(graphics);
-
+        }
+        void MaxCoordinateSearch(List<Cell> listCell)
+        {
+            topMaxX = 99;
+            leftMaxY = 99;
+            downMaxX = 0;
+            rightMaxY = 0;
+            foreach (Cell cell in listCell)
+            {
+                if (cell.border.Background == System.Windows.Media.Brushes.Transparent)
+                {
+                    if (cell.x < topMaxX)
+                    {
+                        topMaxX = cell.x;
+                    }
+                    if (cell.y < leftMaxY)
+                    {
+                        leftMaxY = cell.y;
+                    }
+                    if (cell.x > downMaxX)
+                    {
+                        downMaxX = cell.x;
+                    }
+                    if (cell.y > rightMaxY)
+                    {
+                        rightMaxY = cell.y;
+                    }
+                }
+            }
+            //MessageBox.Show(topMaxX + " -" + leftMaxY + " -" + downMaxX + " -" + rightMaxY);
         }
         void CreateEmptyDrid(Graphics graphics, List<Cell> listCell, List<Word> listWord)
         {
             graphics.Clear(Color.White);
             AddingWatermarks(graphics);
             int count = 0;
+            MessageBox.Show((downMaxX - topMaxX + 1) + " - " + (rightMaxY - leftMaxY + 1));
+            graphics.FillRectangle(blackBrush, 0, 0, (downMaxX - topMaxX +1) * sizeCell, (rightMaxY - leftMaxY+1) * sizeCell);
+            graphics.DrawRectangle(blackPen, 0, 0, (downMaxX - topMaxX + 1) * sizeCell, (rightMaxY - leftMaxY + 1) * sizeCell);
             foreach (Cell cell in listCell)
             {
-                if (cell.border.Background == System.Windows.Media.Brushes.Black)
+
+                //if (cell.border.Background == System.Windows.Media.Brushes.Black)
+                //{
+                //    if (cell.x >= topMaxX && cell.x <= downMaxX)
+                //    {
+                //        if (cell.y >= leftMaxY && cell.y <= rightMaxY)
+                //        {
+                //            graphics.FillRectangle(blackBrush, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
+                //            graphics.DrawRectangle(blackPen, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
+                //        }
+                //    }
+                //}
+                if (cell.border.Background == System.Windows.Media.Brushes.Transparent)
                 {
-                    graphics.FillRectangle(blackBrush, cell.x * sizeCell, cell.y * sizeCell, sizeCell, sizeCell);
-                }
-                else
-                {
-                    graphics.DrawRectangle(blackPen, cell.x * sizeCell, cell.y * sizeCell, sizeCell, sizeCell);
+                    graphics.FillRectangle(whiteBrush, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
+                    graphics.DrawRectangle(blackPen, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
                     bool match = false;
                     foreach (Word word in listWord)
                     {
@@ -62,16 +108,14 @@ namespace Crossword
                             }
                             if (word.right)
                             {
-
-
                                 listDefinitionRight.Add(text);
                             }
                             else
                             {
                                 listDefinitionDown.Add(text);
-
                             }
-                            graphics.DrawString(count.ToString(), drawFont2, blackBrush, (cell.x * sizeCell), (cell.y * sizeCell));
+
+                            graphics.DrawString(count.ToString(), drawFont2, blackBrush, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell);
                         }
                     }
                 }
@@ -86,19 +130,25 @@ namespace Crossword
             {
                 if (cell.border.Background == System.Windows.Media.Brushes.Black)
                 {
-                    graphics.FillRectangle(blackBrush, cell.x * sizeCell, cell.y * sizeCell, sizeCell, sizeCell);
+                    if (cell.x >= topMaxX && cell.x <= downMaxX)
+                    {
+                        if (cell.y >= leftMaxY && cell.y <= rightMaxY)
+                        {
+                            graphics.FillRectangle(blackBrush, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
+                            graphics.DrawRectangle(blackPen, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
+                        }
+                    }
                 }
                 else
                 {
-                    graphics.DrawRectangle(blackPen, cell.x * sizeCell, cell.y * sizeCell, sizeCell, sizeCell);
-                    graphics.DrawString(cell.label.Content.ToString(), drawFont1, blackBrush, (cell.x * sizeCell) + 4, (cell.y * sizeCell) + 4);
+                    graphics.DrawRectangle(blackPen, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
+                    graphics.DrawString(cell.label.Content.ToString(), drawFont1, blackBrush, ((cell.x - topMaxX) * sizeCell) + 4, ((cell.y - leftMaxY) * sizeCell) + 4);
                 }
             }
             img.Save("FillGrid.png", ImageFormat.Png);
         }
         void CreateDefinition(Graphics graphics)
         {
-
             string[] array = File.ReadAllLines("dict.txt");
             List<string> listWordsString = array.ToList();
 

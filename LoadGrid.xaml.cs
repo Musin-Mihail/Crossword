@@ -18,25 +18,21 @@ namespace Crossword
     public partial class LoadGrid : Window
     {
         public string[] listEmptyCellStruct = new string[] { };
-        List<string> allGridList = new List<string>();
+        string[] allGrid = new string[] { };
         public bool ready = false;
         public LoadGrid()
         {
-            //Доделать ичитывание с папки и перебирать все сетки.
-            //В добавление и удалении как то передать ссылки на файлы
-            //Или передавать в лейбел или хранить номер в списке. К пример у имя кнопки
             InitializeComponent();
             DrawGrids();
         }
         void DrawGrids()
         {
             TheGrid.Children.Clear();
-            string[] allGrid = Directory.GetFiles(@"SaveGrid\", "*.grid");
-            allGridList = allGrid.ToList();
+            allGrid = Directory.GetFiles(@"SaveGrid\", "*.grid");
             int nextGrid = 0;
-            for (int i = 0; i < allGridList.Count; i++)
+            for (int i = 0; i < allGrid.Length; i++)
             {
-                listEmptyCellStruct = File.ReadAllLines(allGridList[i]);
+                listEmptyCellStruct = File.ReadAllLines(allGrid[i]);
                 Border border = CreateBlackBorder(nextGrid);
                 TheGrid.Children.Add(border);
                 foreach (string cell in listEmptyCellStruct)
@@ -108,15 +104,14 @@ namespace Crossword
         private void Button_Load(object sender, RoutedEventArgs e)
         {
             int index = Int32.Parse(((Button)sender).Name.Remove(0, 1));
-            listEmptyCellStruct = File.ReadAllLines(allGridList[index]);
+            listEmptyCellStruct = File.ReadAllLines(allGrid[index]);
             ready = true;
             DialogResult = false;
         }
         private void Button_Delete(object sender, RoutedEventArgs e)
         {
             int index = Int32.Parse(((Button)sender).Name.Remove(0, 1));
-            File.Delete(allGridList[index]);
-            //allGridList.RemoveAt(index);
+            File.Delete(allGrid[index]);
             DrawGrids();
         }
     }

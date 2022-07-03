@@ -4,6 +4,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
+using System;
+
 namespace Crossword
 {
     internal class GridFill
@@ -39,16 +41,15 @@ namespace Crossword
             }
             SearchForWordsByLength();
             await SelectionAndInstallationOfWords();
-            DisplayingWordsOnTheScreen();
+            //DisplayingWordsOnTheScreen();
 
         }
         public void SearchForWordsByLength()
         {
             for (int i = 0; i < listWordStruct.Count; i++)
             {
-                Word newWord = listWordStruct[i];
-                int letterCount = newWord.listLabel.Count;
-                newWord.AddWords(listWordsList[letterCount]);
+                int letterCount = listWordStruct[i].listLabel.Count;
+                listWordStruct[i].AddWords(listWordsList[letterCount]);
             }
             foreach (var word in listWordStruct)
             {
@@ -61,11 +62,12 @@ namespace Crossword
             {
                 WindowsText.Content = "Генерация - " + i;
                 await Task.Delay(50);
-                int counWord = 0;
+                int maxError = 0;
                 insertedWords.Clear();
                 foreach (Word word in listWordStruct)
                 {
                     word.Reset();
+                    word.error = 0;
                     word.RestoreDictionary();
                 }
                 foreach (Cell cell in listAllCellStruct)
@@ -73,14 +75,12 @@ namespace Crossword
                     cell.label.Content = null;
                     cell.label.Background = Brushes.Transparent;
                 }
+
                 int index = 0;
 
                 while (index < listWordStruct.Count)
                 {
-                    if (Visualization.IsChecked == true)
-                    {
-                        await Task.Delay(1);
-                    }
+
                     if (STOP)
                     {
                         WindowsText.Content += "СТОП";
@@ -95,32 +95,71 @@ namespace Crossword
                     }
                     if (error == false)
                     {
+
                         index++;
                         continue;
                     }
                     else
                     {
-                        newWord.RestoreDictionary();
-                        counWord++;
-
-                        if (counWord > maxCounWord)
+                        if (Visualization.IsChecked == true)
+                        {
+                            await Task.Delay(100);
+                        }
+                        newWord.error++;
+                        if (newWord.error > maxCounWord)
                         {
                             break;
                         }
-                        for (int t = 0; t < newWord.ConnectionWords.Count; t++)
+                        if (newWord.error > maxError)
                         {
-                            int newindex = listWordStruct.IndexOf(newWord.ConnectionWords[t]);
-                            if (newindex < index)
+                            WindowsText.Content += newWord.error + "\n";
+                            maxError = newWord.error;
+                        }
+                        //if (newWord.listTempWords.Count == 0)
+                        //{
+                            newWord.RestoreDictionary();
+                        //}
+
+                        //foreach (var item in newWord.listLabel)
+                        //{
+                        //    item.Background = Brushes.Green;
+                        //}
+                        List<Word> templist = new List<Word>(newWord.ConnectionWords);
+                        //Random rnd = new Random();
+                        //for (int u = 0; u < templist.Count; u++)
+                        //{
+                        //    Word temp = templist[u];
+                        //    int randomIndex = rnd.Next(u, templist.Count - 1);
+                        //    templist[u] = templist[randomIndex];
+                        //    templist[randomIndex] = temp;
+                        //}
+                        //for (int t = 0; t < templist.Count; t++)
+                        //{
+                        for (int t = templist.Count - 1; t > 0; t--)
+                        {
+                            if (templist[t].full == true)
                             {
-                                index = newindex;
+
+                                templist[t].lastWord = newWord;
+                                int newindex = listWordStruct.IndexOf(templist[t]);
+                                if (newindex < index)
+                                {
+                                    index = newindex;
+                                }
+                                templist[t].Reset();
+
                             }
-                            newWord.ConnectionWords[t].Reset();
                             error = InsertWord(newWord);
                             if (error == false)
                             {
                                 break;
                             }
                         }
+
+                        //foreach (var item in newWord.listLabel)
+                        //{
+                        //    item.Background = Brushes.Transparent;
+                        //}
                         if (index != 999 && index >= 0)
                         {
                             continue;
@@ -137,26 +176,20 @@ namespace Crossword
                 {
                     WindowsText.Content = "ГЕНЕРАЦИЯ УДАЛАСЬ\n";
                     WindowsText.Content += "Было " + i + " попыток генерации\n";
-                    WindowsText.Content += "Максимум " + counWord + " циклов за генерацию\n";
+                    WindowsText.Content += "Максимум " + maxError + " ошибок в слове за одну генерацию\n";
                     return;
-                }
-                else
-                {
-                    WindowsText.Content = "ОШИБКА ГЕНЕРАЦИИ\n";
                 }
             }
         }
         bool InsertWord(Word word)
         {
-            List<string> words = word.listTempWords;
-            if (words.Count == 0)
+            if (word.listTempWords.Count == 0)
             {
                 return true;
             }
             else
             {
-                List<Label> newListLabel = word.listLabel;
-                bool error = SearchWord(newListLabel, words, word);
+                bool error = SearchWord(word.listLabel, word.listTempWords, word);
                 if (error == true)
                 {
                     return true;
@@ -166,7 +199,7 @@ namespace Crossword
         }
         bool SearchWord(List<Label> newListLabel, List<string> words, Word word)
         {
-            if (newListLabel.Count < 16)
+            if (newListLabel.Count < 21)
             {
                 if (newListLabel.Count > 1)
                 {
@@ -223,16 +256,16 @@ namespace Crossword
             }
             else
             {
-                MessageBox.Show("Есть поле больше 15");
+                MessageBox.Show("Есть поле больше 20");
             }
             return false;
         }
-        void DisplayingWordsOnTheScreen()
-        {
-            foreach (var word in listWordStruct)
-            {
-                WindowsText.Content += word.wordString + "\n";
-            }
-        }
+        //void DisplayingWordsOnTheScreen()
+        //{
+        //    foreach (var word in listWordStruct)
+        //    {
+        //        WindowsText.Content += word.wordString + "\n";
+        //    }
+        //}
     }
 }

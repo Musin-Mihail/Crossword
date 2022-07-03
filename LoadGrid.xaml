@@ -8,8 +8,6 @@
         Title="LoadGrid" Height="700" Width="300">
     <ScrollViewer>
         <Grid x:Name="TheGrid">
-
-
         </Grid>
     </ScrollViewer>
 </Window>

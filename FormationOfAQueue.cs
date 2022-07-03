@@ -25,6 +25,7 @@ namespace Crossword
                 MessageBox.Show("SearchForConnectedWords");
             }
             Sorting();
+            //Sorting2();
             //DefiningTheGenerationQueue();
 
             return listWordStruct;
@@ -129,29 +130,26 @@ namespace Crossword
         {
             foreach (Word word in listWordStruct)
             {
-                if (listWordStruct.Count > 0)
+                List<Label> tempListLabel = word.listLabel;
+                foreach (Label label in tempListLabel)
                 {
-                    List<Label> tempListLabel = word.listLabel;
-                    foreach (Label label in tempListLabel)
+                    foreach (Word word2 in listWordStruct)
                     {
-                        foreach (Word word2 in listWordStruct)
+                        if (word.listLabel != word2.listLabel && word2.SearchForMatches(label) == true)
                         {
-                            if (word.listLabel != word2.listLabel && word2.SearchForMatches(label) == true)
+                            if (word.ConnectionWords.Contains(word2) == false)
                             {
-                                if (word.ConnectionWords.Contains(word2) == false)
-                                {
-                                    word.ConnectionWords.Add(word2);
-                                }
-                                if (word.ConnectionLabel.Contains(label) == false)
-                                {
-                                    word.ConnectionLabel.Add(label);
-                                }
-                                if (word2.ConnectionLabel.Contains(label) == false)
-                                {
-                                    word2.ConnectionLabel.Add(label);
-                                }
-
+                                word.ConnectionWords.Add(word2);
                             }
+                            if (word.ConnectionLabel.Contains(label) == false)
+                            {
+                                word.ConnectionLabel.Add(label);
+                            }
+                            if (word2.ConnectionLabel.Contains(label) == false)
+                            {
+                                word2.ConnectionLabel.Add(label);
+                            }
+
                         }
                     }
                 }
@@ -161,8 +159,6 @@ namespace Crossword
         {
             try
             {
-                // Хранить оставшеся слова, если они не соединены. И запускать по новой. Если соединённые закончились.
-                // Добавить цикла на стырый списко. Удалять в процессе. Искать совпадение при добавлении в темп
                 List<Word> OldList = new List<Word>(listWordStruct);
                 List<Word> tempList = new List<Word>();
                 List<Word> NewList = new List<Word>();
@@ -231,6 +227,58 @@ namespace Crossword
             {
                 MessageBox.Show("Error");
             }
+        }
+        public void Sorting2()
+        {
+            List<Word> OldList = new List<Word>(listWordStruct);
+            List<Word> tempList = new List<Word>();
+            List<Word> NewList = new List<Word>();
+            //List<Word> matchList = new List<Word>();
+            float maxD = 0;
+            int index = 0;
+            for (int i = 0; i < OldList.Count; i++)
+            {
+                float D = (float)OldList[i].ConnectionLabel.Count / OldList[i].listLabel.Count;
+                if (D > maxD)
+                {
+                    maxD = D;
+                    index = i;
+                }
+            }
+            int maxCount = OldList.Count;
+            NewList.Add(OldList[index]);
+            tempList.Add(OldList[index]);
+
+            bool right = OldList[index].right;
+            while (tempList.Count < maxCount)
+            {
+                int count = tempList.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    foreach (Word word in tempList[i].ConnectionWords)
+                    {
+                        if (word.right != right && NewList.Contains(word) == false)
+                        {
+                            NewList.Add(word);
+                            right = word.right;
+                            tempList.Add(word);
+                        }
+                    }
+                }
+            }
+            listWordStruct = NewList;
+            //foreach (var item in listWordStruct)
+            //{
+            //    foreach (var item2 in item.listLabel)
+            //    {
+            //        item2.Background = Brushes.Green;
+            //    }
+            //    MessageBox.Show("");
+            //    foreach (var item2 in item.listLabel)
+            //    {
+            //        item2.Background = Brushes.Transparent;
+            //    }
+            //}
         }
         public void DefiningTheGenerationQueue()
         {

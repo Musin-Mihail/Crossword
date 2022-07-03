@@ -33,9 +33,7 @@ namespace Crossword
         }
         async void GridFill()
         {
-            Reset.Visibility = Visibility.Hidden;
-            GenButton.Visibility = Visibility.Hidden;
-            GenStopButton.Visibility = Visibility.Visible;
+            StartGen();
             await Task.Delay(100);
             listEmptyCellStruct = playingField.SearchForEmptyCells();
             if (listEmptyCellStruct.Count > 0)
@@ -54,9 +52,27 @@ namespace Crossword
                 }
                 await gridFill.Generation(maxCounGen, maxCounWord);
             }
+            EndGen();
+
+        }
+        void StartGen()
+        {
+            Reset.Visibility = Visibility.Hidden;
+            GenButton.Visibility = Visibility.Hidden;
+            Save.Visibility = Visibility.Hidden;
+            Load.Visibility = Visibility.Hidden;
+            Screenshot.Visibility = Visibility.Hidden;
+            GenStopButton.Visibility = Visibility.Visible;
+
+        }
+        void EndGen()
+        {
             Reset.Visibility = Visibility.Visible;
-            GenStopButton.Visibility = Visibility.Hidden;
             GenButton.Visibility = Visibility.Visible;
+            Save.Visibility = Visibility.Visible;
+            Load.Visibility = Visibility.Visible;
+            Screenshot.Visibility = Visibility.Visible;
+            GenStopButton.Visibility = Visibility.Hidden;
         }
         void AddingWatermarks()
         {

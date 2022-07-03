@@ -15,6 +15,8 @@ namespace Crossword
         public string wordString = "";
         public List<string> insertedWords = new List<string>();
         public bool right = false;
+        public int error = 0;
+        public Word lastWord = null;
         public void RestoreDictionary()
         {
             listTempWords = new List<string>(listWords);
@@ -69,6 +71,10 @@ namespace Crossword
                 if (word == listTempWords[i])
                 {
                     listTempWords.RemoveAt(i);
+                    if (listTempWords.Count == 0)
+                    {
+                        RestoreDictionary();
+                    }
                     return;
                 }
             }
@@ -106,7 +112,6 @@ namespace Crossword
                 if (insertedWords[i] == wordString)
                 {
                     insertedWords.RemoveAt(i);
-                   
                     break;
                 }
             }
