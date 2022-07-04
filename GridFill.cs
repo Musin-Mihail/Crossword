@@ -80,7 +80,6 @@ namespace Crossword
 
                 while (index < listWordStruct.Count)
                 {
-
                     if (STOP)
                     {
                         WindowsText.Content += "СТОП";
@@ -95,16 +94,11 @@ namespace Crossword
                     }
                     if (error == false)
                     {
-
                         index++;
                         continue;
                     }
                     else
                     {
-                        if (Visualization.IsChecked == true)
-                        {
-                            await Task.Delay(100);
-                        }
                         newWord.error++;
                         if (newWord.error > maxCounWord)
                         {
@@ -112,19 +106,22 @@ namespace Crossword
                         }
                         if (newWord.error > maxError)
                         {
-                            WindowsText.Content += newWord.error + "\n";
                             maxError = newWord.error;
+                            if (newWord.error % 10 == 0)
+                            {
+                                WindowsText.Content = "Генерация - " + i + " Ошибок - " + maxError;
+                                WindowsText.Content += "\nСлов в первом слове - " + listWordStruct[0].listTempWords.Count;
+                                await Task.Delay(1);
+                            }
                         }
-                        //if (newWord.listTempWords.Count == 0)
-                        //{
-                            newWord.RestoreDictionary();
-                        //}
 
-                        //foreach (var item in newWord.listLabel)
-                        //{
-                        //    item.Background = Brushes.Green;
-                        //}
+                        if (newWord.listTempWords.Count == 0)
+                        {
+                            newWord.RestoreDictionary();
+                        }
+
                         List<Word> templist = new List<Word>(newWord.ConnectionWords);
+
                         //Random rnd = new Random();
                         //for (int u = 0; u < templist.Count; u++)
                         //{
@@ -135,27 +132,67 @@ namespace Crossword
                         //}
                         //for (int t = 0; t < templist.Count; t++)
                         //{
-                        for (int t = templist.Count - 1; t > 0; t--)
+                        bool GlobalError = false;
+                        //Оптимизировать. сдеделать цикл чтобы менять дальше 2 слова, пото3 и такдалее.
+                        for (int t = templist.Count - 1; t >= 0; t--)
                         {
                             if (templist[t].full == true)
                             {
-
-                                templist[t].lastWord = newWord;
+                                string saveWord = templist[t].wordString;
+                                if (Visualization.IsChecked == true)
+                                {
+                                    TestWordStartGreen(templist[t]);
+                                    await Task.Delay(1);
+                                    TestWordEnd(templist[t]);
+                                }
                                 int newindex = listWordStruct.IndexOf(templist[t]);
                                 if (newindex < index)
                                 {
                                     index = newindex;
                                 }
-                                templist[t].Reset();
+                                templist[t].ClearLabel();
 
-                            }
-                            error = InsertWord(newWord);
-                            if (error == false)
-                            {
-                                break;
+                                error = InsertWord(newWord);
+                                if (error == false)
+                                {
+                                    templist[t].Reset();
+                                    GlobalError = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    templist[t].InsertWord(saveWord);
+                                }
                             }
                         }
-
+                        if (GlobalError == false)
+                        {
+                            for (int t = templist.Count - 1; t >= 0; t--)
+                            {
+                                if (templist[t].full == true)
+                                {
+                                    string saveWord = templist[t].wordString;
+                                    if (Visualization.IsChecked == true)
+                                    {
+                                        TestWordStartGreen(templist[t]);
+                                        await Task.Delay(1);
+                                        TestWordEnd(templist[t]);
+                                    }
+                                    int newindex = listWordStruct.IndexOf(templist[t]);
+                                    if (newindex < index)
+                                    {
+                                        index = newindex;
+                                    }
+                                    templist[t].Reset();
+                                    error = InsertWord(newWord);
+                                    if (error == false)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        TestWordEnd(newWord);
                         //foreach (var item in newWord.listLabel)
                         //{
                         //    item.Background = Brushes.Transparent;
@@ -181,6 +218,29 @@ namespace Crossword
                 }
             }
         }
+        void TestWordStartRed(Word word)
+        {
+            foreach (var item in word.listLabel)
+            {
+                item.Background = Brushes.Red;
+            }
+        }
+        void TestWordStartGreen(Word word)
+        {
+            foreach (var item in word.listLabel)
+            {
+                item.Background = Brushes.Green;
+            }
+        }
+        void TestWordEnd(Word word)
+        {
+            foreach (var item in word.listLabel)
+            {
+                item.Background = Brushes.Transparent;
+            }
+        }
+
+
         bool InsertWord(Word word)
         {
             if (word.listTempWords.Count == 0)

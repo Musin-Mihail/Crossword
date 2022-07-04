@@ -25,12 +25,15 @@ namespace Crossword
         int leftMaxY = 99;
         int downMaxX = 99;
         int rightMaxY = 99;
-
         float sizeCell = 37.938105f;
         public void CreateImage(List<Cell> listCell, List<Word> listWord)
         {
-            Graphics graphics = Graphics.FromImage(img);
+            img.SetResolution(300, 300);
             MaxCoordinateSearch(listCell);
+            int width = (int)((downMaxX - topMaxX + 1) * sizeCell);
+            int height = (int)((rightMaxY - leftMaxY + 1) * sizeCell);
+            img = new Bitmap(width + 2, height + 2);
+            Graphics graphics = Graphics.FromImage(img);
             CreateEmptyDrid(graphics, listCell, listWord);
             CreateFillDrid(graphics, listCell, listWord);
             CreateDefinition(graphics);
@@ -63,30 +66,17 @@ namespace Crossword
                     }
                 }
             }
-            //MessageBox.Show(topMaxX + " -" + leftMaxY + " -" + downMaxX + " -" + rightMaxY);
         }
         void CreateEmptyDrid(Graphics graphics, List<Cell> listCell, List<Word> listWord)
         {
             graphics.Clear(Color.White);
-            AddingWatermarks(graphics);
+
             int count = 0;
-            MessageBox.Show((downMaxX - topMaxX + 1) + " - " + (rightMaxY - leftMaxY + 1));
-            graphics.FillRectangle(blackBrush, 0, 0, (downMaxX - topMaxX +1) * sizeCell, (rightMaxY - leftMaxY+1) * sizeCell);
+            graphics.FillRectangle(blackBrush, 0, 0, (downMaxX - topMaxX + 1) * sizeCell, (rightMaxY - leftMaxY + 1) * sizeCell);
             graphics.DrawRectangle(blackPen, 0, 0, (downMaxX - topMaxX + 1) * sizeCell, (rightMaxY - leftMaxY + 1) * sizeCell);
+            AddingWatermarks(graphics);
             foreach (Cell cell in listCell)
             {
-
-                //if (cell.border.Background == System.Windows.Media.Brushes.Black)
-                //{
-                //    if (cell.x >= topMaxX && cell.x <= downMaxX)
-                //    {
-                //        if (cell.y >= leftMaxY && cell.y <= rightMaxY)
-                //        {
-                //            graphics.FillRectangle(blackBrush, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
-                //            graphics.DrawRectangle(blackPen, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
-                //        }
-                //    }
-                //}
                 if (cell.border.Background == System.Windows.Media.Brushes.Transparent)
                 {
                     graphics.FillRectangle(whiteBrush, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
@@ -142,7 +132,7 @@ namespace Crossword
                 else
                 {
                     graphics.DrawRectangle(blackPen, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
-                    graphics.DrawString(cell.label.Content.ToString(), drawFont1, blackBrush, ((cell.x - topMaxX) * sizeCell) + 4, ((cell.y - leftMaxY) * sizeCell) + 4);
+                    graphics.DrawString(cell.label.Content.ToString(), drawFont1, blackBrush, ((cell.x - topMaxX) * sizeCell) + 5, ((cell.y - leftMaxY) * sizeCell) + 4);
                 }
             }
             img.Save("FillGrid.png", ImageFormat.Png);

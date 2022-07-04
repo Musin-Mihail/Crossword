@@ -117,5 +117,12 @@ namespace Crossword
             }
             wordString = "";
         }
+        public void InsertWord(string newWord)
+        {
+            for (int i = 0; i < listLabel.Count; i++)
+            {
+                listLabel[i].Content = newWord[i];
+            }
+        }
     }
 }

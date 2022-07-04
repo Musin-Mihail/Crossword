@@ -24,11 +24,48 @@ namespace Crossword
             {
                 MessageBox.Show("SearchForConnectedWords");
             }
-            Sorting();
+            //Sorting();
             //Sorting2();
+            Sorting3();
             //DefiningTheGenerationQueue();
-
+            //Test();
             return listWordStruct;
+        }
+        void Test()
+        {
+            foreach (var item in listWordStruct)
+            {
+                foreach (var item2 in item.listLabel)
+                {
+                    item2.Background = Brushes.Green;
+                }
+                MessageBox.Show("");
+                foreach (var item2 in item.listLabel)
+                {
+                    item2.Background = Brushes.Transparent;
+                }
+            }
+        }
+        void TestWordStartRed(Word word)
+        {
+            foreach (var item in word.listLabel)
+            {
+                item.Background = Brushes.Red;
+            }
+        }
+        void TestWordStartGreen(Word word)
+        {
+            foreach (var item in word.listLabel)
+            {
+                item.Background = Brushes.Green;
+            }
+        }
+        void TestWordEnd(Word word)
+        {
+            foreach (var item in word.listLabel)
+            {
+                item.Background = Brushes.Transparent;
+            }
         }
         public void SearchForTheBeginningAndLengthOfAllWords()
         {
@@ -130,16 +167,25 @@ namespace Crossword
         {
             foreach (Word word in listWordStruct)
             {
+                //TestWordStartRed(word);
                 List<Label> tempListLabel = word.listLabel;
                 foreach (Label label in tempListLabel)
                 {
                     foreach (Word word2 in listWordStruct)
                     {
-                        if (word.listLabel != word2.listLabel && word2.SearchForMatches(label) == true)
+                        if (word != word2 && word2.SearchForMatches(label) == true)
                         {
+                            //TestWordStartGreen(word2);
+                            //MessageBox.Show("Начало проверки");
                             if (word.ConnectionWords.Contains(word2) == false)
                             {
+                                //MessageBox.Show("Добавлене слова");
                                 word.ConnectionWords.Add(word2);
+                            }
+                            if (word2.ConnectionWords.Contains(word) == false)
+                            {
+                                //MessageBox.Show("Добавление в себя слова");
+                                word2.ConnectionWords.Add(word);
                             }
                             if (word.ConnectionLabel.Contains(label) == false)
                             {
@@ -149,10 +195,11 @@ namespace Crossword
                             {
                                 word2.ConnectionLabel.Add(label);
                             }
-
+                            //TestWordEnd(word2);
                         }
                     }
                 }
+                //TestWordEnd(word);
             }
         }
         public void Sorting()
@@ -267,18 +314,45 @@ namespace Crossword
                 }
             }
             listWordStruct = NewList;
-            //foreach (var item in listWordStruct)
-            //{
-            //    foreach (var item2 in item.listLabel)
-            //    {
-            //        item2.Background = Brushes.Green;
-            //    }
-            //    MessageBox.Show("");
-            //    foreach (var item2 in item.listLabel)
-            //    {
-            //        item2.Background = Brushes.Transparent;
-            //    }
-            //}
+        }
+        void Sorting3()
+        {
+            List<Word> tempList = new List<Word>();
+            List<Word> NewList = new List<Word>();
+            List<Word> matchList = new List<Word>();
+            foreach (var item in listWordStruct)
+            {
+                if (NewList.Contains(item) == false)
+                {
+                    NewList.Add(item);
+                }
+                foreach (var item2 in item.ConnectionWords)
+                {
+                    if (matchList.Contains(item2) == false)
+                    {
+                        matchList.Add(item2);
+                        tempList.Add(item2);
+                    }
+                }
+                while (tempList.Count > 0)
+                {
+                    Word newWord = tempList[0];
+                    tempList.RemoveAt(0);
+                    if (NewList.Contains(newWord) == false)
+                    {
+                        NewList.Add(newWord);
+                    }
+                    foreach (var item2 in newWord.ConnectionWords)
+                    {
+                        if (matchList.Contains(item2) == false)
+                        {
+                            matchList.Add(item2);
+                            tempList.Add(item2);
+                        }
+                    }
+                }
+            }
+            listWordStruct = NewList;
         }
         public void DefiningTheGenerationQueue()
         {
