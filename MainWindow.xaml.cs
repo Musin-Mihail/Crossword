@@ -27,7 +27,7 @@ namespace Crossword
         }
         void CreatingThePlayingField()
         {
-            AddingWatermarks();
+            //AddingWatermarks();
             listAllCellStruct = playingField.CreateUIGrid(TheGrid, MoveChangeColor, ClickChangeColor);
             listWordsList = playingField.CreateDictionary();
         }

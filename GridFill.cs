@@ -110,7 +110,9 @@ namespace Crossword
                             if (newWord.error % 10 == 0)
                             {
                                 WindowsText.Content = "Генерация - " + i + " Ошибок - " + maxError;
-                                WindowsText.Content += "\nСлов в первом слове - " + listWordStruct[0].listTempWords.Count;
+                                WindowsText.Content += "\nСлов в 1 слове - " + listWordStruct[0].listTempWords.Count;
+                                WindowsText.Content += "\nСлов в 2 слове - " + listWordStruct[1].listTempWords.Count;
+                                WindowsText.Content += "\nСлов в 3 слове - " + listWordStruct[2].listTempWords.Count;
                                 await Task.Delay(1);
                             }
                         }

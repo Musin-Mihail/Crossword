@@ -29,6 +29,7 @@ namespace Crossword
             Sorting3();
             //DefiningTheGenerationQueue();
             //Test();
+            //DifficultyCalculation();
             return listWordStruct;
         }
         void Test()
@@ -434,6 +435,15 @@ namespace Crossword
                 }
             }
             return theHardestWord;
+        }
+        void DifficultyCalculation()
+        {
+            float difficulty = 0;
+            foreach (var item in listWordStruct)
+            {
+                difficulty += (float)item.listLabel.Count / item.ConnectionLabel.Count;
+            }
+            MessageBox.Show(difficulty + "");
         }
     }
 }

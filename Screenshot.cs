@@ -36,7 +36,7 @@ namespace Crossword
             Graphics graphics = Graphics.FromImage(img);
             CreateEmptyDrid(graphics, listCell, listWord);
             CreateFillDrid(graphics, listCell, listWord);
-            CreateDefinition(graphics);
+            CreateDefinition();
         }
         void MaxCoordinateSearch(List<Cell> listCell)
         {
@@ -74,7 +74,7 @@ namespace Crossword
             int count = 0;
             graphics.FillRectangle(blackBrush, 0, 0, (downMaxX - topMaxX + 1) * sizeCell, (rightMaxY - leftMaxY + 1) * sizeCell);
             graphics.DrawRectangle(blackPen, 0, 0, (downMaxX - topMaxX + 1) * sizeCell, (rightMaxY - leftMaxY + 1) * sizeCell);
-            AddingWatermarks(graphics);
+            //AddingWatermarks(graphics);
             foreach (Cell cell in listCell)
             {
                 if (cell.border.Background == System.Windows.Media.Brushes.Transparent)
@@ -115,7 +115,7 @@ namespace Crossword
         void CreateFillDrid(Graphics graphics, List<Cell> listCell, List<Word> listWord)
         {
             graphics.Clear(Color.White);
-            AddingWatermarks(graphics);
+            //AddingWatermarks(graphics);
             foreach (Cell cell in listCell)
             {
                 if (cell.border.Background == System.Windows.Media.Brushes.Black)
@@ -137,13 +137,10 @@ namespace Crossword
             }
             img.Save("FillGrid.png", ImageFormat.Png);
         }
-        void CreateDefinition(Graphics graphics)
+        void CreateDefinition()
         {
             string[] array = File.ReadAllLines("dict.txt");
             List<string> listWordsString = array.ToList();
-
-            graphics.Clear(Color.White);
-            AddingWatermarks(graphics);
 
             string definitionString = "По горизонтали: ";
             for (int i = 0; i < listDefinitionRight.Count; i++)
@@ -181,8 +178,7 @@ namespace Crossword
                     }
                 }
             }
-            graphics.DrawString(definitionString, drawFont2, blackBrush, 10, 2 * 20);
-            img.Save("Definition.png", ImageFormat.Png);
+            File.WriteAllText("Definition.txt", definitionString);
         }
         void AddingWatermarks(Graphics graphics)
         {
