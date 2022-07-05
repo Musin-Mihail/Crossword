@@ -13,7 +13,7 @@ namespace Crossword
         public List<Word> ConnectionWords = new List<Word>();
         public bool full = false;
         public string wordString = "";
-        public List<string> insertedWords = new List<string>();
+        public List<string> allInsertedWords = new List<string>();
         public bool right = false;
         public int error = 0;
         public Word lastWord = null;
@@ -107,11 +107,11 @@ namespace Crossword
         {
             ClearLabel();
             full = false;
-            for (int i = 0; i < insertedWords.Count; i++)
+            for (int i = 0; i < allInsertedWords.Count; i++)
             {
-                if (insertedWords[i] == wordString)
+                if (allInsertedWords[i] == wordString)
                 {
-                    insertedWords.RemoveAt(i);
+                    allInsertedWords.RemoveAt(i);
                     break;
                 }
             }

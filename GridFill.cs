@@ -4,47 +4,23 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-using System;
-
 namespace Crossword
 {
     internal class GridFill
     {
-        FormationOfAQueue formationOfAQueue = new FormationOfAQueue();
-        List<Cell> listAllCellStruct = new List<Cell>();
-        List<Cell> listEmptyCellStruct = new List<Cell>();
-        public List<Word> listWordStruct = new List<Word>();
-        List<List<string>> listWordsList = new List<List<string>>();
-        Label WindowsText = new Label();
-        CheckBox Visualization = new CheckBox();
         public bool STOP = false;
-        int maxCounGen = 0;
-        int maxCounWord = 0;
-        public List<string> insertedWords = new List<string>();
-
-        public void AddListAllEmptyWordsLabelVisual(List<Cell> listAllCellStruct, List<Cell> listEmptyCellStruct, List<List<string>> listWordsList, Label WindowsText, CheckBox Visualization)
+        public List<string> allInsertedWords = new List<string>();
+        async public Task Generation(int maxCounGen, int maxCounWord, List<Word> listWordStruct, List<Cell> listEmptyCellStruct, List<List<string>> listWordsList, Label WindowsText, CheckBox Visualization)
         {
-            this.listAllCellStruct = listAllCellStruct;
-            this.listEmptyCellStruct = listEmptyCellStruct;
-            this.listWordsList = listWordsList;
-            this.WindowsText = WindowsText;
-            this.Visualization = Visualization;
-        }
-        async public Task Generation(int maxCounGen, int maxCounWord)
-        {
-            this.maxCounGen = maxCounGen;
-            this.maxCounWord = maxCounWord;
-            listWordStruct = formationOfAQueue.FormationQueue(listAllCellStruct, listEmptyCellStruct);
             foreach (Word word in listWordStruct)
             {
-                word.insertedWords = insertedWords;
+                word.allInsertedWords = allInsertedWords;
             }
-            SearchForWordsByLength();
-            await SelectionAndInstallationOfWords();
+            SearchForWordsByLength(listWordStruct, listWordsList);
+            await SelectionAndInstallationOfWords(maxCounGen, maxCounWord, listWordStruct, listEmptyCellStruct, WindowsText, Visualization);
             //DisplayingWordsOnTheScreen();
-
         }
-        public void SearchForWordsByLength()
+        public void SearchForWordsByLength(List<Word> listWordStruct, List<List<string>> listWordsList)
         {
             for (int i = 0; i < listWordStruct.Count; i++)
             {
@@ -56,21 +32,21 @@ namespace Crossword
                 word.ListWordsRandomization();
             }
         }
-        async public Task SelectionAndInstallationOfWords()
+        async public Task SelectionAndInstallationOfWords(int maxCounGen, int maxCounWord, List<Word> listWordStruct, List<Cell> listEmptyCellStruct, Label WindowsText, CheckBox Visualization)
         {
             for (int i = 0; i < maxCounGen; i++)
             {
                 WindowsText.Content = "Генерация - " + i;
                 await Task.Delay(50);
                 int maxError = 0;
-                insertedWords.Clear();
+                allInsertedWords.Clear();
                 foreach (Word word in listWordStruct)
                 {
                     word.Reset();
                     word.error = 0;
                     word.RestoreDictionary();
                 }
-                foreach (Cell cell in listAllCellStruct)
+                foreach (Cell cell in listEmptyCellStruct)
                 {
                     cell.label.Content = null;
                     cell.label.Background = Brushes.Transparent;
@@ -124,18 +100,8 @@ namespace Crossword
 
                         List<Word> templist = new List<Word>(newWord.ConnectionWords);
 
-                        //Random rnd = new Random();
-                        //for (int u = 0; u < templist.Count; u++)
-                        //{
-                        //    Word temp = templist[u];
-                        //    int randomIndex = rnd.Next(u, templist.Count - 1);
-                        //    templist[u] = templist[randomIndex];
-                        //    templist[randomIndex] = temp;
-                        //}
-                        //for (int t = 0; t < templist.Count; t++)
-                        //{
                         bool GlobalError = false;
-                        //Оптимизировать. сдеделать цикл чтобы менять дальше 2 слова, пото3 и такдалее.
+                        //Оптимизировать. сделать цикл чтобы менять дальше 2 слова, потом3 и такдалее.
                         for (int t = templist.Count - 1; t >= 0; t--)
                         {
                             if (templist[t].full == true)
@@ -173,7 +139,6 @@ namespace Crossword
                             {
                                 if (templist[t].full == true)
                                 {
-                                    string saveWord = templist[t].wordString;
                                     if (Visualization.IsChecked == true)
                                     {
                                         TestWordStartGreen(templist[t]);
@@ -194,11 +159,15 @@ namespace Crossword
                                 }
                             }
                         }
-                        TestWordEnd(newWord);
-                        //foreach (var item in newWord.listLabel)
-                        //{
-                        //    item.Background = Brushes.Transparent;
-                        //}
+                        if (GlobalError == false && index != 0)
+                        {
+                            newWord.RestoreDictionary();
+                        }
+                        if (Visualization.IsChecked == true)
+                        {
+                            TestWordEnd(newWord);
+                        }
+
                         if (index != 999 && index >= 0)
                         {
                             continue;
@@ -295,10 +264,10 @@ namespace Crossword
                     string newWord = "";
                     foreach (string item in listWordsString)
                     {
-                        if (insertedWords.Contains(item) == false)
+                        if (allInsertedWords.Contains(item) == false)
                         {
                             newWord = item;
-                            insertedWords.Add(newWord);
+                            allInsertedWords.Add(newWord);
                             word.DeleteWord(newWord);
                             break;
                         }

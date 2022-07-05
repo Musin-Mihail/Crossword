@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows;
+using System.Linq;
 namespace Crossword
 {
     internal class FormationOfAQueue
     {
-        List<Cell> listAllCellStruct = new List<Cell>();
         List<Cell> listEmptyCellStruct = new List<Cell>();
         List<Word> listWordStruct = new List<Word>();
-        public List<Word> FormationQueue(List<Cell> listAllCellStruct, List<Cell> listEmptyCellStruct)
+        public List<Word> FormationQueue(List<Cell> listEmptyCellStruct)
         {
 
-            this.listAllCellStruct = listAllCellStruct;
             this.listEmptyCellStruct = listEmptyCellStruct;
             listWordStruct.Clear();
             SearchForTheBeginningAndLengthOfAllWords();
@@ -28,8 +27,8 @@ namespace Crossword
             //Sorting2();
             Sorting3();
             //DefiningTheGenerationQueue();
+            SortingConnectionWords();
             //Test();
-            //DifficultyCalculation();
             return listWordStruct;
         }
         void Test()
@@ -45,27 +44,6 @@ namespace Crossword
                 {
                     item2.Background = Brushes.Transparent;
                 }
-            }
-        }
-        void TestWordStartRed(Word word)
-        {
-            foreach (var item in word.listLabel)
-            {
-                item.Background = Brushes.Red;
-            }
-        }
-        void TestWordStartGreen(Word word)
-        {
-            foreach (var item in word.listLabel)
-            {
-                item.Background = Brushes.Green;
-            }
-        }
-        void TestWordEnd(Word word)
-        {
-            foreach (var item in word.listLabel)
-            {
-                item.Background = Brushes.Transparent;
             }
         }
         public void SearchForTheBeginningAndLengthOfAllWords()
@@ -108,20 +86,17 @@ namespace Crossword
             List<Label> newListLabel = new List<Label>();
             for (int i = x; i < 30; i++)
             {
-                bool black = true;
-                foreach (Cell cell in listAllCellStruct)
+                bool match = false;
+                foreach (Cell cell in listEmptyCellStruct)
                 {
                     if (cell.y == y && cell.x == i)
                     {
-                        if (cell.border.Background == Brushes.Transparent)
-                        {
-                            newListLabel.Add(cell.label);
-                            black = false;
-                            break;
-                        }
+                        newListLabel.Add(cell.label);
+                        match = true;
+                        break;
                     }
                 }
-                if (black == true)
+                if (match == false)
                 {
                     break;
                 }
@@ -139,20 +114,17 @@ namespace Crossword
             List<Label> newListLabel = new List<Label>();
             for (int i = y; i < 30; i++)
             {
-                bool black = true;
-                foreach (Cell cell in listAllCellStruct)
+                bool match = false;
+                foreach (Cell cell in listEmptyCellStruct)
                 {
                     if (cell.y == i && cell.x == x)
                     {
-                        if (cell.border.Background == Brushes.Transparent)
-                        {
-                            newListLabel.Add(cell.label);
-                            black = false;
-                            break;
-                        }
+                        newListLabel.Add(cell.label);
+                        match = true;
+                        break;
                     }
                 }
-                if (black == true)
+                if (match == false)
                 {
                     break;
                 }
@@ -168,7 +140,6 @@ namespace Crossword
         {
             foreach (Word word in listWordStruct)
             {
-                //TestWordStartRed(word);
                 List<Label> tempListLabel = word.listLabel;
                 foreach (Label label in tempListLabel)
                 {
@@ -176,31 +147,17 @@ namespace Crossword
                     {
                         if (word != word2 && word2.SearchForMatches(label) == true)
                         {
-                            //TestWordStartGreen(word2);
-                            //MessageBox.Show("Начало проверки");
                             if (word.ConnectionWords.Contains(word2) == false)
                             {
-                                //MessageBox.Show("Добавлене слова");
                                 word.ConnectionWords.Add(word2);
-                            }
-                            if (word2.ConnectionWords.Contains(word) == false)
-                            {
-                                //MessageBox.Show("Добавление в себя слова");
-                                word2.ConnectionWords.Add(word);
                             }
                             if (word.ConnectionLabel.Contains(label) == false)
                             {
                                 word.ConnectionLabel.Add(label);
                             }
-                            if (word2.ConnectionLabel.Contains(label) == false)
-                            {
-                                word2.ConnectionLabel.Add(label);
-                            }
-                            //TestWordEnd(word2);
                         }
                     }
                 }
-                //TestWordEnd(word);
             }
         }
         public void Sorting()
@@ -316,7 +273,7 @@ namespace Crossword
             }
             listWordStruct = NewList;
         }
-        void Sorting3()
+        void Sorting3()//Сортировка по цепочке, по соединённым словам
         {
             List<Word> tempList = new List<Word>();
             List<Word> NewList = new List<Word>();
@@ -436,14 +393,12 @@ namespace Crossword
             }
             return theHardestWord;
         }
-        void DifficultyCalculation()
+        void SortingConnectionWords()
         {
-            float difficulty = 0;
             foreach (var item in listWordStruct)
             {
-                difficulty += (float)item.listLabel.Count / item.ConnectionLabel.Count;
+                item.ConnectionWords = item.ConnectionWords.OrderByDescending(word => (float)word.ConnectionLabel.Count / word.listLabel.Count).ToList();
             }
-            MessageBox.Show(difficulty + "");
         }
     }
 }

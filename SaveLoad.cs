@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Media;
 using System.IO;
+using System.Windows.Media;
 
 namespace Crossword
 {
@@ -15,7 +15,7 @@ namespace Crossword
                 saveFile += cell.x + ";" + cell.y + "\n";
             }
             string name = DateTime.Now.ToString("MM_dd_yyyy-HH_mm_ss");
-            File.WriteAllText(@"SaveGrid\" + name+ ".grid", saveFile);
+            File.WriteAllText(@"SaveGrid\" + name + ".grid", saveFile);
         }
         public void Load(List<Cell> listAllCellStruct, string[] listEmptyCellStruct)
         {

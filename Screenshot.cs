@@ -1,12 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
 using System.Linq;
+using System.Windows.Controls;
 
 namespace Crossword
 {
@@ -28,6 +26,8 @@ namespace Crossword
         float sizeCell = 37.938105f;
         public void CreateImage(List<Cell> listCell, List<Word> listWord)
         {
+            listDefinitionRight.Clear();
+            listDefinitionDown.Clear();
             img.SetResolution(300, 300);
             MaxCoordinateSearch(listCell);
             int width = (int)((downMaxX - topMaxX + 1) * sizeCell);
@@ -74,7 +74,7 @@ namespace Crossword
             int count = 0;
             graphics.FillRectangle(blackBrush, 0, 0, (downMaxX - topMaxX + 1) * sizeCell, (rightMaxY - leftMaxY + 1) * sizeCell);
             graphics.DrawRectangle(blackPen, 0, 0, (downMaxX - topMaxX + 1) * sizeCell, (rightMaxY - leftMaxY + 1) * sizeCell);
-            //AddingWatermarks(graphics);
+            AddingWatermarks(graphics);
             foreach (Cell cell in listCell)
             {
                 if (cell.border.Background == System.Windows.Media.Brushes.Transparent)
@@ -115,7 +115,7 @@ namespace Crossword
         void CreateFillDrid(Graphics graphics, List<Cell> listCell, List<Word> listWord)
         {
             graphics.Clear(Color.White);
-            //AddingWatermarks(graphics);
+            AddingWatermarks(graphics);
             foreach (Cell cell in listCell)
             {
                 if (cell.border.Background == System.Windows.Media.Brushes.Black)
