@@ -73,40 +73,71 @@ namespace Crossword
                         index++;
                         continue;
                     }
-                    else
+
+                    newWord.error++;
+                    if (newWord.error > maxCounWord)
                     {
-                        newWord.error++;
-                        if (newWord.error > maxCounWord)
+                        break;
+                    }
+                    if (newWord.error > maxError)
+                    {
+                        maxError = newWord.error;
+                        if (newWord.error % 10 == 0)
                         {
-                            break;
+                            WindowsText.Content = "Генерация - " + i + " Ошибок - " + maxError;
+                            WindowsText.Content += "\nСлов в 1 слове - " + listWordStruct[0].listTempWords.Count;
+                            WindowsText.Content += "\nСлов в 2 слове - " + listWordStruct[1].listTempWords.Count;
+                            WindowsText.Content += "\nСлов в 3 слове - " + listWordStruct[2].listTempWords.Count;
+                            await Task.Delay(1);
                         }
-                        if (newWord.error > maxError)
+                    }
+
+                    if (newWord.listTempWords.Count == 0)
+                    {
+                        newWord.RestoreDictionary();
+                    }
+
+                    List<Word> templist = new List<Word>(newWord.ConnectionWords);
+
+                    bool GlobalError = false;
+                    //Оптимизировать. сделать цикл чтобы менять дальше 2 слова, потом3 и такдалее.
+                    for (int t = templist.Count - 1; t >= 0; t--)
+                    {
+                        if (templist[t].full == true)
                         {
-                            maxError = newWord.error;
-                            if (newWord.error % 10 == 0)
+                            string saveWord = templist[t].wordString;
+                            if (Visualization.IsChecked == true)
                             {
-                                WindowsText.Content = "Генерация - " + i + " Ошибок - " + maxError;
-                                WindowsText.Content += "\nСлов в 1 слове - " + listWordStruct[0].listTempWords.Count;
-                                WindowsText.Content += "\nСлов в 2 слове - " + listWordStruct[1].listTempWords.Count;
-                                WindowsText.Content += "\nСлов в 3 слове - " + listWordStruct[2].listTempWords.Count;
+                                TestWordStartGreen(templist[t]);
                                 await Task.Delay(1);
+                                TestWordEnd(templist[t]);
+                            }
+                            int newindex = listWordStruct.IndexOf(templist[t]);
+                            if (newindex < index)
+                            {
+                                index = newindex;
+                            }
+                            templist[t].ClearLabel();
+
+                            error = InsertWord(newWord);
+                            if (error == false)
+                            {
+                                templist[t].Reset();
+                                GlobalError = true;
+                                break;
+                            }
+                            else
+                            {
+                                templist[t].InsertWord(saveWord);
                             }
                         }
-
-                        if (newWord.listTempWords.Count == 0)
-                        {
-                            newWord.RestoreDictionary();
-                        }
-
-                        List<Word> templist = new List<Word>(newWord.ConnectionWords);
-
-                        bool GlobalError = false;
-                        //Оптимизировать. сделать цикл чтобы менять дальше 2 слова, потом3 и такдалее.
+                    }
+                    if (GlobalError == false)
+                    {
                         for (int t = templist.Count - 1; t >= 0; t--)
                         {
                             if (templist[t].full == true)
                             {
-                                string saveWord = templist[t].wordString;
                                 if (Visualization.IsChecked == true)
                                 {
                                     TestWordStartGreen(templist[t]);
@@ -118,66 +149,33 @@ namespace Crossword
                                 {
                                     index = newindex;
                                 }
-                                templist[t].ClearLabel();
-
+                                templist[t].Reset();
                                 error = InsertWord(newWord);
                                 if (error == false)
                                 {
-                                    templist[t].Reset();
-                                    GlobalError = true;
                                     break;
                                 }
-                                else
-                                {
-                                    templist[t].InsertWord(saveWord);
-                                }
                             }
                         }
-                        if (GlobalError == false)
-                        {
-                            for (int t = templist.Count - 1; t >= 0; t--)
-                            {
-                                if (templist[t].full == true)
-                                {
-                                    if (Visualization.IsChecked == true)
-                                    {
-                                        TestWordStartGreen(templist[t]);
-                                        await Task.Delay(1);
-                                        TestWordEnd(templist[t]);
-                                    }
-                                    int newindex = listWordStruct.IndexOf(templist[t]);
-                                    if (newindex < index)
-                                    {
-                                        index = newindex;
-                                    }
-                                    templist[t].Reset();
-                                    error = InsertWord(newWord);
-                                    if (error == false)
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        if (GlobalError == false && index != 0)
-                        {
-                            newWord.RestoreDictionary();
-                        }
-                        if (Visualization.IsChecked == true)
-                        {
-                            TestWordEnd(newWord);
-                        }
+                    }
+                    if (GlobalError == false && index != 0)
+                    {
+                        newWord.RestoreDictionary();
+                    }
+                    if (Visualization.IsChecked == true)
+                    {
+                        TestWordEnd(newWord);
+                    }
 
-                        if (index != 999 && index >= 0)
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            MessageBox.Show("Критическая ошибка\nНе нашёл соединённых слов\n");
-                            WindowsText.Content += "Не нашёл соединённых слов\n";
-                            return;
-                        }
+                    if (index != 999 && index >= 0)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Критическая ошибка\nНе нашёл соединённых слов\n");
+                        WindowsText.Content += "Не нашёл соединённых слов\n";
+                        return;
                     }
                 }
                 if (index >= listWordStruct.Count)

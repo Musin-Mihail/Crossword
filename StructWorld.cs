@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Controls;
 namespace Crossword
 {
-    class Word
+    public class Word
     {
         public List<Label> listLabel = new List<Label>();
         public Label firstLabel = new Label();

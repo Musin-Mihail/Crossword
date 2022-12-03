@@ -24,7 +24,6 @@ namespace Crossword
                 cell.label.Content = null;
                 cell.border.Background = Brushes.Black;
             }
-            //string[] listEmptyCellStruct = File.ReadAllLines("SaveGrid.txt");
             foreach (var item in listEmptyCellStruct)
             {
                 List<string> strings = new List<string>(item.Split(';'));

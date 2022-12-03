@@ -30,8 +30,8 @@ namespace Crossword
                 foreach (string cell in listEmptyCellStruct)
                 {
                     List<string> strings = new List<string>(cell.Split(';'));
-                    int x = Int32.Parse(strings[0]);
-                    int y = Int32.Parse(strings[1]);
+                    int x = Int32.Parse(strings[0])-1;
+                    int y = Int32.Parse(strings[1])-1;
                     border = CreateWhiteBorder(x, y, nextGrid);
                     TheGrid.Children.Add(border);
                 }
