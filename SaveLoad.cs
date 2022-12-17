@@ -14,9 +14,11 @@ namespace Crossword
             {
                 saveFile += cell.x + ";" + cell.y + "\n";
             }
+
             string name = DateTime.Now.ToString("MM_dd_yyyy-HH_mm_ss");
             File.WriteAllText(@"SaveGrid\" + name + ".grid", saveFile);
         }
+
         public void Load(List<Cell> listAllCellStruct, string[] listEmptyCellStruct)
         {
             foreach (Cell cell in listAllCellStruct)
@@ -24,6 +26,7 @@ namespace Crossword
                 cell.label.Content = null;
                 cell.border.Background = Brushes.Black;
             }
+
             foreach (var item in listEmptyCellStruct)
             {
                 List<string> strings = new List<string>(item.Split(';'));

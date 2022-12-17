@@ -4,6 +4,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Crossword.PlayingField;
+using Crossword.Words;
 
 namespace Crossword
 {
@@ -12,7 +14,6 @@ namespace Crossword
         private List<List<string>> _listWordsList = new();
         private static List<Cell> _listAllCellStruct = new();
         private List<Cell> _listEmptyCellStruct = new();
-        private readonly PlayingField _playingField = new();
         private readonly SaveLoad _saveLoad = new();
         private readonly GridFill _gridFill = new();
         private readonly Screenshot _screenshot = new();
@@ -25,6 +26,9 @@ namespace Crossword
         public bool verticallyMirror = false;
         public bool allMirror = false;
 
+        private const int CellSize = 30;
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -35,8 +39,8 @@ namespace Crossword
         private void CreatingThePlayingField()
         {
             _listAllCellStruct.Clear();
-            _listAllCellStruct = _playingField.CreateUiGrid(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically);
-            _listWordsList = _playingField.CreateDictionary();
+            _listAllCellStruct = CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize);
+            _listWordsList = CreateDictionary.Get();
             
             LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
             LineCenterH.X2 = _numberOfCellsHorizontally * 30 / 2 + 30;
@@ -51,7 +55,7 @@ namespace Crossword
         {
             StartGen();
             await Task.Delay(100);
-            _listEmptyCellStruct = _playingField.SearchForEmptyCells();
+            _listEmptyCellStruct = SearchForEmptyCells.Get(_listAllCellStruct);
             if (_listEmptyCellStruct.Count > 0)
             {
                 _listWordStruct = _formationOfAQueue.FormationQueue(_listEmptyCellStruct);
@@ -67,9 +71,8 @@ namespace Crossword
                     MessageBox.Show("ОШИБКА. Водите только цифры");
                 }
 
-                await _gridFill.Generation(maxCountGen, maxCountWord, _listWordStruct, _listEmptyCellStruct, _listWordsList, WindowsText, Visualization);
+                await _gridFill.Generation(maxCountGen, maxCountWord, _listWordStruct, _listEmptyCellStruct, _listWordsList, WindowsTextTop, Visualization);
             }
-            
             EndGen();
         }
         
@@ -110,7 +113,7 @@ namespace Crossword
 
         private void Button_ClickSaveGrid(object sender, RoutedEventArgs e)
         {
-            _listEmptyCellStruct = _playingField.SearchForEmptyCells();
+            _listEmptyCellStruct = SearchForEmptyCells.Get(_listAllCellStruct);
             _saveLoad.Save(_listEmptyCellStruct);
         }
 
@@ -152,6 +155,14 @@ namespace Crossword
                 {
                     ColoringAll(myBorder, Brushes.Transparent);
                 }
+                else if (VerticallyMirrorRevers.IsChecked == true)
+                {
+                    ColoringHorizontalRevers(myBorder, Brushes.Transparent);
+                }
+                else if (HorizontallyMirrorRevers.IsChecked == true)
+                {
+                    ColoringVerticalRevers(myBorder, Brushes.Transparent);
+                }
                 else
                 {
                     myBorder.Background = Brushes.Transparent;
@@ -173,9 +184,47 @@ namespace Crossword
                 {
                     ColoringAll(myBorder, Brushes.Black);
                 }
+                else if (VerticallyMirrorRevers.IsChecked == true)
+                {
+                    ColoringHorizontalRevers(myBorder, Brushes.Black);
+                }
+                else if (HorizontallyMirrorRevers.IsChecked == true)
+                {
+                    ColoringVerticalRevers(myBorder, Brushes.Black);
+                }
                 else
                 {
                     myBorder.Background = Brushes.Black;
+                }
+            }
+        }
+        static void ColoringVerticalRevers(Border myBorder, Brush color)
+        {
+            int x = 0;
+            int y = 0;
+            foreach (var cell in _listAllCellStruct)
+            {
+                if (cell.border == myBorder)
+                {
+                    x = cell.x;
+                    y = cell.y;
+                    break;
+                }
+            }
+            int center = _numberOfCellsHorizontally / 2;
+            if (x <= center)
+            {
+                myBorder.Background = color;
+                int mirrorX = _numberOfCellsHorizontally - x + 1;
+                int mirrorY = _numberOfCellsVertically - y + 1;
+                ColoringCell(mirrorX, mirrorY, color);
+            }
+
+            if (_numberOfCellsHorizontally % 2 != 0)
+            {
+                if (x == center+1)
+                {
+                    myBorder.Background = color;
                 }
             }
         }
@@ -204,6 +253,35 @@ namespace Crossword
             if (_numberOfCellsHorizontally % 2 != 0)
             {
                 if (x == center+1)
+                {
+                    myBorder.Background = color;
+                }
+            }
+        }
+        static void ColoringHorizontalRevers(Border myBorder, Brush color)
+        {
+            int x = 0;
+            int y = 0;
+            foreach (var cell in _listAllCellStruct)
+            {
+                if (cell.border == myBorder)
+                {
+                    x = cell.x;
+                    y = cell.y;
+                    break;
+                }
+            }
+            int center = _numberOfCellsVertically / 2;
+            if (y <= center)
+            {
+                myBorder.Background = color;
+                int mirrorX = _numberOfCellsHorizontally - x + 1;
+                int mirrorY = _numberOfCellsVertically - y + 1;
+                ColoringCell(mirrorX, mirrorY, color);
+            }
+            if (_numberOfCellsVertically % 2 != 0)
+            {
+                if (y == center + 1)
                 {
                     myBorder.Background = color;
                 }

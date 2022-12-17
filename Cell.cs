@@ -4,10 +4,11 @@ namespace Crossword
 {
     public class Cell
     {
-        public Border border = new Border();
-        public Label label = new Label();
+        public Border border = new();
+        public Label label = new();
         public int x;
         public int y;
+
         public void AddBorderLabelXY(Border border, Label label, int x, int y)
         {
             this.border = border;

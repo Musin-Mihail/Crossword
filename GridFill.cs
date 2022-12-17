@@ -3,33 +3,38 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Crossword.Words;
 
 namespace Crossword
 {
     internal class GridFill
     {
         public bool STOP = false;
-        public List<string> allInsertedWords = new List<string>();
-        async public Task Generation(int maxCounGen, int maxCounWord, List<Word> listWordStruct, List<Cell> listEmptyCellStruct, List<List<string>> listWordsList, Label WindowsText, CheckBox Visualization)
+        public List<string> allInsertedWords = new();
+
+        async public Task Generation(int maxCounGen, int maxCounWord, List<Word> listWordStruct, List<Cell> listEmptyCellStruct, List<List<string>> listWordsList, Label windowsText, CheckBox visualization)
         {
             foreach (Word word in listWordStruct)
             {
                 word.allInsertedWords = allInsertedWords;
             }
+
             SearchForWordsByLength(listWordStruct, listWordsList);
-            await SelectionAndInstallationOfWords(maxCounGen, maxCounWord, listWordStruct, listEmptyCellStruct, WindowsText, Visualization);
-            //DisplayingWordsOnTheScreen();
+            
+            await SelectionAndInstallationOfWords(maxCounGen, maxCounWord, listWordStruct, listEmptyCellStruct, windowsText, visualization);
         }
+
         public void SearchForWordsByLength(List<Word> listWordStruct, List<List<string>> listWordsList)
         {
             for (int i = 0; i < listWordStruct.Count; i++)
             {
                 int letterCount = listWordStruct[i].listLabel.Count;
-                listWordStruct[i].AddWords(listWordsList[letterCount]);
+                AddWords.Get(listWordStruct[i], listWordsList[letterCount]);
             }
+
             foreach (var word in listWordStruct)
             {
-                word.ListWordsRandomization();
+                ListWordsRandomization.Get(word);
             }
         }
         async public Task SelectionAndInstallationOfWords(int maxCounGen, int maxCounWord, List<Word> listWordStruct, List<Cell> listEmptyCellStruct, Label WindowsText, CheckBox Visualization)
@@ -42,10 +47,11 @@ namespace Crossword
                 allInsertedWords.Clear();
                 foreach (Word word in listWordStruct)
                 {
-                    word.Reset();
+                    Reset.Get(word);
                     word.error = 0;
-                    word.RestoreDictionary();
+                    RestoreDictionary.Get(word);
                 }
+
                 foreach (Cell cell in listEmptyCellStruct)
                 {
                     cell.label.Content = null;
@@ -53,7 +59,6 @@ namespace Crossword
                 }
 
                 int index = 0;
-
                 while (index < listWordStruct.Count)
                 {
                     if (STOP)
@@ -62,23 +67,25 @@ namespace Crossword
                         STOP = false;
                         return;
                     }
+
+
                     bool error = false;
                     Word newWord = listWordStruct[index];
                     if (newWord.full == false)
                     {
-                        error = InsertWord(newWord);
+                        error = InsertWordGrid(newWord);
                     }
                     if (error == false)
                     {
                         index++;
                         continue;
                     }
-
                     newWord.error++;
                     if (newWord.error > maxCounWord)
                     {
                         break;
                     }
+
                     if (newWord.error > maxError)
                     {
                         maxError = newWord.error;
@@ -92,15 +99,15 @@ namespace Crossword
                         }
                     }
 
+
                     if (newWord.listTempWords.Count == 0)
                     {
-                        newWord.RestoreDictionary();
+                        RestoreDictionary.Get(newWord);
                     }
 
-                    List<Word> templist = new List<Word>(newWord.ConnectionWords);
 
+                    List<Word> templist = new List<Word>(newWord.connectionWords);
                     bool GlobalError = false;
-                    //Оптимизировать. сделать цикл чтобы менять дальше 2 слова, потом3 и такдалее.
                     for (int t = templist.Count - 1; t >= 0; t--)
                     {
                         if (templist[t].full == true)
@@ -112,26 +119,32 @@ namespace Crossword
                                 await Task.Delay(1);
                                 TestWordEnd(templist[t]);
                             }
+
                             int newindex = listWordStruct.IndexOf(templist[t]);
                             if (newindex < index)
                             {
                                 index = newindex;
                             }
-                            templist[t].ClearLabel();
 
-                            error = InsertWord(newWord);
+                            ClearLabel.Get(templist[t]);
+
+                            error = InsertWordGrid(newWord);
                             if (error == false)
                             {
-                                templist[t].Reset();
+                                Reset.Get(templist[t]);
                                 GlobalError = true;
                                 break;
                             }
-                            else
+
+                            if (saveWord.Length == 0)
                             {
-                                templist[t].InsertWord(saveWord);
+                                MessageBox.Show("saveWord.Length == 0");
                             }
+
+                            InsertWord.Get(templist[t], saveWord);
                         }
                     }
+
                     if (GlobalError == false)
                     {
                         for (int t = templist.Count - 1; t >= 0; t--)
@@ -144,13 +157,15 @@ namespace Crossword
                                     await Task.Delay(1);
                                     TestWordEnd(templist[t]);
                                 }
+
                                 int newindex = listWordStruct.IndexOf(templist[t]);
                                 if (newindex < index)
                                 {
                                     index = newindex;
                                 }
-                                templist[t].Reset();
-                                error = InsertWord(newWord);
+
+                                Reset.Get(templist[t]);
+                                error = InsertWordGrid(newWord);
                                 if (error == false)
                                 {
                                     break;
@@ -158,26 +173,29 @@ namespace Crossword
                             }
                         }
                     }
+
                     if (GlobalError == false && index != 0)
                     {
-                        newWord.RestoreDictionary();
+                        RestoreDictionary.Get(newWord);
                     }
+
                     if (Visualization.IsChecked == true)
                     {
                         TestWordEnd(newWord);
                     }
 
+
                     if (index != 999 && index >= 0)
                     {
                         continue;
                     }
-                    else
-                    {
-                        MessageBox.Show("Критическая ошибка\nНе нашёл соединённых слов\n");
-                        WindowsText.Content += "Не нашёл соединённых слов\n";
-                        return;
-                    }
+
+
+                    MessageBox.Show("Критическая ошибка\nНе нашёл соединённых слов\n");
+                    WindowsText.Content += "Не нашёл соединённых слов\n";
+                    return;
                 }
+
                 if (index >= listWordStruct.Count)
                 {
                     WindowsText.Content = "ГЕНЕРАЦИЯ УДАЛАСЬ\n";
@@ -187,20 +205,15 @@ namespace Crossword
                 }
             }
         }
-        void TestWordStartRed(Word word)
+
+        void TestWordStartGreen(Word wordOld)
         {
-            foreach (var item in word.listLabel)
-            {
-                item.Background = Brushes.Red;
-            }
-        }
-        void TestWordStartGreen(Word word)
-        {
-            foreach (var item in word.listLabel)
+            foreach (var item in wordOld.listLabel)
             {
                 item.Background = Brushes.Green;
             }
         }
+
         void TestWordEnd(Word word)
         {
             foreach (var item in word.listLabel)
@@ -210,22 +223,22 @@ namespace Crossword
         }
 
 
-        bool InsertWord(Word word)
+        bool InsertWordGrid(Word word)
         {
             if (word.listTempWords.Count == 0)
             {
                 return true;
             }
-            else
+
+            bool error = SearchWord(word.listLabel, word.listTempWords, word);
+            if (error == true)
             {
-                bool error = SearchWord(word.listLabel, word.listTempWords, word);
-                if (error == true)
-                {
-                    return true;
-                }
+                return true;
             }
+
             return false;
         }
+
         bool SearchWord(List<Label> newListLabel, List<string> words, Word word)
         {
             if (newListLabel.Count < 21)
@@ -234,7 +247,6 @@ namespace Crossword
                 {
                     List<string> listWordsString = new List<string>(words);
                     List<string> tempListString = new List<string>();
-                    //Поиск слов с теми же буквами
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
                         if (newListLabel[i].Content != null)
@@ -248,6 +260,7 @@ namespace Crossword
                                     tempListString.Add(item);
                                 }
                             }
+
                             if (tempListString.Count > 0)
                             {
                                 listWordsString = new List<string>(tempListString);
@@ -259,6 +272,7 @@ namespace Crossword
                             }
                         }
                     }
+
                     string newWord = "";
                     foreach (string item in listWordsString)
                     {
@@ -266,14 +280,16 @@ namespace Crossword
                         {
                             newWord = item;
                             allInsertedWords.Add(newWord);
-                            word.DeleteWord(newWord);
+                            DeleteWord.Get(newWord, word);
                             break;
                         }
                     }
+
                     if (newWord.Length < 2)
                     {
                         return true;
                     }
+
                     for (int i = 0; i < newListLabel.Count; i++)
                     {
                         newListLabel[i].Content = newWord[i];
@@ -287,14 +303,8 @@ namespace Crossword
             {
                 MessageBox.Show("Есть поле больше 20");
             }
+
             return false;
         }
-        //void DisplayingWordsOnTheScreen()
-        //{
-        //    foreach (var word in listWordStruct)
-        //    {
-        //        WindowsText.Content += word.wordString + "\n";
-        //    }
-        //}
     }
 }
