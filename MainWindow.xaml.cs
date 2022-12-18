@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Crossword.GridFill;
 using Crossword.PlayingField;
 using Crossword.Words;
 
@@ -15,7 +16,6 @@ namespace Crossword
         private static List<Cell> _listAllCellStruct = new();
         private List<Cell> _listEmptyCellStruct = new();
         private readonly SaveLoad _saveLoad = new();
-        private readonly GridFill _gridFill = new();
         private readonly Screenshot _screenshot = new();
         private readonly FormationOfAQueue _formationOfAQueue = new();
         private List<Word> _listWordStruct = new();
@@ -70,8 +70,8 @@ namespace Crossword
                 {
                     MessageBox.Show("ОШИБКА. Водите только цифры");
                 }
-
-                await _gridFill.Generation(maxCountGen, maxCountWord, _listWordStruct, _listEmptyCellStruct, _listWordsList, WindowsTextTop, Visualization);
+                
+                await Generation.Get(maxCountGen, maxCountWord, _listWordStruct, _listEmptyCellStruct, _listWordsList, WindowsTextTop, Visualization);
             }
             EndGen();
         }
@@ -388,7 +388,7 @@ namespace Crossword
 
         private void Button_ClickStop(object sender, RoutedEventArgs e)
         {
-            _gridFill.STOP = true;
+            Global.stop = true;
         }
 
         private void Button_Reset(object sender, RoutedEventArgs e)
