@@ -15,8 +15,8 @@ public class Generation
             word.allInsertedWords = allInsertedWords;
         }
 
+        // Testing.Get(listEmptyCellStruct, listWordStruct);
         SearchForWordsByLength.Get(listWordStruct, listWordsList);
-
         await SelectionAndInstallationOfWords.Get(allInsertedWords, maxCounGen, maxCounWord, listWordStruct, listEmptyCellStruct, windowsText, visualization);
     }
 }

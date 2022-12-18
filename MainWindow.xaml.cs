@@ -4,8 +4,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Crossword.FormationOfAQueue;
 using Crossword.GridFill;
 using Crossword.PlayingField;
+using Crossword.SaveLoad;
+using Crossword.Screenshot;
 using Crossword.Words;
 
 namespace Crossword
@@ -15,19 +18,11 @@ namespace Crossword
         private List<List<string>> _listWordsList = new();
         private static List<Cell> _listAllCellStruct = new();
         private List<Cell> _listEmptyCellStruct = new();
-        private readonly SaveLoad _saveLoad = new();
-        private readonly Screenshot _screenshot = new();
-        private readonly FormationOfAQueue _formationOfAQueue = new();
         private List<Word> _listWordStruct = new();
         private static int _numberOfCellsHorizontally = 30;
         private static int _numberOfCellsVertically = 30;
 
-        public bool horizontallyMirror = false;
-        public bool verticallyMirror = false;
-        public bool allMirror = false;
-
         private const int CellSize = 30;
-
 
         public MainWindow()
         {
@@ -41,11 +36,11 @@ namespace Crossword
             _listAllCellStruct.Clear();
             _listAllCellStruct = CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize);
             _listWordsList = CreateDictionary.Get();
-            
+
             LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
             LineCenterH.X2 = _numberOfCellsHorizontally * 30 / 2 + 30;
             LineCenterH.Y2 = _numberOfCellsVertically * 30 + 60;
-            
+
             LineCenterV.Y1 = _numberOfCellsVertically * 30 / 2 + 30;
             LineCenterV.Y2 = _numberOfCellsVertically * 30 / 2 + 30;
             LineCenterV.X2 = _numberOfCellsHorizontally * 30 + 60;
@@ -58,7 +53,7 @@ namespace Crossword
             _listEmptyCellStruct = SearchForEmptyCells.Get(_listAllCellStruct);
             if (_listEmptyCellStruct.Count > 0)
             {
-                _listWordStruct = _formationOfAQueue.FormationQueue(_listEmptyCellStruct);
+                _listWordStruct = FormationQueue.Get(_listEmptyCellStruct);
                 int maxCountGen = 0;
                 int maxCountWord = 0;
                 try
@@ -70,18 +65,19 @@ namespace Crossword
                 {
                     MessageBox.Show("ОШИБКА. Водите только цифры");
                 }
-                
+
                 await Generation.Get(maxCountGen, maxCountWord, _listWordStruct, _listEmptyCellStruct, _listWordsList, WindowsTextTop, Visualization);
             }
+
             EndGen();
         }
-        
+
         private void StartGen()
         {
             Reset.Visibility = Visibility.Hidden;
             GenButton.Visibility = Visibility.Hidden;
-            Save.Visibility = Visibility.Hidden;
-            Load.Visibility = Visibility.Hidden;
+            SaveGrid.Visibility = Visibility.Hidden;
+            LoadGrid.Visibility = Visibility.Hidden;
             Screenshot.Visibility = Visibility.Hidden;
             GenStopButton.Visibility = Visibility.Visible;
             RadioButtons.Visibility = Visibility.Hidden;
@@ -91,8 +87,8 @@ namespace Crossword
         {
             Reset.Visibility = Visibility.Visible;
             GenButton.Visibility = Visibility.Visible;
-            Save.Visibility = Visibility.Visible;
-            Load.Visibility = Visibility.Visible;
+            SaveGrid.Visibility = Visibility.Visible;
+            LoadGrid.Visibility = Visibility.Visible;
             Screenshot.Visibility = Visibility.Visible;
             GenStopButton.Visibility = Visibility.Hidden;
             RadioButtons.Visibility = Visibility.Visible;
@@ -114,7 +110,7 @@ namespace Crossword
         private void Button_ClickSaveGrid(object sender, RoutedEventArgs e)
         {
             _listEmptyCellStruct = SearchForEmptyCells.Get(_listAllCellStruct);
-            _saveLoad.Save(_listEmptyCellStruct);
+            Save.Get(_listEmptyCellStruct);
         }
 
         private void Button_ClickLoadGrid(object sender, RoutedEventArgs e)
@@ -123,7 +119,7 @@ namespace Crossword
             loadGrid.ShowDialog();
             if (loadGrid.ready == true)
             {
-                _saveLoad.Load(_listAllCellStruct, loadGrid.listEmptyCellStruct);
+                Load.Get(_listAllCellStruct, loadGrid.listEmptyCellStruct);
             }
         }
 
@@ -142,7 +138,7 @@ namespace Crossword
             if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
                 Border myBorder = (Border)sender;
-                
+
                 if (VerticallyMirror.IsChecked == true)
                 {
                     ColoringHorizontal(myBorder, Brushes.Transparent);
@@ -167,7 +163,6 @@ namespace Crossword
                 {
                     myBorder.Background = Brushes.Transparent;
                 }
-
             }
             else if (Mouse.RightButton == MouseButtonState.Pressed)
             {
@@ -198,6 +193,7 @@ namespace Crossword
                 }
             }
         }
+
         static void ColoringVerticalRevers(Border myBorder, Brush color)
         {
             int x = 0;
@@ -211,6 +207,7 @@ namespace Crossword
                     break;
                 }
             }
+
             int center = _numberOfCellsHorizontally / 2;
             if (x <= center)
             {
@@ -222,7 +219,7 @@ namespace Crossword
 
             if (_numberOfCellsHorizontally % 2 != 0)
             {
-                if (x == center+1)
+                if (x == center + 1)
                 {
                     myBorder.Background = color;
                 }
@@ -242,6 +239,7 @@ namespace Crossword
                     break;
                 }
             }
+
             int center = _numberOfCellsHorizontally / 2;
             if (x <= center)
             {
@@ -252,12 +250,13 @@ namespace Crossword
 
             if (_numberOfCellsHorizontally % 2 != 0)
             {
-                if (x == center+1)
+                if (x == center + 1)
                 {
                     myBorder.Background = color;
                 }
             }
         }
+
         static void ColoringHorizontalRevers(Border myBorder, Brush color)
         {
             int x = 0;
@@ -271,6 +270,7 @@ namespace Crossword
                     break;
                 }
             }
+
             int center = _numberOfCellsVertically / 2;
             if (y <= center)
             {
@@ -279,6 +279,7 @@ namespace Crossword
                 int mirrorY = _numberOfCellsVertically - y + 1;
                 ColoringCell(mirrorX, mirrorY, color);
             }
+
             if (_numberOfCellsVertically % 2 != 0)
             {
                 if (y == center + 1)
@@ -287,7 +288,7 @@ namespace Crossword
                 }
             }
         }
-        
+
         static void ColoringHorizontal(Border myBorder, Brush color)
         {
             int x = 0;
@@ -301,6 +302,7 @@ namespace Crossword
                     break;
                 }
             }
+
             int center = _numberOfCellsVertically / 2;
             if (y <= center)
             {
@@ -308,6 +310,7 @@ namespace Crossword
                 int mirrorY = _numberOfCellsVertically - y + 1;
                 ColoringCell(x, mirrorY, color);
             }
+
             if (_numberOfCellsVertically % 2 != 0)
             {
                 if (y == center + 1)
@@ -316,6 +319,7 @@ namespace Crossword
                 }
             }
         }
+
         static void ColoringAll(Border myBorder, Brush color)
         {
             int x = 0;
@@ -329,6 +333,7 @@ namespace Crossword
                     break;
                 }
             }
+
             int centerH = _numberOfCellsHorizontally / 2;
             int centerV = _numberOfCellsVertically / 2;
             if (x <= centerH && y <= centerV)
@@ -340,6 +345,7 @@ namespace Crossword
                 ColoringCell(x, mirrorY, color);
                 ColoringCell(mirrorX, mirrorY, color);
             }
+
             if (_numberOfCellsHorizontally % 2 != 0)
             {
                 if (x == centerH + 1 && y <= centerV)
@@ -349,7 +355,7 @@ namespace Crossword
                     ColoringCell(x, mirrorY, color);
                 }
             }
-            
+
             if (_numberOfCellsVertically % 2 != 0)
             {
                 if (x <= centerH && y == centerV + 1)
@@ -359,7 +365,7 @@ namespace Crossword
                     ColoringCell(mirrorX, y, color);
                 }
             }
-            
+
             if (_numberOfCellsHorizontally % 2 != 0 && _numberOfCellsVertically % 2 != 0)
             {
                 if (x == centerH + 1 && y == centerV + 1)
@@ -402,7 +408,7 @@ namespace Crossword
 
         private void Button_Screenshot(object sender, RoutedEventArgs e)
         {
-            _screenshot.CreateImage(_listAllCellStruct, _listWordStruct);
+            CreateImage.Get(_listAllCellStruct, _listWordStruct);
         }
 
         private void Button_ChangeFill(object sender, RoutedEventArgs e)
@@ -414,6 +420,40 @@ namespace Crossword
                 _numberOfCellsHorizontally = сhangeFill.numberOfCellsHorizontally;
                 _numberOfCellsVertically = сhangeFill.numberOfCellsVertically;
                 CreatingThePlayingField();
+            }
+        }
+
+        private void ClearMirror_OnChecked(object sender, RoutedEventArgs e)
+        {
+            if (VerticallyMirror.IsChecked == true)
+            {
+                LineCenterH.Visibility = Visibility.Hidden;
+                LineCenterV.Visibility = Visibility.Visible;
+            }
+            else if (HorizontallyMirror.IsChecked == true)
+            {
+                LineCenterH.Visibility = Visibility.Visible;
+                LineCenterV.Visibility = Visibility.Hidden;
+            }
+            else if (AllMirror.IsChecked == true)
+            {
+                LineCenterH.Visibility = Visibility.Visible;
+                LineCenterV.Visibility = Visibility.Visible;
+            }
+            else if (VerticallyMirrorRevers.IsChecked == true)
+            {
+                LineCenterH.Visibility = Visibility.Hidden;
+                LineCenterV.Visibility = Visibility.Visible;
+            }
+            else if (HorizontallyMirrorRevers.IsChecked == true)
+            {
+                LineCenterH.Visibility = Visibility.Visible;
+                LineCenterV.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                LineCenterH.Visibility = Visibility.Hidden;
+                LineCenterV.Visibility = Visibility.Hidden;
             }
         }
     }
