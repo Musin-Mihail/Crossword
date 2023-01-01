@@ -6,7 +6,7 @@ namespace Crossword.FormationOfAQueue;
 
 public class SaveWordDown
 {
-    public static void Get(List<Word> listWordStruct, int x, int y)
+    public static void Get(int x, int y)
     {
         List<Label> newListLabel = new List<Label>();
         for (int i = y; i < 31; i++)
@@ -32,7 +32,7 @@ public class SaveWordDown
         {
             Word newWord = new Word();
             newWord.listLabel = newListLabel;
-            listWordStruct.Add(newWord);
+            Global.listWordsGrid.Add(newWord);
         }
     }
 }

@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using Crossword.Objects;
-
-namespace Crossword.FormationOfAQueue;
+﻿namespace Crossword.FormationOfAQueue;
 
 public class SearchForTheBeginningAndLengthOfAllWords
 {
-    public static void Get(List<Word> listWordStruct)
+    public static void Get()
     {
         foreach (Cell cell in Global.listEmptyCellStruct)
         {
@@ -24,7 +21,7 @@ public class SearchForTheBeginningAndLengthOfAllWords
 
             if (black == true)
             {
-                SaveWordRight.Get(listWordStruct, x, y);
+                SaveWordRight.Get(x, y);
             }
 
             black = true;
@@ -39,7 +36,7 @@ public class SearchForTheBeginningAndLengthOfAllWords
 
             if (black == true)
             {
-                SaveWordDown.Get(listWordStruct, x, y);
+                SaveWordDown.Get(x, y);
             }
         }
     }

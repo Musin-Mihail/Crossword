@@ -5,9 +5,9 @@ namespace Crossword.Words;
 
 public class AddWords
 {
-    public static void Get(Word word, List<Dictionary> listWordsList)
+    public static void Get(Word word)
     {
-        word.listWords = new List<Dictionary>(listWordsList);
-        word.listTempWords = new List<Dictionary>(listWordsList);
+        word.listWords = new List<Dictionary>(Global.listDictionaries);
+        word.listTempWords = new List<Dictionary>(Global.listDictionaries);
     }
 }

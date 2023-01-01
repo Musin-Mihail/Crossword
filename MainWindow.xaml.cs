@@ -17,8 +17,6 @@ namespace Crossword
 {
     public partial class MainWindow
     {
-        private List<Dictionary> _listWordsList = new();
-        private List<Word> _listWordStruct = new();
         private static int _numberOfCellsHorizontally = 30;
         private static int _numberOfCellsVertically = 30;
         private const int CellSize = 30;
@@ -44,8 +42,8 @@ namespace Crossword
 
         private void ResetDict()
         {
-            _listWordsList.Clear();
-            _listWordsList.Add(CreateDictionary.Get("dict.txt"));
+            Global.listDictionaries.Clear();
+            Global.listDictionaries.Add(CreateDictionary.Get("dict.txt"));
             SelectedDictionary.Content = "Основной словарь";
         }
 
@@ -56,7 +54,7 @@ namespace Crossword
             SearchForEmptyCells.Get();
             if (Global.listEmptyCellStruct.Count > 0)
             {
-                _listWordStruct = FormationQueue.Get();
+                FormationQueue.Get();
                 int maxCountGen = 0;
                 int maxCountWord = 0;
                 try
@@ -69,7 +67,7 @@ namespace Crossword
                     MessageBox.Show("ОШИБКА. Водите только цифры");
                 }
 
-                await Generation.Get(maxCountGen, maxCountWord, _listWordStruct, _listWordsList, WindowsTextTop, Visualization);
+                await Generation.Get(maxCountGen, maxCountWord, WindowsTextTop, Visualization);
             }
 
             EndGen();
@@ -410,7 +408,7 @@ namespace Crossword
 
         private void Button_Screenshot(object sender, RoutedEventArgs e)
         {
-            CreateImage.Get(_listWordStruct, _listWordsList);
+            CreateImage.Get();
         }
 
         private void Button_ChangeFill(object sender, RoutedEventArgs e)
@@ -431,7 +429,7 @@ namespace Crossword
             dictionariesSelection.ShowDialog();
             if (dictionariesSelection.ready == true)
             {
-                _listWordsList.Clear();
+                Global.listDictionaries.Clear();
                 string message = "Выбранные словари:\n";
                 List<string> dictionariesPaths = Directory.GetFiles("Dictionaries/").ToList();
                 foreach (var selectedDictionaries in dictionariesSelection.selectedDictionaries)
@@ -445,7 +443,7 @@ namespace Crossword
                             message += selectedDictionaries + "\n";
                             Dictionary dictionary = CreateDictionary.Get(path);
                             dictionary.maxCount = int.Parse(list[1]);
-                            _listWordsList.Add(dictionary);
+                            Global.listDictionaries.Add(dictionary);
                             break;
                         }
                     }

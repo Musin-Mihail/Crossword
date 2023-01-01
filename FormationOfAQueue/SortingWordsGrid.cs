@@ -3,18 +3,18 @@ using Crossword.Objects;
 
 namespace Crossword.FormationOfAQueue;
 
-public class Sorting
+public class SortingWordsGrid
 {
-    public static List<Word> Get(List<Word> listWordStruct)
+    public static void Get()
     {
         List<Word> tempList = new List<Word>();
-        List<Word> NewList = new List<Word>();
+        List<Word> newList = new List<Word>();
         List<Word> matchList = new List<Word>();
-        foreach (var item in listWordStruct)
+        foreach (var item in Global.listWordsGrid)
         {
-            if (NewList.Contains(item) == false)
+            if (newList.Contains(item) == false)
             {
-                NewList.Add(item);
+                newList.Add(item);
             }
 
             foreach (var item2 in item.connectionWords)
@@ -30,9 +30,9 @@ public class Sorting
             {
                 Word newWord = tempList[0];
                 tempList.RemoveAt(0);
-                if (NewList.Contains(newWord) == false)
+                if (newList.Contains(newWord) == false)
                 {
-                    NewList.Add(newWord);
+                    newList.Add(newWord);
                 }
 
                 foreach (var item2 in newWord.connectionWords)
@@ -46,6 +46,6 @@ public class Sorting
             }
         }
 
-        return NewList;
+        Global.listWordsGrid = new List<Word>(newList);
     }
 }

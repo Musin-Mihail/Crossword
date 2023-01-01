@@ -10,15 +10,15 @@ namespace Crossword.GridFill;
 
 public class SelectionAndInstallationOfWords
 {
-    public static async Task Get(List<string> allInsertedWords, int maxCounGen, int maxCounWord, List<Word> listWordStruct, Label WindowsText, CheckBox Visualization)
+    public static async Task Get(List<string> allInsertedWords, int maxCountGen, int maxCountWord, Label windowsText, CheckBox visualization)
     {
-        for (int i = 0; i < maxCounGen; i++)
+        for (int i = 0; i < maxCountGen; i++)
         {
-            WindowsText.Content = "Генерация - " + i;
+            windowsText.Content = "Генерация - " + i;
             await Task.Delay(50);
             int maxError = 0;
             allInsertedWords.Clear();
-            foreach (Word word in listWordStruct)
+            foreach (Word word in Global.listWordsGrid)
             {
                 Reset.Get(word);
                 word.error = 0;
@@ -32,18 +32,18 @@ public class SelectionAndInstallationOfWords
             }
 
             int index = 0;
-            while (index < listWordStruct.Count)
+            while (index < Global.listWordsGrid.Count)
             {
                 if (Global.stop)
                 {
-                    WindowsText.Content += "СТОП";
+                    windowsText.Content += "СТОП";
                     Global.stop = false;
                     return;
                 }
 
 
                 bool error = false;
-                Word newWord = listWordStruct[index];
+                Word newWord = Global.listWordsGrid[index];
                 if (newWord.full == false)
                 {
                     error = InsertWordGrid.Get(allInsertedWords, newWord);
@@ -56,7 +56,7 @@ public class SelectionAndInstallationOfWords
                 }
 
                 newWord.error++;
-                if (newWord.error > maxCounWord)
+                if (newWord.error > maxCountWord)
                 {
                     break;
                 }
@@ -66,10 +66,10 @@ public class SelectionAndInstallationOfWords
                     maxError = newWord.error;
                     if (newWord.error % 10 == 0)
                     {
-                        WindowsText.Content = "Генерация - " + i + " Ошибок - " + maxError;
-                        WindowsText.Content += "\nСлов в 1 слове - " + listWordStruct[0].listTempWords.Count;
-                        WindowsText.Content += "\nСлов в 2 слове - " + listWordStruct[1].listTempWords.Count;
-                        WindowsText.Content += "\nСлов в 3 слове - " + listWordStruct[2].listTempWords.Count;
+                        windowsText.Content = "Генерация - " + i + " Ошибок - " + maxError;
+                        windowsText.Content += "\nСлов в 1 слове - " + Global.listWordsGrid[0].listTempWords.Count;
+                        windowsText.Content += "\nСлов в 2 слове - " + Global.listWordsGrid[1].listTempWords.Count;
+                        windowsText.Content += "\nСлов в 3 слове - " + Global.listWordsGrid[2].listTempWords.Count;
                         await Task.Delay(1);
                     }
                 }
@@ -86,14 +86,14 @@ public class SelectionAndInstallationOfWords
                     if (templist[t].full == true)
                     {
                         string saveWord = templist[t].wordString;
-                        if (Visualization.IsChecked == true)
+                        if (visualization.IsChecked == true)
                         {
                             TestWordStartGreen.Get(templist[t]);
                             await Task.Delay(1);
                             TestWordEnd.Get(templist[t]);
                         }
 
-                        int newindex = listWordStruct.IndexOf(templist[t]);
+                        int newindex = Global.listWordsGrid.IndexOf(templist[t]);
                         if (newindex < index)
                         {
                             index = newindex;
@@ -124,14 +124,14 @@ public class SelectionAndInstallationOfWords
                     {
                         if (templist[t].full == true)
                         {
-                            if (Visualization.IsChecked == true)
+                            if (visualization.IsChecked == true)
                             {
                                 TestWordStartGreen.Get(templist[t]);
                                 await Task.Delay(1);
                                 TestWordEnd.Get(templist[t]);
                             }
 
-                            int newindex = listWordStruct.IndexOf(templist[t]);
+                            int newindex = Global.listWordsGrid.IndexOf(templist[t]);
                             if (newindex < index)
                             {
                                 index = newindex;
@@ -152,7 +152,7 @@ public class SelectionAndInstallationOfWords
                     RestoreDictionary.Get(newWord);
                 }
 
-                if (Visualization.IsChecked == true)
+                if (visualization.IsChecked == true)
                 {
                     TestWordEnd.Get(newWord);
                 }
@@ -163,15 +163,15 @@ public class SelectionAndInstallationOfWords
                 }
 
                 MessageBox.Show("Критическая ошибка\nНе нашёл соединённых слов\n");
-                WindowsText.Content += "Не нашёл соединённых слов\n";
+                windowsText.Content += "Не нашёл соединённых слов\n";
                 return;
             }
 
-            if (index >= listWordStruct.Count)
+            if (index >= Global.listWordsGrid.Count)
             {
-                WindowsText.Content = "ГЕНЕРАЦИЯ УДАЛАСЬ\n";
-                WindowsText.Content += "Было " + i + " попыток генерации\n";
-                WindowsText.Content += "Максимум " + maxError + " ошибок в слове за одну генерацию\n";
+                windowsText.Content = "ГЕНЕРАЦИЯ УДАЛАСЬ\n";
+                windowsText.Content += "Было " + i + " попыток генерации\n";
+                windowsText.Content += "Максимум " + maxError + " ошибок в слове за одну генерацию\n";
                 return;
             }
         }

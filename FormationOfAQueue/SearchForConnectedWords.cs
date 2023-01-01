@@ -7,14 +7,14 @@ namespace Crossword.FormationOfAQueue;
 
 public class SearchForConnectedWords
 {
-    public static void Get(List<Word> listWordStruct)
+    public static void Get()
     {
-        foreach (Word word in listWordStruct)
+        foreach (Word word in Global.listWordsGrid)
         {
             List<Label> tempListLabel = word.listLabel;
             foreach (Label label in tempListLabel)
             {
-                foreach (Word word2 in listWordStruct)
+                foreach (Word word2 in Global.listWordsGrid)
                 {
                     if (word != word2 && SearchForMatches.Get(word2, label) == true)
                     {

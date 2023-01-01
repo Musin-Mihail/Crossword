@@ -1,17 +1,13 @@
-﻿using System.Collections.Generic;
-using Crossword.Objects;
-
-namespace Crossword.FormationOfAQueue;
+﻿namespace Crossword.FormationOfAQueue;
 
 public class FormationQueue
 {
-    public static List<Word> Get()
+    public static void Get()
     {
-        List<Word> listWordStruct = new();
-        SearchForTheBeginningAndLengthOfAllWords.Get(listWordStruct);
-        SearchForConnectedWords.Get(listWordStruct);
-        listWordStruct = Sorting.Get(listWordStruct);
-        SortingConnectionWords.Get(listWordStruct);
-        return listWordStruct;
+        Global.listWordsGrid.Clear();
+        SearchForTheBeginningAndLengthOfAllWords.Get();
+        SearchForConnectedWords.Get();
+        SortingWordsGrid.Get();
+        SortingConnectionWords.Get();
     }
 }

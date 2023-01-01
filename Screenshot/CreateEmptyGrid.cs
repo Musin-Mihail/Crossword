@@ -9,7 +9,7 @@ namespace Crossword.Screenshot;
 
 public class CreateEmptyGrid
 {
-    public static void Get(Bitmap img, Graphics graphics, List<Word> listWord, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell, List<string> listDefinitionRight, List<string> listDefinitionDown)
+    public static void Get(Bitmap img, Graphics graphics, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell, List<string> listDefinitionRight, List<string> listDefinitionDown)
     {
         SolidBrush blackBrush = new SolidBrush(Color.Black);
         SolidBrush whiteBrush = new SolidBrush(Color.White);
@@ -27,7 +27,7 @@ public class CreateEmptyGrid
                 graphics.FillRectangle(whiteBrush, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
                 graphics.DrawRectangle(blackPen, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
                 bool match = false;
-                foreach (Word word in listWord)
+                foreach (Word word in Global.listWordsGrid)
                 {
                     if (cell.label == word.listLabel[0])
                     {

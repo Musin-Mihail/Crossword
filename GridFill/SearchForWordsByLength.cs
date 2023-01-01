@@ -6,14 +6,15 @@ namespace Crossword.GridFill;
 
 public class SearchForWordsByLength
 {
-    public static void Get(List<Word> listWordStruct, List<Dictionary> listWordsList)
+    public static void Get()
     {
-        for (int i = 0; i < listWordStruct.Count; i++)
+        for (int i = 0; i < Global.listWordsGrid.Count; i++)
         {
-            AddWords.Get(listWordStruct[i], listWordsList);
+            Word word = Global.listWordsGrid[i];
+            AddWords.Get(word);
         }
 
-        foreach (Word word in listWordStruct)
+        foreach (Word word in Global.listWordsGrid)
         {
             ListWordsRandomization.Get(word);
         }

@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
-using Crossword.Objects;
 
 namespace Crossword.Screenshot;
 
 public class CreateImage
 {
-    public static void Get(List<Word> listWord, List<Dictionary> dictionaries)
+    public static void Get()
     {
         int topMaxX = 99;
         int leftMaxY = 99;
@@ -22,10 +21,10 @@ public class CreateImage
         Graphics graphics = Graphics.FromImage(img);
         List<string> listDefinitionRight = new List<string>();
         List<string> listDefinitionDown = new List<string>();
-        CreateEmptyGrid.Get(img, graphics, listWord, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, listDefinitionRight, listDefinitionDown);
+        CreateEmptyGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, listDefinitionRight, listDefinitionDown);
         CreateFillGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell);
         CreateAnswer.Get(listDefinitionRight, listDefinitionDown);
-        CreateDefinition.Get(listDefinitionRight, listDefinitionDown, dictionaries);
+        CreateDefinition.Get(listDefinitionRight, listDefinitionDown);
         MessageBox.Show("Кросворд сохранён");
     }
 }
