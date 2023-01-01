@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace Crossword.SaveLoad;
 
 public class Save
 {
-    public static void Get(List<Cell> listEmptyCellStruct)
+    public static void Get()
     {
         string saveFile = "";
-        foreach (Cell cell in listEmptyCellStruct)
+        foreach (Cell cell in Global.listEmptyCellStruct)
         {
             saveFile += cell.x + ";" + cell.y + "\n";
         }

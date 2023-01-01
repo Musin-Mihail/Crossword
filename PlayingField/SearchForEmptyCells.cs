@@ -5,17 +5,15 @@ namespace Crossword.PlayingField;
 
 public class SearchForEmptyCells
 {
-    public static List<Cell> Get(List<Cell> listAllCellStruct)
+    public static void Get(List<Cell> listAllCellStruct)
     {
-        List<Cell> listEmptyCellStruct = new List<Cell>();
+        Global.listEmptyCellStruct.Clear();
         foreach (Cell cell in listAllCellStruct)
         {
             if (cell.border.Background == Brushes.Transparent)
             {
-                listEmptyCellStruct.Add(cell);
+                Global.listEmptyCellStruct.Add(cell);
             }
         }
-
-        return listEmptyCellStruct;
     }
 }

@@ -19,7 +19,6 @@ namespace Crossword
     {
         private List<Dictionary> _listWordsList = new();
         private static List<Cell> _listAllCellStruct = new();
-        private List<Cell> _listEmptyCellStruct = new();
         private List<Word> _listWordStruct = new();
         private static int _numberOfCellsHorizontally = 30;
         private static int _numberOfCellsVertically = 30;
@@ -59,10 +58,10 @@ namespace Crossword
         {
             StartGen();
             await Task.Delay(100);
-            _listEmptyCellStruct = SearchForEmptyCells.Get(_listAllCellStruct);
-            if (_listEmptyCellStruct.Count > 0)
+            SearchForEmptyCells.Get(_listAllCellStruct);
+            if (Global.listEmptyCellStruct.Count > 0)
             {
-                _listWordStruct = FormationQueue.Get(_listEmptyCellStruct);
+                _listWordStruct = FormationQueue.Get();
                 int maxCountGen = 0;
                 int maxCountWord = 0;
                 try
@@ -75,7 +74,7 @@ namespace Crossword
                     MessageBox.Show("ОШИБКА. Водите только цифры");
                 }
 
-                await Generation.Get(maxCountGen, maxCountWord, _listWordStruct, _listEmptyCellStruct, _listWordsList, WindowsTextTop, Visualization);
+                await Generation.Get(maxCountGen, maxCountWord, _listWordStruct, _listWordsList, WindowsTextTop, Visualization);
             }
 
             EndGen();
@@ -118,8 +117,8 @@ namespace Crossword
 
         private void Button_ClickSaveGrid(object sender, RoutedEventArgs e)
         {
-            _listEmptyCellStruct = SearchForEmptyCells.Get(_listAllCellStruct);
-            Save.Get(_listEmptyCellStruct);
+            SearchForEmptyCells.Get(_listAllCellStruct);
+            Save.Get();
         }
 
         private void Button_ClickLoadGrid(object sender, RoutedEventArgs e)

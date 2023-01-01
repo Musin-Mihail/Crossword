@@ -7,7 +7,7 @@ namespace Crossword.GridFill;
 
 public class Generation
 {
-    static async public Task Get(int maxCounGen, int maxCounWord, List<Word> listWordStruct, List<Cell> listEmptyCellStruct, List<Dictionary> listWordsList, Label windowsText, CheckBox visualization)
+    static async public Task Get(int maxCounGen, int maxCounWord, List<Word> listWordStruct, List<Dictionary> listWordsList, Label windowsText, CheckBox visualization)
     {
         List<string> allInsertedWords = new();
         foreach (Word word in listWordStruct)
@@ -16,6 +16,6 @@ public class Generation
         }
 
         SearchForWordsByLength.Get(listWordStruct, listWordsList);
-        await SelectionAndInstallationOfWords.Get(allInsertedWords, maxCounGen, maxCounWord, listWordStruct, listEmptyCellStruct, windowsText, visualization);
+        await SelectionAndInstallationOfWords.Get(allInsertedWords, maxCounGen, maxCounWord, listWordStruct, windowsText, visualization);
     }
 }

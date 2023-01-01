@@ -10,7 +10,7 @@ namespace Crossword.GridFill;
 
 public class SelectionAndInstallationOfWords
 {
-    public static async Task Get(List<string> allInsertedWords, int maxCounGen, int maxCounWord, List<Word> listWordStruct, List<Cell> listEmptyCellStruct, Label WindowsText, CheckBox Visualization)
+    public static async Task Get(List<string> allInsertedWords, int maxCounGen, int maxCounWord, List<Word> listWordStruct, Label WindowsText, CheckBox Visualization)
     {
         for (int i = 0; i < maxCounGen; i++)
         {
@@ -25,7 +25,7 @@ public class SelectionAndInstallationOfWords
                 RestoreDictionary.Get(word);
             }
 
-            foreach (Cell cell in listEmptyCellStruct)
+            foreach (Cell cell in Global.listEmptyCellStruct)
             {
                 cell.label.Content = null;
                 cell.label.Background = Brushes.Transparent;
@@ -74,12 +74,10 @@ public class SelectionAndInstallationOfWords
                     }
                 }
 
-
                 if (newWord.listTempWords.Count == 0)
                 {
                     RestoreDictionary.Get(newWord);
                 }
-
 
                 List<Word> templist = new List<Word>(newWord.connectionWords);
                 bool GlobalError = false;
@@ -159,12 +157,10 @@ public class SelectionAndInstallationOfWords
                     TestWordEnd.Get(newWord);
                 }
 
-
                 if (index != 999 && index >= 0)
                 {
                     continue;
                 }
-
 
                 MessageBox.Show("Критическая ошибка\nНе нашёл соединённых слов\n");
                 WindowsText.Content += "Не нашёл соединённых слов\n";

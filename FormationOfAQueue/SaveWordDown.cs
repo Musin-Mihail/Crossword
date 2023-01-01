@@ -6,13 +6,13 @@ namespace Crossword.FormationOfAQueue;
 
 public class SaveWordDown
 {
-    public static void Get(List<Word> listWordStruct, List<Cell> listEmptyCellStruct, int x, int y)
+    public static void Get(List<Word> listWordStruct, int x, int y)
     {
         List<Label> newListLabel = new List<Label>();
         for (int i = y; i < 31; i++)
         {
             bool match = false;
-            foreach (Cell cell in listEmptyCellStruct)
+            foreach (Cell cell in Global.listEmptyCellStruct)
             {
                 if (cell.y == i && cell.x == x)
                 {

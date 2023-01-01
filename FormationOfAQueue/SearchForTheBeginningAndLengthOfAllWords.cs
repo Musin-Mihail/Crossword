@@ -5,15 +5,15 @@ namespace Crossword.FormationOfAQueue;
 
 public class SearchForTheBeginningAndLengthOfAllWords
 {
-    public static void Get(List<Word> listWordStruct, List<Cell> listEmptyCellStruct)
+    public static void Get(List<Word> listWordStruct)
     {
-        foreach (Cell cell in listEmptyCellStruct)
+        foreach (Cell cell in Global.listEmptyCellStruct)
         {
             int x = cell.x;
             int y = cell.y;
             bool black = true;
 
-            foreach (Cell cell2 in listEmptyCellStruct)
+            foreach (Cell cell2 in Global.listEmptyCellStruct)
             {
                 if (cell2.x == x - 1 && cell2.y == y)
                 {
@@ -24,11 +24,11 @@ public class SearchForTheBeginningAndLengthOfAllWords
 
             if (black == true)
             {
-                SaveWordRight.Get(listWordStruct, listEmptyCellStruct, x, y);
+                SaveWordRight.Get(listWordStruct, x, y);
             }
 
             black = true;
-            foreach (Cell cell2 in listEmptyCellStruct)
+            foreach (Cell cell2 in Global.listEmptyCellStruct)
             {
                 if (cell2.x == x && cell2.y == y - 1)
                 {
@@ -39,7 +39,7 @@ public class SearchForTheBeginningAndLengthOfAllWords
 
             if (black == true)
             {
-                SaveWordDown.Get(listWordStruct, listEmptyCellStruct, x, y);
+                SaveWordDown.Get(listWordStruct, x, y);
             }
         }
     }
