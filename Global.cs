@@ -6,4 +6,5 @@ public static class Global
 {
     public static bool stop = false;
     public static List<Cell> listEmptyCellStruct = new();
+    public static List<Cell> listAllCellStruct = new();
 }

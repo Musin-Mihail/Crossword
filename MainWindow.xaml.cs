@@ -18,11 +18,9 @@ namespace Crossword
     public partial class MainWindow
     {
         private List<Dictionary> _listWordsList = new();
-        private static List<Cell> _listAllCellStruct = new();
         private List<Word> _listWordStruct = new();
         private static int _numberOfCellsHorizontally = 30;
         private static int _numberOfCellsVertically = 30;
-
         private const int CellSize = 30;
 
         public MainWindow()
@@ -34,14 +32,11 @@ namespace Crossword
 
         private void CreatingThePlayingField()
         {
-            _listAllCellStruct.Clear();
             ResetDict();
-            _listAllCellStruct = CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize);
-
+            CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize);
             LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
             LineCenterH.X2 = _numberOfCellsHorizontally * 30 / 2 + 30;
             LineCenterH.Y2 = _numberOfCellsVertically * 30 + 60;
-
             LineCenterV.Y1 = _numberOfCellsVertically * 30 / 2 + 30;
             LineCenterV.Y2 = _numberOfCellsVertically * 30 / 2 + 30;
             LineCenterV.X2 = _numberOfCellsHorizontally * 30 + 60;
@@ -58,7 +53,7 @@ namespace Crossword
         {
             StartGen();
             await Task.Delay(100);
-            SearchForEmptyCells.Get(_listAllCellStruct);
+            SearchForEmptyCells.Get();
             if (Global.listEmptyCellStruct.Count > 0)
             {
                 _listWordStruct = FormationQueue.Get();
@@ -117,7 +112,7 @@ namespace Crossword
 
         private void Button_ClickSaveGrid(object sender, RoutedEventArgs e)
         {
-            SearchForEmptyCells.Get(_listAllCellStruct);
+            SearchForEmptyCells.Get();
             Save.Get();
         }
 
@@ -127,7 +122,7 @@ namespace Crossword
             loadGrid.ShowDialog();
             if (loadGrid.ready == true)
             {
-                Load.Get(_listAllCellStruct, loadGrid.listEmptyCellStruct);
+                Load.Get(loadGrid.listEmptyCellStruct);
             }
         }
 
@@ -146,7 +141,6 @@ namespace Crossword
             if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
                 Border myBorder = (Border)sender;
-
                 if (VerticallyMirror.IsChecked == true)
                 {
                     ColoringHorizontal(myBorder, Brushes.Transparent);
@@ -206,7 +200,7 @@ namespace Crossword
         {
             int x = 0;
             int y = 0;
-            foreach (var cell in _listAllCellStruct)
+            foreach (Cell cell in Global.listAllCellStruct)
             {
                 if (cell.border == myBorder)
                 {
@@ -238,7 +232,7 @@ namespace Crossword
         {
             int x = 0;
             int y = 0;
-            foreach (var cell in _listAllCellStruct)
+            foreach (Cell cell in Global.listAllCellStruct)
             {
                 if (cell.border == myBorder)
                 {
@@ -269,7 +263,7 @@ namespace Crossword
         {
             int x = 0;
             int y = 0;
-            foreach (var cell in _listAllCellStruct)
+            foreach (Cell cell in Global.listAllCellStruct)
             {
                 if (cell.border == myBorder)
                 {
@@ -301,7 +295,7 @@ namespace Crossword
         {
             int x = 0;
             int y = 0;
-            foreach (var cell in _listAllCellStruct)
+            foreach (Cell cell in Global.listAllCellStruct)
             {
                 if (cell.border == myBorder)
                 {
@@ -332,7 +326,7 @@ namespace Crossword
         {
             int x = 0;
             int y = 0;
-            foreach (var cell in _listAllCellStruct)
+            foreach (Cell cell in Global.listAllCellStruct)
             {
                 if (cell.border == myBorder)
                 {
@@ -385,7 +379,7 @@ namespace Crossword
 
         static void ColoringCell(int x, int y, Brush color)
         {
-            foreach (var cell in _listAllCellStruct)
+            foreach (Cell cell in Global.listAllCellStruct)
             {
                 if (cell.x == x && cell.y == y)
                 {
@@ -407,7 +401,7 @@ namespace Crossword
 
         private void Button_Reset(object sender, RoutedEventArgs e)
         {
-            foreach (Cell cell in _listAllCellStruct)
+            foreach (Cell cell in Global.listAllCellStruct)
             {
                 cell.label.Content = null;
                 cell.border.Background = Brushes.Black;
@@ -416,7 +410,7 @@ namespace Crossword
 
         private void Button_Screenshot(object sender, RoutedEventArgs e)
         {
-            CreateImage.Get(_listAllCellStruct, _listWordStruct, _listWordsList);
+            CreateImage.Get(_listWordStruct, _listWordsList);
         }
 
         private void Button_ChangeFill(object sender, RoutedEventArgs e)

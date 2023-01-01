@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 
 namespace Crossword.PlayingField;
 
 public class SearchForEmptyCells
 {
-    public static void Get(List<Cell> listAllCellStruct)
+    public static void Get()
     {
         Global.listEmptyCellStruct.Clear();
-        foreach (Cell cell in listAllCellStruct)
+        foreach (Cell cell in Global.listAllCellStruct)
         {
             if (cell.border.Background == Brushes.Transparent)
             {

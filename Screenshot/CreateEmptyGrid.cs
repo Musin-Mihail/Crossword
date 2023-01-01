@@ -9,19 +9,18 @@ namespace Crossword.Screenshot;
 
 public class CreateEmptyGrid
 {
-    public static void Get(Bitmap img, Graphics graphics, List<Cell> listCell, List<Word> listWord, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell, List<string> listDefinitionRight, List<string> listDefinitionDown)
+    public static void Get(Bitmap img, Graphics graphics, List<Word> listWord, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell, List<string> listDefinitionRight, List<string> listDefinitionDown)
     {
         SolidBrush blackBrush = new SolidBrush(Color.Black);
         SolidBrush whiteBrush = new SolidBrush(Color.White);
         Pen blackPen = new Pen(Color.Black, 1);
         Font font = new Font("Arial", 4);
         graphics.Clear(Color.White);
-
         int count = 0;
         graphics.FillRectangle(blackBrush, 0, 0, (downMaxX - topMaxX + 1) * sizeCell, (rightMaxY - leftMaxY + 1) * sizeCell);
         graphics.DrawRectangle(blackPen, 0, 0, (downMaxX - topMaxX + 1) * sizeCell, (rightMaxY - leftMaxY + 1) * sizeCell);
         AddingWatermarks.Get(graphics);
-        foreach (Cell cell in listCell)
+        foreach (Cell cell in Global.listAllCellStruct)
         {
             if (cell.border.Background == Brushes.Transparent)
             {

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -8,9 +7,9 @@ namespace Crossword.PlayingField;
 
 public class CreateUiGrid
 {
-    public static List<Cell> Get(Grid theGrid, MouseEventHandler moveChangeColor, MouseButtonEventHandler clickChangeColor, int numberOfCellsHorizontally, int numberOfCellsVertically, int cellSize)
+    public static void Get(Grid theGrid, MouseEventHandler moveChangeColor, MouseButtonEventHandler clickChangeColor, int numberOfCellsHorizontally, int numberOfCellsVertically, int cellSize)
     {
-        List<Cell> listAllCellStruct = new();
+        Global.listAllCellStruct.Clear();
         theGrid.Children.Clear();
         for (int y = 0 + 1; y < numberOfCellsVertically + 1; y++)
         {
@@ -24,7 +23,7 @@ public class CreateUiGrid
                 border.Child = label;
                 label.Margin = new Thickness(0, -4, 0, 0);
                 cell.AddBorderLabelXY(border, label, x, y);
-                listAllCellStruct.Add(cell);
+                Global.listAllCellStruct.Add(cell);
             }
         }
 
@@ -72,7 +71,5 @@ public class CreateUiGrid
         border1.HorizontalAlignment = HorizontalAlignment.Left;
         border1.VerticalAlignment = VerticalAlignment.Top;
         theGrid.Children.Add(border1);
-
-        return listAllCellStruct;
     }
 }

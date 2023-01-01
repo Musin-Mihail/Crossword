@@ -6,9 +6,9 @@ namespace Crossword.SaveLoad;
 
 public class Load
 {
-    public static void Get(List<Cell> listAllCellStruct, string[] listEmptyCellStruct)
+    public static void Get(string[] listEmptyCellStruct)
     {
-        foreach (Cell cell in listAllCellStruct)
+        foreach (Cell cell in Global.listAllCellStruct)
         {
             cell.label.Content = null;
             cell.border.Background = Brushes.Black;
@@ -19,7 +19,7 @@ public class Load
             List<string> strings = new List<string>(item.Split(';'));
             int x = Int32.Parse(strings[0]);
             int y = Int32.Parse(strings[1]);
-            foreach (Cell cell in listAllCellStruct)
+            foreach (Cell cell in Global.listAllCellStruct)
             {
                 if (cell.x == x)
                 {

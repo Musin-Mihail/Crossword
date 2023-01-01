@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
 using Brushes = System.Windows.Media.Brushes;
 
@@ -7,14 +6,14 @@ namespace Crossword.Screenshot;
 
 public class CreateFillGrid
 {
-    public static void Get(Bitmap img, Graphics graphics, List<Cell> listCell, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell)
+    public static void Get(Bitmap img, Graphics graphics, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell)
     {
         SolidBrush blackBrush = new SolidBrush(Color.Black);
         Pen blackPen = new Pen(Color.Black, 1);
         Font font = new Font("Arial", 7);
         graphics.Clear(Color.White);
         AddingWatermarks.Get(graphics);
-        foreach (Cell cell in listCell)
+        foreach (Cell cell in Global.listAllCellStruct)
         {
             if (cell.border.Background == Brushes.Black)
             {
