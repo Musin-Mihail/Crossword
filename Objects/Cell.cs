@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Crossword
+namespace Crossword.Objects
 {
     public class Cell
     {
@@ -9,7 +9,7 @@ namespace Crossword
         public int x;
         public int y;
 
-        public void AddBorderLabelXY(Border border, Label label, int x, int y)
+        public void AddBorderLabelXy(Border border, Label label, int x, int y)
         {
             this.border = border;
             this.label = label;

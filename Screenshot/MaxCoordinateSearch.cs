@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media;
+using Crossword.Objects;
 
 namespace Crossword.Screenshot;
 

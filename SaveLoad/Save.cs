@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Crossword.Objects;
 
 namespace Crossword.SaveLoad;
 

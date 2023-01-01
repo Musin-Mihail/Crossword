@@ -1,4 +1,6 @@
-﻿namespace Crossword.FormationOfAQueue;
+﻿using Crossword.Objects;
+
+namespace Crossword.FormationOfAQueue;
 
 public class SearchForTheBeginningAndLengthOfAllWords
 {

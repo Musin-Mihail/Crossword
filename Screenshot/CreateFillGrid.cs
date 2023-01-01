@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
+using Crossword.Objects;
 using Brushes = System.Windows.Media.Brushes;
 
 namespace Crossword.Screenshot;

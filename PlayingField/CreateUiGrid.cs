@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Crossword.Objects;
 
 namespace Crossword.PlayingField;
 
@@ -22,7 +23,7 @@ public class CreateUiGrid
                 label.FontSize = 20;
                 border.Child = label;
                 label.Margin = new Thickness(0, -4, 0, 0);
-                cell.AddBorderLabelXY(border, label, x, y);
+                cell.AddBorderLabelXy(border, label, x, y);
                 Global.listAllCellStruct.Add(cell);
             }
         }
