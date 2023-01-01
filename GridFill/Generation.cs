@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Crossword.Words;
+using Crossword.Objects;
 
 namespace Crossword.GridFill;
 
 public class Generation
 {
-    static async public Task Get(int maxCounGen, int maxCounWord, List<Word> listWordStruct, List<Cell> listEmptyCellStruct, List<List<string>> listWordsList, Label windowsText, CheckBox visualization)
+    static async public Task Get(int maxCounGen, int maxCounWord, List<Word> listWordStruct, List<Cell> listEmptyCellStruct, List<Dictionary> listWordsList, Label windowsText, CheckBox visualization)
     {
         List<string> allInsertedWords = new();
         foreach (Word word in listWordStruct)
@@ -15,7 +15,6 @@ public class Generation
             word.allInsertedWords = allInsertedWords;
         }
 
-        // Testing.Get(listEmptyCellStruct, listWordStruct);
         SearchForWordsByLength.Get(listWordStruct, listWordsList);
         await SelectionAndInstallationOfWords.Get(allInsertedWords, maxCounGen, maxCounWord, listWordStruct, listEmptyCellStruct, windowsText, visualization);
     }

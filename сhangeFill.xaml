@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:system="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d"
-        Title="сhangeFill" Height="300" Width="350">
+        Title="сhangeFill" Height="300" Width="350"
+        WindowStartupLocation="CenterScreen">
     <Grid>
         <Label Content="Ширина" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" FontSize="18" HorizontalContentAlignment="Center" Margin="50,20,0,0" />
         <Label Content="Высота" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" FontSize="18" HorizontalContentAlignment="Center" Margin="200,20,0,0" />

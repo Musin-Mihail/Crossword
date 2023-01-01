@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Crossword.Words;
+using Crossword.Objects;
 
 namespace Crossword.FormationOfAQueue;
 

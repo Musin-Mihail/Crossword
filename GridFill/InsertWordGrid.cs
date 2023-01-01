@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Crossword.Words;
+using Crossword.Objects;
 
 namespace Crossword.GridFill;
 
@@ -12,11 +12,19 @@ public class InsertWordGrid
             return true;
         }
 
-        bool error = SearchWord.Get(allInsertedWords, word.listLabel, word.listTempWords, word);
-        if (error == true)
+        string answer = SearchWord.Get(allInsertedWords, word);
+        if (answer == "")
         {
             return true;
         }
+
+        for (int i = 0; i < word.listLabel.Count; i++)
+        {
+            word.listLabel[i].Content = answer[i];
+        }
+
+        word.full = true;
+        word.wordString = answer;
 
         return false;
     }

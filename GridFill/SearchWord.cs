@@ -1,77 +1,60 @@
 ﻿using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
+using Crossword.Objects;
 using Crossword.Words;
 
 namespace Crossword.GridFill;
 
 public class SearchWord
 {
-    public static bool Get(List<string> allInsertedWords, List<Label> newListLabel, List<string> words, Word word)
+    public static string Get(List<string> allInsertedWords, Word word)
+    {
+        if (word.listLabel.Count > 1)
         {
-            if (newListLabel.Count < 21)
+            string gridWord = "";
+            foreach (var label in word.listLabel)
             {
-                if (newListLabel.Count > 1)
+                if (label.Content != null)
                 {
-                    List<string> listWordsString = new List<string>(words);
-                    List<string> tempListString = new List<string>();
-                    for (int i = 0; i < newListLabel.Count; i++)
+                    gridWord += label.Content;
+                }
+                else
+                {
+                    gridWord += '*';
+                }
+            }
+
+            ListWordsRandomization.Get(word);
+            foreach (var dictionary in word.listTempWords)
+            {
+                foreach (var dictionaryWord in dictionary.words)
+                {
+                    if (dictionaryWord.answers.Length == gridWord.Length)
                     {
-                        if (newListLabel[i].Content != null)
+                        for (int i = 0; i < gridWord.Length; i++)
                         {
-                            string tempString = newListLabel[i].Content.ToString();
-                            foreach (string item in listWordsString)
+                            if (gridWord[i] != '*')
                             {
-                                string tempString2 = item[i].ToString();
-                                if (tempString2 == tempString)
+                                if (dictionaryWord.answers[i] != gridWord[i])
                                 {
-                                    tempListString.Add(item);
+                                    break;
                                 }
                             }
 
-                            if (tempListString.Count > 0)
+                            if (i == dictionaryWord.answers.Length - 1)
                             {
-                                listWordsString = new List<string>(tempListString);
-                                tempListString.Clear();
-                            }
-                            else
-                            {
-                                return true;
+                                if (allInsertedWords.Contains(dictionaryWord.answers) == false)
+                                {
+                                    allInsertedWords.Add(dictionaryWord.answers);
+                                    DeleteWord.Get(dictionaryWord.answers, word);
+                                    return dictionaryWord.answers;
+                                }
                             }
                         }
                     }
-
-                    string newWord = "";
-                    foreach (string item in listWordsString)
-                    {
-                        if (allInsertedWords.Contains(item) == false)
-                        {
-                            newWord = item;
-                            allInsertedWords.Add(newWord);
-                            DeleteWord.Get(newWord, word);
-                            break;
-                        }
-                    }
-
-                    if (newWord.Length < 2)
-                    {
-                        return true;
-                    }
-
-                    for (int i = 0; i < newListLabel.Count; i++)
-                    {
-                        newListLabel[i].Content = newWord[i];
-                    }
-
-                    word.full = true;
-                    word.wordString = newWord;
                 }
             }
-            else
-            {
-                MessageBox.Show("Есть поле больше 20");
-            }
-
-            return false;
         }
+
+        return "";
+    }
 }

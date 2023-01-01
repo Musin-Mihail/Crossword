@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -6,16 +8,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Crossword.FormationOfAQueue;
 using Crossword.GridFill;
+using Crossword.Objects;
 using Crossword.PlayingField;
 using Crossword.SaveLoad;
 using Crossword.Screenshot;
-using Crossword.Words;
 
 namespace Crossword
 {
     public partial class MainWindow
     {
-        private List<List<string>> _listWordsList = new();
+        private List<Dictionary> _listWordsList = new();
         private static List<Cell> _listAllCellStruct = new();
         private List<Cell> _listEmptyCellStruct = new();
         private List<Word> _listWordStruct = new();
@@ -34,8 +36,8 @@ namespace Crossword
         private void CreatingThePlayingField()
         {
             _listAllCellStruct.Clear();
+            ResetDict();
             _listAllCellStruct = CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize);
-            _listWordsList = CreateDictionary.Get();
 
             LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
             LineCenterH.X2 = _numberOfCellsHorizontally * 30 / 2 + 30;
@@ -44,6 +46,13 @@ namespace Crossword
             LineCenterV.Y1 = _numberOfCellsVertically * 30 / 2 + 30;
             LineCenterV.Y2 = _numberOfCellsVertically * 30 / 2 + 30;
             LineCenterV.X2 = _numberOfCellsHorizontally * 30 + 60;
+        }
+
+        private void ResetDict()
+        {
+            _listWordsList.Clear();
+            _listWordsList.Add(CreateDictionary.Get("dict.txt"));
+            SelectedDictionary.Content = "Основной словарь";
         }
 
         private async Task GridFill()
@@ -408,7 +417,7 @@ namespace Crossword
 
         private void Button_Screenshot(object sender, RoutedEventArgs e)
         {
-            CreateImage.Get(_listAllCellStruct, _listWordStruct);
+            CreateImage.Get(_listAllCellStruct, _listWordStruct, _listWordsList);
         }
 
         private void Button_ChangeFill(object sender, RoutedEventArgs e)
@@ -421,6 +430,43 @@ namespace Crossword
                 _numberOfCellsVertically = сhangeFill.numberOfCellsVertically;
                 CreatingThePlayingField();
             }
+        }
+
+        private void Button_DictionariesSelection(object sender, RoutedEventArgs e)
+        {
+            var dictionariesSelection = new DictionariesSelection();
+            dictionariesSelection.ShowDialog();
+            if (dictionariesSelection.ready == true)
+            {
+                _listWordsList.Clear();
+                string message = "Выбранные словари:\n";
+                List<string> dictionariesPaths = Directory.GetFiles("Dictionaries/").ToList();
+                foreach (var selectedDictionaries in dictionariesSelection.selectedDictionaries)
+                {
+                    List<string> list = new List<string>(selectedDictionaries.Split(';'));
+                    foreach (var path in dictionariesPaths)
+                    {
+                        string name = Path.GetFileNameWithoutExtension(path);
+                        if (list[0] == name)
+                        {
+                            message += selectedDictionaries + "\n";
+                            Dictionary dictionary = CreateDictionary.Get(path);
+                            dictionary.maxCount = int.Parse(list[1]);
+                            _listWordsList.Add(dictionary);
+                            break;
+                        }
+                    }
+                }
+
+                MessageBox.Show(message);
+                SelectedDictionary.Content = message;
+            }
+        }
+
+        private void Button_Basic_Dictionary(object sender, RoutedEventArgs e)
+        {
+            ResetDict();
+            MessageBox.Show("Выбран основной словарь");
         }
 
         private void ClearMirror_OnChecked(object sender, RoutedEventArgs e)

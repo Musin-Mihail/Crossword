@@ -1,0 +1,19 @@
+﻿<Window x:Class="Crossword.DictionariesSelection"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Title="DictionariesSelection" Height="600" Width="400"
+        WindowStartupLocation="CenterScreen">
+    <Grid Name="GridD">
+        <ScrollViewer Margin="0,0,0,50" VerticalAlignment="Top">
+            <ItemsControl Name="ItemsControl" />
+
+        </ScrollViewer>
+
+        <Button Content="Выбрать" Height="40" Width="100" VerticalAlignment="Bottom" Click="ButtonBase_OnClick" />
+
+    </Grid>
+
+</Window>

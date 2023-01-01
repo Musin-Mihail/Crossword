@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
+using Crossword.Objects;
 using Crossword.Words;
 
 namespace Crossword.GridFill;
 
 public class SearchForWordsByLength
 {
-    public static void Get(List<Word> listWordStruct, List<List<string>> listWordsList)
+    public static void Get(List<Word> listWordStruct, List<Dictionary> listWordsList)
     {
         for (int i = 0; i < listWordStruct.Count; i++)
         {
-            int letterCount = listWordStruct[i].listLabel.Count;
-            AddWords.Get(listWordStruct[i], listWordsList[letterCount]);
+            AddWords.Get(listWordStruct[i], listWordsList);
         }
 
-        foreach (var word in listWordStruct)
+        foreach (Word word in listWordStruct)
         {
             ListWordsRandomization.Get(word);
         }

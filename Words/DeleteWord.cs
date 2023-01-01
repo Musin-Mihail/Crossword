@@ -1,4 +1,6 @@
-﻿namespace Crossword.Words;
+﻿using Crossword.Objects;
+
+namespace Crossword.Words;
 
 public class DeleteWord
 {
@@ -6,15 +8,18 @@ public class DeleteWord
     {
         for (int i = 0; i < word.listTempWords.Count; i++)
         {
-            if (wordString == word.listTempWords[i])
+            foreach (DictionaryWord dictionaryWord in word.listTempWords[i].words)
             {
-                word.listTempWords.RemoveAt(i);
-                if (word.listTempWords.Count == 0)
+                if (wordString == dictionaryWord.answers)
                 {
-                    RestoreDictionary.Get(word);
-                }
+                    word.listTempWords.RemoveAt(i);
+                    if (word.listTempWords.Count == 0)
+                    {
+                        RestoreDictionary.Get(word);
+                    }
 
-                return;
+                    return;
+                }
             }
         }
     }

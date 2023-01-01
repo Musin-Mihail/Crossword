@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Windows;
 using System.Windows.Controls;
+using Crossword.Objects;
 using Brushes = System.Windows.Media.Brushes;
-using Crossword.Words;
 
 namespace Crossword.Screenshot;
 
@@ -38,13 +37,13 @@ public class CreateEmptyGrid
                             count++;
                             match = true;
                         }
-        
+
                         string text = count + ";";
                         foreach (Label label in word.listLabel)
                         {
                             text += label.Content.ToString();
                         }
-        
+
                         if (word.right)
                         {
                             listDefinitionRight.Add(text);
@@ -53,7 +52,7 @@ public class CreateEmptyGrid
                         {
                             listDefinitionDown.Add(text);
                         }
-        
+
                         graphics.DrawString(count.ToString(), font, blackBrush, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell);
                     }
                 }

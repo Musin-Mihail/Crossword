@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Controls;
-using Crossword.Words;
+using Crossword.Objects;
 
 namespace Crossword.FormationOfAQueue;
 

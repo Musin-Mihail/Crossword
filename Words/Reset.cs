@@ -1,4 +1,6 @@
-﻿namespace Crossword.Words;
+﻿using Crossword.Objects;
+
+namespace Crossword.Words;
 
 public class Reset
 {

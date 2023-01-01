@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Windows;
+using Crossword.Objects;
 
 namespace Crossword.Words;
 
@@ -6,13 +8,23 @@ public class ListWordsRandomization
 {
     public static void Get(Word word)
     {
-        Random rnd = new Random();
-        for (int i = 0; i < word.listTempWords.Count; i++)
+        try
         {
-            string temp = word.listTempWords[i];
-            int randomIndex = rnd.Next(0, word.listTempWords.Count - 1);
-            word.listTempWords[i] = word.listTempWords[randomIndex];
-            word.listTempWords[randomIndex] = temp;
+            Random rnd = new Random();
+            foreach (var dictionary in word.listTempWords)
+            {
+                for (int i = 0; i < dictionary.words.Count; i++)
+                {
+                    DictionaryWord temp = dictionary.words[i];
+                    int randomIndex = rnd.Next(0, dictionary.words.Count - 1);
+                    dictionary.words[i] = dictionary.words[randomIndex];
+                    dictionary.words[randomIndex] = temp;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            MessageBox.Show("ListWordsRandomization\n" + e);
         }
     }
 }

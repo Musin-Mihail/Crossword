@@ -1,5 +1,5 @@
 ﻿using System.Windows.Media;
-using Crossword.Words;
+using Crossword.Objects;
 
 namespace Crossword.GridFill;
 

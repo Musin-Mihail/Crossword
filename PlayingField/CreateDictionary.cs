@@ -1,48 +1,30 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Windows;
+using System.Linq;
+using Crossword.Objects;
 
 namespace Crossword.PlayingField;
 
-public class CreateDictionary
+public static class CreateDictionary
 {
-    public static List<List<string>> Get()
+    public static Dictionary Get(string path)
     {
-        List<List<string>> listWordsList = new List<List<string>>();
-        string[] listWordsString = File.ReadAllLines("dict.txt");
-        for (int i = 0; i < 20; i++)
+        string[] listWordsString = File.ReadAllLines(path);
+        ListRandomization.Get(listWordsString);
+        Dictionary dictionary = new Dictionary();
+        foreach (var word in listWordsString)
         {
-            List<string> list = new List<string>();
-            listWordsList.Add(list);
-        }
-
-        string error = "";
-        foreach (string word in listWordsString)
-        {
-            try
+            List<string> answerAndDefinition = word.Split(';').ToList();
+            DictionaryWord dictionaryWord = new DictionaryWord();
+            dictionaryWord.answers = answerAndDefinition[0];
+            for (int i = 1; i < answerAndDefinition.Count; i++)
             {
-                string newWord = word.Split(';')[0];
-                if (word.Split(';')[1].Length > 1)
-                {
-                    int count = newWord.Length;
-                    listWordsList[count].Add(newWord);
-                }
-                else
-                {
-                    error += word + "\n";
-                }
+                dictionaryWord.definitions.Add(answerAndDefinition[i]);
             }
-            catch
-            {
-                error += word + "\n";
-            }
+
+            dictionary.words.Add(dictionaryWord);
         }
 
-        if (error.Length > 2)
-        {
-            MessageBox.Show(error);
-        }
-
-        return listWordsList;
+        return dictionary;
     }
 }

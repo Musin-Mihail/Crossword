@@ -4,7 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="LoadGrid" Height="700" Width="1100">
+        Title="LoadGrid" Height="700" Width="1100"
+        WindowStartupLocation="CenterScreen">
     <ScrollViewer>
         <Grid x:Name="TheGrid" />
     </ScrollViewer>

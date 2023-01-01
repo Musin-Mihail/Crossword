@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using Crossword.Objects;
 
 namespace Crossword.Words;
 

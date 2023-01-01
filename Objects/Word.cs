@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Controls;
 
-namespace Crossword.Words;
+namespace Crossword.Objects;
 
 public class Word
 {
     public List<Label> listLabel = new();
-    public List<string> listWords = new();
-    public List<string> listTempWords = new();
+    public List<Dictionary> listWords = new();
+    public List<Dictionary> listTempWords = new();
     public readonly List<Label> connectionLabel = new();
     public List<Word> connectionWords = new();
     public bool full = false;

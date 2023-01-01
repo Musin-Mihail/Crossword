@@ -1,32 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Windows;
+using Crossword.Objects;
 
 namespace Crossword.Screenshot;
 
 public class CreateDefinition
 {
-    public static void Get(List<string> listDefinitionRight, List<string> listDefinitionDown)
+    public static void Get(List<string> listDefinitionRight, List<string> listDefinitionDown, List<Dictionary> dictionaries)
+    {
+        try
         {
-            string[] array = File.ReadAllLines("dict.txt");
-            List<string> listWordsString = array.ToList();
+            List<DictionaryWord> listWordsString = new();
+            foreach (var dictionary in dictionaries)
+            {
+                listWordsString.AddRange(dictionary.words);
+            }
 
             string definitionString = "По горизонтали: ";
             for (int i = 0; i < listDefinitionRight.Count; i++)
             {
-                foreach (string definition in listWordsString)
+                foreach (DictionaryWord definition in listWordsString)
                 {
-                    List<string> newListDefinition = new List<string>(definition.Split(';'));
                     List<string> newListWord = new List<string>(listDefinitionRight[i].Split(';'));
                     string word1 = newListWord[1];
-                    string word2 = newListDefinition[0];
+                    string word2 = definition.answers;
+
                     if (word1 == word2)
                     {
                         Random rnd = new Random();
-                        int randomIndex = rnd.Next(1, newListDefinition.Count - 1);
-                        definitionString += newListWord[0] + "." + newListDefinition[randomIndex] + ". ";
+                        int randomIndex = rnd.Next(0, definition.definitions.Count - 1);
+                        definitionString += newListWord[0] + "." + definition.definitions[randomIndex] + ". ";
                         break;
                     }
                 }
@@ -35,23 +40,26 @@ public class CreateDefinition
             definitionString += "\nПо вертикали: ";
             for (int i = 0; i < listDefinitionDown.Count; i++)
             {
-                foreach (string definition in listWordsString)
+                foreach (DictionaryWord definition in listWordsString)
                 {
-                    List<string> newListDefinition = new List<string>(definition.Split(';'));
                     List<string> newListWord = new List<string>(listDefinitionDown[i].Split(';'));
                     string word1 = newListWord[1];
-                    string word2 = newListDefinition[0];
+                    string word2 = definition.answers;
                     if (word1 == word2)
                     {
                         Random rnd = new Random();
-                        int randomIndex = rnd.Next(1, newListDefinition.Count - 1);
-                        definitionString += newListWord[0] + "." + newListDefinition[randomIndex] + ". ";
+                        int randomIndex = rnd.Next(0, definition.definitions.Count - 1);
+                        definitionString += newListWord[0] + "." + definition.definitions[randomIndex] + ". ";
                         break;
                     }
                 }
             }
 
             File.WriteAllText("Definition.txt", definitionString);
-            MessageBox.Show("Кросворд сохранён");
         }
+        catch (Exception e)
+        {
+            MessageBox.Show("CreateDefinition\n" + e);
+        }
+    }
 }
