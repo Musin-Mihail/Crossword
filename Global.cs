@@ -10,4 +10,5 @@ public static class Global
     public static List<Cell> listAllCellStruct = new();
     public static List<Dictionary> listDictionaries = new();
     public static List<Word> listWordsGrid = new();
+    public static List<string> allInsertedWords = new();
 }

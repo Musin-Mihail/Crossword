@@ -7,7 +7,7 @@ public class RestoreDictionary
 {
     public static void Get(Word word)
     {
-        word.listTempWords = new List<Dictionary>(word.listWords);
+        word.listTempWords = new List<Dictionary>(Global.listDictionaries);
         ListWordsRandomization.Get(word);
     }
 }

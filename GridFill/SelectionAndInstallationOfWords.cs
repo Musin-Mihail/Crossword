@@ -10,14 +10,14 @@ namespace Crossword.GridFill;
 
 public class SelectionAndInstallationOfWords
 {
-    public static async Task Get(List<string> allInsertedWords, int maxCountGen, int maxCountWord, Label windowsText, CheckBox visualization)
+    public static async Task Get(int maxCountGen, int maxCountWord, Label windowsText, CheckBox visualization)
     {
         for (int i = 0; i < maxCountGen; i++)
         {
             windowsText.Content = "Генерация - " + i;
             await Task.Delay(50);
             int maxError = 0;
-            allInsertedWords.Clear();
+            Global.allInsertedWords.Clear();
             foreach (Word word in Global.listWordsGrid)
             {
                 Reset.Get(word);
@@ -46,7 +46,7 @@ public class SelectionAndInstallationOfWords
                 Word newWord = Global.listWordsGrid[index];
                 if (newWord.full == false)
                 {
-                    error = InsertWordGrid.Get(allInsertedWords, newWord);
+                    error = InsertWordGrid.Get(newWord);
                 }
 
                 if (error == false)
@@ -67,9 +67,6 @@ public class SelectionAndInstallationOfWords
                     if (newWord.error % 10 == 0)
                     {
                         windowsText.Content = "Генерация - " + i + " Ошибок - " + maxError;
-                        windowsText.Content += "\nСлов в 1 слове - " + Global.listWordsGrid[0].listTempWords.Count;
-                        windowsText.Content += "\nСлов в 2 слове - " + Global.listWordsGrid[1].listTempWords.Count;
-                        windowsText.Content += "\nСлов в 3 слове - " + Global.listWordsGrid[2].listTempWords.Count;
                         await Task.Delay(1);
                     }
                 }
@@ -101,7 +98,7 @@ public class SelectionAndInstallationOfWords
 
                         ClearLabel.Get(templist[t]);
 
-                        error = InsertWordGrid.Get(allInsertedWords, newWord);
+                        error = InsertWordGrid.Get(newWord);
                         if (error == false)
                         {
                             Reset.Get(templist[t]);
@@ -138,7 +135,7 @@ public class SelectionAndInstallationOfWords
                             }
 
                             Reset.Get(templist[t]);
-                            error = InsertWordGrid.Get(allInsertedWords, newWord);
+                            error = InsertWordGrid.Get(newWord);
                             if (error == false)
                             {
                                 break;

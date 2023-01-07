@@ -1,18 +1,17 @@
-﻿using System.Collections.Generic;
-using Crossword.Objects;
+﻿using Crossword.Objects;
 
 namespace Crossword.GridFill;
 
 public class InsertWordGrid
 {
-    public static bool Get(List<string> allInsertedWords, Word word)
+    public static bool Get(Word word)
     {
         if (word.listTempWords.Count == 0)
         {
             return true;
         }
 
-        string answer = SearchWord.Get(allInsertedWords, word);
+        string answer = SearchWord.Get(word);
         if (answer == "")
         {
             return true;

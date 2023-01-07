@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using Crossword.Objects;
+﻿using Crossword.Objects;
 using Crossword.Words;
 
 namespace Crossword.GridFill;
 
 public class SearchWord
 {
-    public static string Get(List<string> allInsertedWords, Word word)
+    public static string Get(Word word)
     {
         if (word.listLabel.Count > 1)
         {
@@ -42,9 +41,9 @@ public class SearchWord
 
                             if (i == dictionaryWord.answers.Length - 1)
                             {
-                                if (allInsertedWords.Contains(dictionaryWord.answers) == false)
+                                if (Global.allInsertedWords.Contains(dictionaryWord.answers) == false)
                                 {
-                                    allInsertedWords.Add(dictionaryWord.answers);
+                                    Global.allInsertedWords.Add(dictionaryWord.answers);
                                     DeleteWord.Get(dictionaryWord.answers, word);
                                     return dictionaryWord.answers;
                                 }

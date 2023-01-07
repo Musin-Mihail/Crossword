@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows.Controls;
-using Crossword.Objects;
 
 namespace Crossword.GridFill;
 
@@ -9,13 +7,8 @@ public class Generation
 {
     static async public Task Get(int maxCountGen, int maxCountWord, Label windowsText, CheckBox visualization)
     {
-        List<string> allInsertedWords = new();
-        foreach (Word word in Global.listWordsGrid)
-        {
-            word.allInsertedWords = allInsertedWords;
-        }
-
+        Global.allInsertedWords.Clear();
         SearchForWordsByLength.Get();
-        await SelectionAndInstallationOfWords.Get(allInsertedWords, maxCountGen, maxCountWord, windowsText, visualization);
+        await SelectionAndInstallationOfWords.Get(maxCountGen, maxCountWord, windowsText, visualization);
     }
 }

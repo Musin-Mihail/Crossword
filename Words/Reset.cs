@@ -8,11 +8,11 @@ public class Reset
     {
         ClearLabel.Get(word);
         word.full = false;
-        for (int i = 0; i < word.allInsertedWords.Count; i++)
+        for (int i = 0; i < Global.allInsertedWords.Count; i++)
         {
-            if (word.allInsertedWords[i] == word.wordString)
+            if (Global.allInsertedWords[i] == word.wordString)
             {
-                word.allInsertedWords.RemoveAt(i);
+                Global.allInsertedWords.RemoveAt(i);
                 break;
             }
         }
