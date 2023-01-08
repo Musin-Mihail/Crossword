@@ -5,10 +5,9 @@ namespace Crossword.GridFill;
 
 public class Generation
 {
-    static async public Task Get(int maxCountGen, int maxCountWord, Label windowsText, CheckBox visualization)
+    static async public Task Get(int maxCountGen, int maxCountWord, int taskDelay, Label windowsText, CheckBox visualization)
     {
         Global.allInsertedWords.Clear();
-        SearchForWordsByLength.Get();
-        await SelectionAndInstallationOfWords.Get(maxCountGen, maxCountWord, windowsText, visualization);
+        await SelectionAndInstallationOfWords.Get(maxCountGen, maxCountWord, taskDelay, windowsText, visualization);
     }
 }

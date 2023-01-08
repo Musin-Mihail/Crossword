@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,167 +10,165 @@ namespace Crossword.GridFill;
 
 public class SelectionAndInstallationOfWords
 {
-    public static async Task Get(int maxCountGen, int maxCountWord, Label windowsText, CheckBox visualization)
+    public static async Task Get(int maxCountGen, int maxCountWord, int taskDelay, Label windowsText, CheckBox visualization)
     {
-        for (int i = 0; i < maxCountGen; i++)
+        try
         {
-            windowsText.Content = "Генерация - " + i;
-            await Task.Delay(50);
-            int maxError = 0;
-            Global.allInsertedWords.Clear();
-            foreach (Word word in Global.listWordsGrid)
+            float difficultyLevel = 0;
+            foreach (var word in Global.listWordsGrid)
             {
-                Reset.Get(word);
-                word.error = 0;
-                RestoreDictionary.Get(word);
+                difficultyLevel +=  (float)word.connectionLabel.Count / word.listLabel.Count;
             }
 
-            foreach (Cell cell in Global.listEmptyCellStruct)
+            difficultyLevel /= Global.listWordsGrid.Count;
+            for (int i = 0; i < maxCountGen; i++)
             {
-                cell.label.Content = null;
-                cell.label.Background = Brushes.Transparent;
-            }
-
-            int index = 0;
-            while (index < Global.listWordsGrid.Count)
-            {
-                if (Global.stop)
+                windowsText.Content = "Сложность - " + difficultyLevel;
+                windowsText.Content += "\nГенерация - " + i;
+                await Task.Delay(1);
+                int maxError = 0;
+                Global.allInsertedWords.Clear();
+                foreach (Word word in Global.listWordsGrid)
                 {
-                    windowsText.Content += "СТОП";
-                    Global.stop = false;
-                    return;
+                    ResetWord.Get(word);
                 }
 
-
-                bool error = false;
-                Word newWord = Global.listWordsGrid[index];
-                if (newWord.full == false)
+                foreach (Cell cell in Global.listEmptyCellStruct)
                 {
-                    error = InsertWordGrid.Get(newWord);
+                    cell.label.Content = null;
+                    cell.label.Background = Brushes.Transparent;
                 }
 
-                if (error == false)
+                int index = 0;
+                while (index < Global.listWordsGrid.Count)
                 {
-                    index++;
-                    continue;
-                }
-
-                newWord.error++;
-                if (newWord.error > maxCountWord)
-                {
-                    break;
-                }
-
-                if (newWord.error > maxError)
-                {
-                    maxError = newWord.error;
-                    if (newWord.error % 10 == 0)
+                    if (Global.stop)
                     {
-                        windowsText.Content = "Генерация - " + i + " Ошибок - " + maxError;
-                        await Task.Delay(1);
+                        windowsText.Content += "СТОП";
+                        Global.stop = false;
+                        return;
                     }
-                }
 
-                if (newWord.listTempWords.Count == 0)
-                {
-                    RestoreDictionary.Get(newWord);
-                }
-
-                List<Word> templist = new List<Word>(newWord.connectionWords);
-                bool GlobalError = false;
-                for (int t = templist.Count - 1; t >= 0; t--)
-                {
-                    if (templist[t].full == true)
+                    Word newWord = Global.listWordsGrid[index];
+                    if (newWord.full)
                     {
-                        string saveWord = templist[t].wordString;
-                        if (visualization.IsChecked == true)
-                        {
-                            TestWordStartGreen.Get(templist[t]);
-                            await Task.Delay(1);
-                            TestWordEnd.Get(templist[t]);
-                        }
-
-                        int newindex = Global.listWordsGrid.IndexOf(templist[t]);
-                        if (newindex < index)
-                        {
-                            index = newindex;
-                        }
-
-                        ClearLabel.Get(templist[t]);
-
-                        error = InsertWordGrid.Get(newWord);
-                        if (error == false)
-                        {
-                            Reset.Get(templist[t]);
-                            GlobalError = true;
-                            break;
-                        }
-
-                        if (saveWord.Length == 0)
-                        {
-                            MessageBox.Show("saveWord.Length == 0");
-                        }
-
-                        InsertWord.Get(templist[t], saveWord);
+                        index++;
+                        continue;
                     }
-                }
 
-                if (GlobalError == false)
-                {
-                    for (int t = templist.Count - 1; t >= 0; t--)
+                    if (newWord.full == false)
                     {
-                        if (templist[t].full == true)
+                        if (!InsertWordGrid.Get(newWord))
                         {
                             if (visualization.IsChecked == true)
                             {
-                                TestWordStartGreen.Get(templist[t]);
-                                await Task.Delay(1);
-                                TestWordEnd.Get(templist[t]);
+                                TestWordStart.Get(newWord, Brushes.Green);
+                                await Task.Delay(taskDelay);
+                                TestWordEnd.Get(newWord);
                             }
 
-                            int newindex = Global.listWordsGrid.IndexOf(templist[t]);
+                            index++;
+                            continue;
+                        }
+
+                        if (visualization.IsChecked == true)
+                        {
+                            TestWordStart.Get(newWord, Brushes.Red);
+                            await Task.Delay(taskDelay);
+                            TestWordEnd.Get(newWord);
+                        }
+                    }
+
+                    newWord.error++;
+                    if (newWord.error > maxCountWord)
+                    {
+                        break;
+                    }
+                    
+                    if (newWord.error > maxError)
+                    {
+                        maxError = newWord.error;
+                    }
+
+                    foreach (var word in newWord.connectionWords)
+                    {
+                        foreach (var connectionWord in word.connectionWords)
+                        {
+                            int newindex = Global.listWordsGrid.IndexOf(connectionWord);
                             if (newindex < index)
                             {
-                                index = newindex;
+                                index = newindex - 1;
                             }
 
-                            Reset.Get(templist[t]);
-                            error = InsertWordGrid.Get(newWord);
-                            if (error == false)
+                            if (connectionWord.full)
                             {
-                                break;
+                                foreach (var label in connectionWord.listLabel)
+                                {
+                                    if (label.Content == null)
+                                    {
+                                        RemoveInsertWord.Get(connectionWord);
+                                        break;
+                                    }
+                                }
                             }
                         }
+
+                        int newindex2 = Global.listWordsGrid.IndexOf(word);
+                        if (Global.listWordsGrid.IndexOf(word) < index)
+                        {
+                            index = newindex2 - 1;
+                        }
+
+                        if (index < 0)
+                        {
+                            index = 0;
+                        }
+
+                        for (int j = index + 1; j < Global.listWordsGrid.Count; j++)
+                        {
+                            if (Global.listWordsGrid[j].full)
+                            {
+                                foreach (var label in Global.listWordsGrid[j].listLabel)
+                                {
+                                    if (label.Content == null)
+                                    {
+                                        RemoveInsertWord.Get(Global.listWordsGrid[j]);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        foreach (var label in word.listLabel)
+                        {
+                            label.Content = null;
+                        }
+
+                        if (word.full)
+                        {
+                            RemoveInsertWord.Get(word);
+                        }
+                    }
+
+                    foreach (var label in newWord.listLabel)
+                    {
+                        label.Content = null;
                     }
                 }
 
-                if (GlobalError == false && index != 0)
+                if (index >= Global.listWordsGrid.Count)
                 {
-                    RestoreDictionary.Get(newWord);
+                    windowsText.Content = "ГЕНЕРАЦИЯ УДАЛАСЬ\n";
+                    windowsText.Content += "Было " + i + " попыток генерации\n";
+                    windowsText.Content += "Максимум " + maxError + " ошибок в слове за одну генерацию\n";
+                    return;
                 }
-
-                if (visualization.IsChecked == true)
-                {
-                    TestWordEnd.Get(newWord);
-                }
-
-                if (index != 999 && index >= 0)
-                {
-                    continue;
-                }
-
-                MessageBox.Show("Критическая ошибка\nНе нашёл соединённых слов\n");
-                windowsText.Content += "Не нашёл соединённых слов\n";
-                return;
             }
-
-            if (index >= Global.listWordsGrid.Count)
-            {
-                windowsText.Content = "ГЕНЕРАЦИЯ УДАЛАСЬ\n";
-                windowsText.Content += "Было " + i + " попыток генерации\n";
-                windowsText.Content += "Максимум " + maxError + " ошибок в слове за одну генерацию\n";
-                return;
-            }
+        }
+        catch (Exception e)
+        {
+            MessageBox.Show("" + e);
+            throw;
         }
     }
 }

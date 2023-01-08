@@ -18,7 +18,7 @@
             <Button Content="Основной словарь" Click="Button_Basic_Dictionary" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1140,660,0,0" />
             <Label x:Name="SelectedDictionary" Content="Основной словарь" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" Height="250" Width="120" Margin="1140,710,0,0" />
 
-            <Label x:Name="WindowsTextTop" Content="" HorizontalAlignment="Left" Margin="990,10,0,0" VerticalAlignment="Top" Width="276" FontSize="10" />
+            <Label x:Name="WindowsTextTop" Content="" HorizontalAlignment="Left" Margin="1140,10,0,0" VerticalAlignment="Top" Width="276" FontSize="10" />
             <Label Content="Всего генераций" HorizontalAlignment="Left" VerticalAlignment="Top" Width="152" FontSize="18" Margin="991,114,0,0" />
             <Label Content="Количество циклов" HorizontalAlignment="Left" VerticalAlignment="Top" Width="176" FontSize="18" Margin="979,240,0,0" />
             <Label Content="На одну генерацию" HorizontalAlignment="Left" VerticalAlignment="Top" Width="178" FontSize="18" Margin="978,279,0,0" />
@@ -30,6 +30,10 @@
             <Button x:Name="Screenshot" Content="Скриншот" Click="Button_Screenshot" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,900,0,0" />
             <TextBox x:Name="CountGen" TextWrapping="Wrap" Text="100" Height="50" Width="120" Margin="1010,153,0,0" FontSize="36" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
             <TextBox x:Name="CountGenWord" TextWrapping="Wrap" Text="10" Height="50" Width="120" Margin="1007,330,0,0" FontSize="36" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
+            <Label Content="Задержка" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" FontSize="18" Margin="1165,350,0,0" />
+
+            <TextBox x:Name="TaskDelay" TextWrapping="Wrap" Text="100" Height="30" Width="120" Margin="1150,390,0,0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
+
             <CheckBox x:Name="Visualization" Content="Визуализация" HorizontalAlignment="Left" Margin="1042,399,0,0" VerticalAlignment="Top" IsChecked="True" />
             <Canvas x:Name="RadioButtons" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,25,0,0">
                 <RadioButton x:Name="ClearMirror" Height="15" Width="15" Margin="1013,480,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ClearMirror_OnChecked" />

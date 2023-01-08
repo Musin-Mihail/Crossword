@@ -22,8 +22,8 @@ public class SearchWord
                 }
             }
 
-            ListWordsRandomization.Get(word);
-            foreach (var dictionary in word.listTempWords)
+            ListWordsRandomization.Get();
+            foreach (var dictionary in Global.listDictionaries)
             {
                 foreach (var dictionaryWord in dictionary.words)
                 {
@@ -44,7 +44,6 @@ public class SearchWord
                                 if (Global.allInsertedWords.Contains(dictionaryWord.answers) == false)
                                 {
                                     Global.allInsertedWords.Add(dictionaryWord.answers);
-                                    DeleteWord.Get(dictionaryWord.answers, word);
                                     return dictionaryWord.answers;
                                 }
                             }

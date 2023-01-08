@@ -57,17 +57,19 @@ namespace Crossword
                 FormationQueue.Get();
                 int maxCountGen = 0;
                 int maxCountWord = 0;
+                int taskDelay = 0;
                 try
                 {
                     maxCountGen = int.Parse(CountGen.Text);
                     maxCountWord = int.Parse(CountGenWord.Text);
+                    taskDelay = int.Parse(TaskDelay.Text);
                 }
                 catch
                 {
                     MessageBox.Show("ОШИБКА. Водите только цифры");
                 }
 
-                await Generation.Get(maxCountGen, maxCountWord, WindowsTextTop, Visualization);
+                await Generation.Get(maxCountGen, maxCountWord, taskDelay, WindowsTextTop, Visualization);
             }
 
             EndGen();

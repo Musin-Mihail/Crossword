@@ -3,13 +3,13 @@ using Crossword.Objects;
 
 namespace Crossword.GridFill;
 
-public class TestWordStartGreen
+public class TestWordStart
 {
-    public static void Get(Word wordOld)
+    public static void Get(Word wordOld, SolidColorBrush color)
     {
         foreach (var item in wordOld.listLabel)
         {
-            item.Background = Brushes.Green;
+            item.Background = color;
         }
     }
 }

@@ -6,11 +6,6 @@ public class InsertWordGrid
 {
     public static bool Get(Word word)
     {
-        if (word.listTempWords.Count == 0)
-        {
-            return true;
-        }
-
         string answer = SearchWord.Get(word);
         if (answer == "")
         {

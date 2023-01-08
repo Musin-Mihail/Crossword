@@ -10,7 +10,6 @@ public static class CreateDictionary
     public static Dictionary Get(string path)
     {
         string[] listWordsString = File.ReadAllLines(path);
-        ListRandomization.Get(listWordsString);
         Dictionary dictionary = new Dictionary();
         foreach (var word in listWordsString)
         {
