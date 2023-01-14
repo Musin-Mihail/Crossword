@@ -12,7 +12,7 @@ public class SelectionAndInstallationOfWords
         try
         {
             Global.allInsertedWords.Clear();
-            Global.windowsText.Content = "Сложность - " + DifficultyLevel.Get();
+            Global.difficultyLevel.Content = "Сложность - " + DifficultyLevel.Get();
             await Generation.Get();
         }
         catch (Exception e)

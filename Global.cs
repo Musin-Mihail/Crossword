@@ -15,11 +15,12 @@ public static class Global
     public static List<string> allInsertedWords = new();
     
     public static int index = 0;
-    public static int maxError = 50;
+    public static int maxError = 5;
     public static int maxSeconds= 0;
     public static int taskDelay = 0;
     
     public static Label? windowsText;
+    public static Label? difficultyLevel;
     public static CheckBox? visualization;
     public static Grid? gridGeneration;
     public static Button? startGeneration;

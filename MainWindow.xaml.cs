@@ -37,6 +37,7 @@ namespace Crossword
             Global.gridGeneration = GridGeneration;
             Global.startGeneration = GenButton;
             Global.stopGeneration = GenStopButton;
+            Global.difficultyLevel = DifficultyLevel;
             
             CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize);
             LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
