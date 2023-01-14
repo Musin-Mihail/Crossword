@@ -31,6 +31,8 @@ namespace Crossword
         private void CreatingThePlayingField()
         {
             ResetDict();
+            Global.windowsText = WindowsTextTop;
+            Global.visualization = Visualization;
             CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize);
             LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
             LineCenterH.X2 = _numberOfCellsHorizontally * 30 / 2 + 30;
@@ -69,7 +71,7 @@ namespace Crossword
                     MessageBox.Show("ОШИБКА. Водите только цифры");
                 }
 
-                await Generation.Get(maxCountGen, maxCountWord, taskDelay, WindowsTextTop, Visualization);
+                await SelectionAndInstallationOfWords.Get(maxCountGen, maxCountWord, taskDelay);
             }
 
             EndGen();

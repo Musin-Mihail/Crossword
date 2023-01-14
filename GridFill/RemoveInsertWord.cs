@@ -1,20 +1,19 @@
-﻿using Crossword.Objects;
+﻿using System.Threading.Tasks;
+using Crossword.Objects;
 
 namespace Crossword.GridFill;
 
 public class RemoveInsertWord
 {
-    public static void Get(Word word)
+    public static async Task Get(Word word)
     {
-        Global.allInsertedWords.RemoveAt(Global.allInsertedWords.IndexOf(word.wordString));
+        int index = Global.allInsertedWords.IndexOf(word.wordString);
+        if (index >= 0)
+        {
+            Global.allInsertedWords.RemoveAt(index);
+        }
+
         word.wordString = "";
         word.full = false;
-        foreach (var label in word.listLabel)
-        {
-            if (!word.connectionLabel.Contains(label))
-            {
-                label.Content = null;
-            }
-        }
     }
 }

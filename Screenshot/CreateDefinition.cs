@@ -19,16 +19,18 @@ public class CreateDefinition
             }
 
             string definitionString = "По горизонтали: ";
+            string testing = "";
             for (int i = 0; i < listDefinitionRight.Count; i++)
             {
+                List<string> newListWord = new List<string>(listDefinitionRight[i].Split(';'));
+                string word1 = newListWord[1];
+                testing += "\n" + word1;
                 foreach (DictionaryWord definition in listWordsString)
                 {
-                    List<string> newListWord = new List<string>(listDefinitionRight[i].Split(';'));
-                    string word1 = newListWord[1];
                     string word2 = definition.answers;
-
                     if (word1 == word2)
                     {
+                        testing += " - " + word2;
                         Random rnd = new Random();
                         int randomIndex = rnd.Next(0, definition.definitions.Count - 1);
                         definitionString += newListWord[0] + "." + definition.definitions[randomIndex] + ". ";
@@ -37,13 +39,15 @@ public class CreateDefinition
                 }
             }
 
+            MessageBox.Show(testing);
+
             definitionString += "\nПо вертикали: ";
             for (int i = 0; i < listDefinitionDown.Count; i++)
             {
+                List<string> newListWord = new List<string>(listDefinitionDown[i].Split(';'));
+                string word1 = newListWord[1];
                 foreach (DictionaryWord definition in listWordsString)
                 {
-                    List<string> newListWord = new List<string>(listDefinitionDown[i].Split(';'));
-                    string word1 = newListWord[1];
                     string word2 = definition.answers;
                     if (word1 == word2)
                     {
