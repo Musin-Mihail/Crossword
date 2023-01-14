@@ -1,18 +1,44 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using System.Timers;
+using System.Windows;
 using System.Windows.Media;
 using Crossword.Objects;
 
 namespace Crossword.GridFill.SelectionAndInstallation;
 
-public class OneGeneration
+public class Generation
 {
-    public static async Task Get(int i, int taskDelay, int maxCountWord, int maxError)
+
+    public static async Task Get()
     {
+        StartGeneration.Get();
+        StartGeneration.Get();
+        ClearAllCell.Get();
+        DateTime date = DateTime.Now;
+
+        int maxError = 0;
         Global.index = 0;
+        int maxIndex = 0;
         while (Global.index < Global.listWordsGrid.Count)
         {
+            var time = DateTime.Now - date;
+            if (time.TotalSeconds > Global.maxSeconds)
+            {
+                Global.stop = true;
+                StopGeneration.Get();
+            }
+            
+            if (Global.index > maxIndex)
+            {
+                date = DateTime.Now;
+                maxIndex = Global.index;
+                await Task.Delay(1);
+            }
+
             if (Global.stop)
             {
+                Global.stop = false;
                 return;
             }
 
@@ -28,30 +54,24 @@ public class OneGeneration
                 if (Global.visualization.IsChecked == true)
                 {
                     TestWordStart.Get(newWord, Brushes.Green);
-                    await Task.Delay(taskDelay);
+                    await Task.Delay(Global.taskDelay);
                     TestWordEnd.Get(newWord);
-                    newWord.goodInsert++;
-                    if (newWord.goodInsert > maxCountWord)
+                }
+
+                newWord.goodInsert++;
+                if (newWord.goodInsert > Global.maxError)
+                {
+                    if (Global.visualization.IsChecked == true)
                     {
-                        newWord.goodInsert = 0;
                         TestWordStart.Get(newWord, Brushes.Yellow);
-                        await Task.Delay(taskDelay);
+                        await Task.Delay(Global.taskDelay);
                         TestWordEnd.Get(newWord);
-                        await StepBack.Get(newWord);
-                        //     newWord.goodInsert = 0;
-                        //     if (Global.index - 1 >= 0)
-                        //     {
-                        //         // MessageBox.Show("if (Global.index - 2 >= 0)");
-                        //         newWord = Global.listWordsGrid[Global.index - 1];
-                        //     }
-                        //     else
-                        //     {
-                        //         // MessageBox.Show("else");
-                        //         newWord = Global.listWordsGrid[0];
-                        //     }
-                        //     await StepBack.Get(newWord);
-                        continue;
                     }
+
+                    newWord.goodInsert = 0;
+                    TestWordEnd.Get(newWord);
+                    await StepBack.Get(newWord);
+                    continue;
                 }
 
                 Global.index++;
@@ -61,12 +81,12 @@ public class OneGeneration
             if (Global.visualization.IsChecked == true)
             {
                 TestWordStart.Get(newWord, Brushes.Red);
-                await Task.Delay(taskDelay);
+                await Task.Delay(Global.taskDelay);
                 TestWordEnd.Get(newWord);
             }
 
             newWord.error++;
-            if (newWord.error > maxCountWord)
+            if (newWord.error > Global.maxError)
             {
                 newWord.error = 0;
                 if (Global.index - 2 >= 0)
@@ -89,8 +109,9 @@ public class OneGeneration
 
         if (Global.index >= Global.listWordsGrid.Count)
         {
-            Success.Get(i, maxError);
-            Global.stop = true;
+            Success.Get();
         }
+
+        StopGeneration.Get();
     }
 }

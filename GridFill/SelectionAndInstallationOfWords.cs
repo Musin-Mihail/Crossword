@@ -7,12 +7,13 @@ namespace Crossword.GridFill;
 
 public class SelectionAndInstallationOfWords
 {
-    public static async Task Get(int maxCountGen, int maxCountWord, int taskDelay)
+    public static async Task Get()
     {
         try
         {
             Global.allInsertedWords.Clear();
-            await Generation.Get(maxCountGen, DifficultyLevel.Get(), taskDelay, maxCountWord);
+            Global.windowsText.Content = "Сложность - " + DifficultyLevel.Get();
+            await Generation.Get();
         }
         catch (Exception e)
         {

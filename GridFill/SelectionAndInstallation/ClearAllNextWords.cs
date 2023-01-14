@@ -8,7 +8,10 @@ public class ClearAllNextWords
     {
         for (int i = Global.index + 1; i < Global.listWordsGrid.Count; i++)
         {
-            await ClearConnectionLabel.Get(Global.listWordsGrid[i]);
+            if (!Global.listWordsGrid[i].full)
+            {
+                await ClearConnectionLabel.Get(Global.listWordsGrid[i]);
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Crossword.FormationOfAQueue;
 using Crossword.GridFill;
+using Crossword.GridFill.SelectionAndInstallation;
 using Crossword.Objects;
 using Crossword.PlayingField;
 using Crossword.SaveLoad;
@@ -33,6 +34,10 @@ namespace Crossword
             ResetDict();
             Global.windowsText = WindowsTextTop;
             Global.visualization = Visualization;
+            Global.gridGeneration = GridGeneration;
+            Global.startGeneration = GenButton;
+            Global.stopGeneration = GenStopButton;
+            
             CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize);
             LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
             LineCenterH.X2 = _numberOfCellsHorizontally * 30 / 2 + 30;
@@ -51,54 +56,25 @@ namespace Crossword
 
         private async Task GridFill()
         {
-            StartGen();
             await Task.Delay(100);
             SearchForEmptyCells.Get();
             if (Global.listEmptyCellStruct.Count > 0)
             {
                 FormationQueue.Get();
-                int maxCountGen = 0;
-                int maxCountWord = 0;
-                int taskDelay = 0;
                 try
                 {
-                    maxCountGen = int.Parse(CountGen.Text);
-                    maxCountWord = int.Parse(CountGenWord.Text);
-                    taskDelay = int.Parse(TaskDelay.Text);
+                    Global.maxSeconds = int.Parse(MaxSeconds.Text);
+                    Global.taskDelay = int.Parse(TaskDelay.Text);
                 }
                 catch
                 {
                     MessageBox.Show("ОШИБКА. Водите только цифры");
                 }
 
-                await SelectionAndInstallationOfWords.Get(maxCountGen, maxCountWord, taskDelay);
+                SelectionAndInstallationOfWords.Get();
             }
-
-            EndGen();
         }
-
-        private void StartGen()
-        {
-            Reset.Visibility = Visibility.Hidden;
-            GenButton.Visibility = Visibility.Hidden;
-            SaveGrid.Visibility = Visibility.Hidden;
-            LoadGrid.Visibility = Visibility.Hidden;
-            Screenshot.Visibility = Visibility.Hidden;
-            GenStopButton.Visibility = Visibility.Visible;
-            RadioButtons.Visibility = Visibility.Hidden;
-        }
-
-        private void EndGen()
-        {
-            Reset.Visibility = Visibility.Visible;
-            GenButton.Visibility = Visibility.Visible;
-            SaveGrid.Visibility = Visibility.Visible;
-            LoadGrid.Visibility = Visibility.Visible;
-            Screenshot.Visibility = Visibility.Visible;
-            GenStopButton.Visibility = Visibility.Hidden;
-            RadioButtons.Visibility = Visibility.Visible;
-        }
-
+        
         private void AddingWatermarks()
         {
             for (int i = 0; i < 50; i++)
@@ -393,11 +369,13 @@ namespace Crossword
 
         private void Button_ClickGen(object sender, RoutedEventArgs e)
         {
+
             GridFill();
         }
 
         private void Button_ClickStop(object sender, RoutedEventArgs e)
         {
+            StopGeneration.Get();
             Global.stop = true;
         }
 

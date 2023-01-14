@@ -14,41 +14,38 @@
             <Line x:Name="LineCenterV" X1="0" Y1="500" X2="1000" Y2="500" Stroke="Green" StrokeThickness="4" Visibility="Hidden" />
             <Label x:Name="MusinMihail" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" Foreground="#FFEDEDED" />
             <Button x:Name="ChangeFill" Content="Изменить поле" Click="Button_ChangeFill" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,50,0,0" />
-            <Button Content="Выбор словарей" Click="Button_DictionariesSelection" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,660,0,0" />
-            <Button Content="Основной словарь" Click="Button_Basic_Dictionary" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1140,660,0,0" />
-            <Label x:Name="SelectedDictionary" Content="Основной словарь" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" Height="250" Width="120" Margin="1140,710,0,0" />
 
-            <Label x:Name="WindowsTextTop" Content="" HorizontalAlignment="Left" Margin="1300,10,0,0" VerticalAlignment="Top" Width="276" FontSize="10" />
-            <Label Content="Всего генераций" HorizontalAlignment="Left" VerticalAlignment="Top" Width="152" FontSize="18" Margin="991,114,0,0" />
-            <Label Content="Количество циклов" HorizontalAlignment="Left" VerticalAlignment="Top" Width="176" FontSize="18" Margin="979,240,0,0" />
-            <Label Content="На одну генерацию" HorizontalAlignment="Left" VerticalAlignment="Top" Width="178" FontSize="18" Margin="978,279,0,0" />
+            <Label x:Name="WindowsTextTop" Content="" HorizontalAlignment="Left" Margin="1000,200,0,0" VerticalAlignment="Top" Width="276" FontSize="10" />
+            <Label Content="Количество секунд на одно слово" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" FontSize="18" Margin="978,279,0,0" />
             <Button x:Name="GenButton" Content="Генерация" Click="Button_ClickGen" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,425,0,0" />
             <Button x:Name="GenStopButton" Content="Стоп" Click="Button_ClickStop" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,425,0,0" Visibility="Hidden" />
-            <Button x:Name="Reset" Content="Очистить поле" Click="Button_Reset" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,720,0,0" />
-            <Button x:Name="SaveGrid" Content="Сохранить сетку" Click="Button_ClickSaveGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,780,0,0" />
-            <Button x:Name="LoadGrid" Content="Загрузить сетку" Click="Button_ClickLoadGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,840,0,0" />
-            <Button x:Name="Screenshot" Content="Скриншот" Click="Button_Screenshot" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,900,0,0" />
-            <TextBox x:Name="CountGen" TextWrapping="Wrap" Text="100" Height="50" Width="120" Margin="1010,153,0,0" FontSize="36" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
-            <TextBox x:Name="CountGenWord" TextWrapping="Wrap" Text="10" Height="50" Width="120" Margin="1007,330,0,0" FontSize="36" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
-            <Label Content="Задержка" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" FontSize="18" Margin="1165,350,0,0" />
-
-            <TextBox x:Name="TaskDelay" TextWrapping="Wrap" Text="100" Height="30" Width="120" Margin="1150,390,0,0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
-
+            <TextBox x:Name="MaxSeconds" TextWrapping="Wrap" Text="10" Height="50" Width="120" Margin="1007,330,0,0" FontSize="36" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
+            <Grid Name="GridGeneration">
+                <Label Content="Задержка" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" FontSize="18" Margin="1165,350,0,0" />
+                <TextBox x:Name="TaskDelay" TextWrapping="Wrap" Text="100" Height="30" Width="120" Margin="1150,390,0,0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
+                <Canvas x:Name="RadioButtons" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,25,0,0">
+                    <RadioButton x:Name="ClearMirror" Height="15" Width="15" Margin="1013,480,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ClearMirror_OnChecked" />
+                    <Image Source="pack://siteoforigin:,,,/image/clear_mirror.png" Height="40" Margin="1000,500,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <RadioButton x:Name="HorizontallyMirror" Height="15" Width="15" Margin="1064,480,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ClearMirror_OnChecked" />
+                    <Image Source="pack://siteoforigin:,,,/image/horizontal_mirror.png" Height="40" Margin="1050,500,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <RadioButton x:Name="VerticallyMirror" Height="15" Width="15" Margin="1112,480,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ClearMirror_OnChecked" />
+                    <Image Source="pack://siteoforigin:,,,/image/vertical_mirror.png" Height="40" Margin="1100,500,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <RadioButton x:Name="AllMirror" Height="15" Width="15" Margin="1163,480,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ClearMirror_OnChecked" />
+                    <Image Source="pack://siteoforigin:,,,/image/all_mirror.png" Height="40" Margin="1150,500,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <RadioButton x:Name="HorizontallyMirrorRevers" Height="15" Width="15" Margin="1064,550,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ClearMirror_OnChecked" />
+                    <Image Source="pack://siteoforigin:,,,/image/horizontal_mirror_revers.png" Height="40" Margin="1052,570,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <RadioButton x:Name="VerticallyMirrorRevers" Height="15" Width="15" Margin="1112,550,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ClearMirror_OnChecked" />
+                    <Image Source="pack://siteoforigin:,,,/image/vertical_mirror_revers.png" Height="40" Margin="1100,570,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                </Canvas>
+                <Button Content="Выбор словарей" Click="Button_DictionariesSelection" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,660,0,0" />
+                <Button Content="Основной словарь" Click="Button_Basic_Dictionary" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1140,660,0,0" />
+                <Button x:Name="Reset" Content="Очистить поле" Click="Button_Reset" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,720,0,0" />
+                <Button x:Name="SaveGrid" Content="Сохранить сетку" Click="Button_ClickSaveGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,780,0,0" />
+                <Button x:Name="LoadGrid" Content="Загрузить сетку" Click="Button_ClickLoadGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,840,0,0" />
+                <Button x:Name="Screenshot" Content="Скриншот" Click="Button_Screenshot" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,900,0,0" />
+                <Label x:Name="SelectedDictionary" Content="Основной словарь" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" Height="250" Width="120" Margin="1140,710,0,0" />
+            </Grid>
             <CheckBox x:Name="Visualization" Content="Визуализация" HorizontalAlignment="Left" Margin="1042,399,0,0" VerticalAlignment="Top" IsChecked="True" />
-            <Canvas x:Name="RadioButtons" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,25,0,0">
-                <RadioButton x:Name="ClearMirror" Height="15" Width="15" Margin="1013,480,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ClearMirror_OnChecked" />
-                <Image Source="pack://siteoforigin:,,,/image/clear_mirror.png" Height="40" Margin="1000,500,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                <RadioButton x:Name="HorizontallyMirror" Height="15" Width="15" Margin="1064,480,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ClearMirror_OnChecked" />
-                <Image Source="pack://siteoforigin:,,,/image/horizontal_mirror.png" Height="40" Margin="1050,500,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                <RadioButton x:Name="VerticallyMirror" Height="15" Width="15" Margin="1112,480,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ClearMirror_OnChecked" />
-                <Image Source="pack://siteoforigin:,,,/image/vertical_mirror.png" Height="40" Margin="1100,500,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                <RadioButton x:Name="AllMirror" Height="15" Width="15" Margin="1163,480,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ClearMirror_OnChecked" />
-                <Image Source="pack://siteoforigin:,,,/image/all_mirror.png" Height="40" Margin="1150,500,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                <RadioButton x:Name="HorizontallyMirrorRevers" Height="15" Width="15" Margin="1064,550,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ClearMirror_OnChecked" />
-                <Image Source="pack://siteoforigin:,,,/image/horizontal_mirror_revers.png" Height="40" Margin="1052,570,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                <RadioButton x:Name="VerticallyMirrorRevers" Height="15" Width="15" Margin="1112,550,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ClearMirror_OnChecked" />
-                <Image Source="pack://siteoforigin:,,,/image/vertical_mirror_revers.png" Height="40" Margin="1100,570,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
-            </Canvas>
             <Grid x:Name="TheGrid" HorizontalAlignment="Left" VerticalAlignment="Top" />
         </Grid>
     </ScrollViewer>
