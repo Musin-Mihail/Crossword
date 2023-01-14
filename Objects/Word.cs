@@ -12,4 +12,5 @@ public class Word
     public string wordString = "";
     public bool right = false;
     public int error = 0;
+    public int goodInsert = 0;
 }

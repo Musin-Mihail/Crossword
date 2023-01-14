@@ -22,6 +22,7 @@ public class SearchWord
                 }
             }
 
+
             ListWordsRandomization.Get();
             foreach (var dictionary in Global.listDictionaries)
             {

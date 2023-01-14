@@ -3,13 +3,16 @@ using Crossword.Objects;
 
 namespace Crossword.GridFill.SelectionAndInstallation;
 
-public class ClearLabel
+public class ClearConnectionLabel
 {
     public static async Task Get(Word word)
     {
         foreach (var label in word.listLabel)
         {
-            label.Content = null;
+            if (!CheckConnectionLabel.Get(word, label))
+            {
+                label.Content = null;
+            }
         }
 
         await RemoveInsertWord.Get(word);

@@ -15,5 +15,7 @@ public class RemoveInsertWord
 
         word.wordString = "";
         word.full = false;
+        word.error = 0;
+        word.goodInsert = 0;
     }
 }

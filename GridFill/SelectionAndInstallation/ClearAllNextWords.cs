@@ -6,16 +6,9 @@ public class ClearAllNextWords
 {
     public static async Task Get()
     {
-        for (int j = Global.index + 1; j < Global.listWordsGrid.Count; j++)
+        for (int i = Global.index + 1; i < Global.listWordsGrid.Count; i++)
         {
-            foreach (var label in Global.listWordsGrid[j].listLabel)
-            {
-                if (label.Content == null)
-                {
-                    await RemoveInsertWord.Get(Global.listWordsGrid[j]);
-                    break;
-                }
-            }
+            await ClearConnectionLabel.Get(Global.listWordsGrid[i]);
         }
     }
 }

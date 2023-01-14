@@ -30,6 +30,28 @@ public class OneGeneration
                     TestWordStart.Get(newWord, Brushes.Green);
                     await Task.Delay(taskDelay);
                     TestWordEnd.Get(newWord);
+                    newWord.goodInsert++;
+                    if (newWord.goodInsert > maxCountWord)
+                    {
+                        newWord.goodInsert = 0;
+                        TestWordStart.Get(newWord, Brushes.Yellow);
+                        await Task.Delay(taskDelay);
+                        TestWordEnd.Get(newWord);
+                        await StepBack.Get(newWord);
+                        //     newWord.goodInsert = 0;
+                        //     if (Global.index - 1 >= 0)
+                        //     {
+                        //         // MessageBox.Show("if (Global.index - 2 >= 0)");
+                        //         newWord = Global.listWordsGrid[Global.index - 1];
+                        //     }
+                        //     else
+                        //     {
+                        //         // MessageBox.Show("else");
+                        //         newWord = Global.listWordsGrid[0];
+                        //     }
+                        //     await StepBack.Get(newWord);
+                        continue;
+                    }
                 }
 
                 Global.index++;
@@ -46,7 +68,15 @@ public class OneGeneration
             newWord.error++;
             if (newWord.error > maxCountWord)
             {
-                break;
+                newWord.error = 0;
+                if (Global.index - 2 >= 0)
+                {
+                    newWord = Global.listWordsGrid[Global.index - 2];
+                }
+                else
+                {
+                    newWord = Global.listWordsGrid[0];
+                }
             }
 
             if (newWord.error > maxError)

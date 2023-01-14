@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using System.Windows;
 using Crossword.Objects;
 
 namespace Crossword.GridFill.SelectionAndInstallation;
@@ -9,16 +10,15 @@ public class StepBack
     {
         foreach (var word in newWord.connectionWords)
         {
+            await ClearConnectionLabel.Get(word);
+
             int newindex = Global.listWordsGrid.IndexOf(word);
-            if (Global.listWordsGrid.IndexOf(word) < Global.index)
+            if (newindex < Global.index)
             {
                 Global.index = newindex;
             }
-
-            await ClearAllNextWords.Get();
-            await ClearLabel.Get(word);
         }
+        await ClearAllNextWords.Get();
 
-        await ClearLabel.Get(newWord);
     }
 }

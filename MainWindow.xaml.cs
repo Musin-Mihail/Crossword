@@ -412,7 +412,14 @@ namespace Crossword
 
         private void Button_Screenshot(object sender, RoutedEventArgs e)
         {
-            CreateImage.Get();
+            if (Global.listEmptyCellStruct.Count > 1)
+            {
+                CreateImage.Get();
+            }
+            else
+            {
+                MessageBox.Show("Ячеек меньше двух\nИли не было генерации");
+            }
         }
 
         private void Button_ChangeFill(object sender, RoutedEventArgs e)
