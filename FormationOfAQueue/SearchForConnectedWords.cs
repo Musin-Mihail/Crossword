@@ -12,6 +12,7 @@ public class SearchForConnectedWords
         foreach (Word word in Global.listWordsGrid)
         {
             List<Label> tempListLabel = word.listLabel;
+            CreateWordDictionary.Get(word);
             foreach (Label label in tempListLabel)
             {
                 foreach (Word word2 in Global.listWordsGrid)

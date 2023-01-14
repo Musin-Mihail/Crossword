@@ -13,4 +13,6 @@ public class Word
     public bool right = false;
     public int error = 0;
     public int goodInsert = 0;
+    public List<Dictionary> fullDictionaries = new();
+    public List<Dictionary> workDictionaries = new();
 }

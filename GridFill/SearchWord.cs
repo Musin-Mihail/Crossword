@@ -23,8 +23,8 @@ public class SearchWord
             }
 
 
-            ListWordsRandomization.Get();
-            foreach (var dictionary in Global.listDictionaries)
+            ListWordsRandomization.Get(word);
+            foreach (var dictionary in word.fullDictionaries)
             {
                 foreach (var dictionaryWord in dictionary.words)
                 {

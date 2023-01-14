@@ -6,12 +6,12 @@ namespace Crossword.Words;
 
 public class ListWordsRandomization
 {
-    public static void Get()
+    public static void Get(Word word)
     {
         try
         {
             Random rnd = new Random();
-            foreach (var dictionary in Global.listDictionaries)
+            foreach (var dictionary in word.fullDictionaries)
             {
                 for (int i = 0; i < dictionary.words.Count; i++)
                 {

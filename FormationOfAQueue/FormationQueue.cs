@@ -7,6 +7,7 @@ public class FormationQueue
         Global.listWordsGrid.Clear();
         SearchForTheBeginningAndLengthOfAllWords.Get();
         SearchForConnectedWords.Get();
+        // SortingWordsGridNew.Get();
         SortingWordsGrid.Get();
         SortingConnectionWords.Get();
     }
