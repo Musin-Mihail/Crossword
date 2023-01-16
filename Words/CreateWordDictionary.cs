@@ -7,9 +7,10 @@ public class CreateWordDictionary
 {
     public static void Get(Word word)
     {
-        Dictionary newDictionary = new();
         foreach (var dictionary in Global.listDictionaries)
         {
+            Dictionary newDictionary = new();
+            newDictionary.name = dictionary.name;
             List<DictionaryWord> newDictionaryWord = new();
             foreach (var dictionaryWord in dictionary.words)
             {
@@ -20,8 +21,7 @@ public class CreateWordDictionary
             }
 
             newDictionary.words = new List<DictionaryWord>(newDictionaryWord);
+            word.fullDictionaries.Add(newDictionary);
         }
-
-        word.fullDictionaries.Add(newDictionary);
     }
 }

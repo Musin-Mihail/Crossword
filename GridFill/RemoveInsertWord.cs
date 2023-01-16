@@ -10,6 +10,7 @@ public class RemoveInsertWord
         int index = Global.allInsertedWords.IndexOf(word.wordString);
         if (index >= 0)
         {
+            SearchDictionaryEntryRemove.Get(word.wordString);
             Global.allInsertedWords.RemoveAt(index);
         }
 

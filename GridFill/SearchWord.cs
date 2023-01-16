@@ -25,6 +25,11 @@ public class SearchWord
             ListWordsRandomization.Get(word);
             foreach (var dictionary in word.workDictionaries)
             {
+                if (!CheckDictionary.Get(dictionary.name))
+                {
+                    continue;
+                }
+
                 foreach (var dictionaryWord in dictionary.words)
                 {
                     if (dictionaryWord.answers.Length == gridWord.Length)
@@ -45,6 +50,7 @@ public class SearchWord
                                 {
                                     Global.allInsertedWords.Add(dictionaryWord.answers);
                                     string answers = dictionaryWord.answers;
+                                    SearchDictionaryEntryAdd.Get(answers);
                                     dictionaryWord.answers = "";
                                     return answers;
                                 }

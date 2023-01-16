@@ -38,7 +38,7 @@ namespace Crossword
             Global.startGeneration = GenButton;
             Global.stopGeneration = GenStopButton;
             Global.difficultyLevel = DifficultyLevel;
-            
+
             CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize);
             LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
             LineCenterH.X2 = _numberOfCellsHorizontally * 30 / 2 + 30;
@@ -51,7 +51,12 @@ namespace Crossword
         private void ResetDict()
         {
             Global.listDictionaries.Clear();
-            Global.listDictionaries.Add(CreateDictionary.Get("dict.txt"));
+
+            Dictionary commonDictionary = CreateDictionary.Get("dict.txt");
+            Global.listDictionaries.Add(commonDictionary);
+            Global.listDictionaries[^1].name = "Общий";
+            Global.listDictionaries[^1].maxCount = commonDictionary.words.Count;
+
             SelectedDictionary.Content = "Основной словарь";
         }
 
@@ -75,7 +80,7 @@ namespace Crossword
                 SelectionAndInstallationOfWords.Get();
             }
         }
-        
+
         private void AddingWatermarks()
         {
             for (int i = 0; i < 50; i++)
@@ -370,7 +375,6 @@ namespace Crossword
 
         private void Button_ClickGen(object sender, RoutedEventArgs e)
         {
-
             GridFill();
         }
 
@@ -432,6 +436,7 @@ namespace Crossword
                         {
                             message += selectedDictionaries + "\n";
                             Dictionary dictionary = CreateDictionary.Get(path);
+                            dictionary.name = name;
                             dictionary.maxCount = int.Parse(list[1]);
                             Global.listDictionaries.Add(dictionary);
                             break;
@@ -439,6 +444,11 @@ namespace Crossword
                     }
                 }
 
+                Dictionary commonDictionary = CreateDictionary.Get("dict.txt");
+
+                Global.listDictionaries.Add(commonDictionary);
+                Global.listDictionaries[^1].name = "Общий";
+                Global.listDictionaries[^1].maxCount = commonDictionary.words.Count;
                 MessageBox.Show(message);
                 SelectedDictionary.Content = message;
             }
