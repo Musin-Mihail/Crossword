@@ -22,9 +22,8 @@ public class SearchWord
                 }
             }
 
-
             ListWordsRandomization.Get(word);
-            foreach (var dictionary in word.fullDictionaries)
+            foreach (var dictionary in word.workDictionaries)
             {
                 foreach (var dictionaryWord in dictionary.words)
                 {
@@ -45,7 +44,9 @@ public class SearchWord
                                 if (Global.allInsertedWords.Contains(dictionaryWord.answers) == false)
                                 {
                                     Global.allInsertedWords.Add(dictionaryWord.answers);
-                                    return dictionaryWord.answers;
+                                    string answers = dictionaryWord.answers;
+                                    dictionaryWord.answers = "";
+                                    return answers;
                                 }
                             }
                         }

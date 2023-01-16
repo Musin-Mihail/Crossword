@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using System.Windows;
 using Crossword.Objects;
 
 namespace Crossword.GridFill.SelectionAndInstallation;
@@ -19,6 +18,5 @@ public class StepBack
             }
         }
         await ClearAllNextWords.Get();
-
     }
 }

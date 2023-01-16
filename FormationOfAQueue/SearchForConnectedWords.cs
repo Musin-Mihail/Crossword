@@ -31,6 +31,7 @@ public class SearchForConnectedWords
                     }
                 }
             }
+            word.RestoreDictionaries();
         }
     }
 }

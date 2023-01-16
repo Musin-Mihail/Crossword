@@ -12,7 +12,21 @@ public class Word
     public string wordString = "";
     public bool right = false;
     public int error = 0;
-    public int goodInsert = 0;
     public List<Dictionary> fullDictionaries = new();
     public List<Dictionary> workDictionaries = new();
+    public void RestoreDictionaries()
+    {
+        workDictionaries = new List<Dictionary>();
+        workDictionaries.Add(new Dictionary());
+        foreach (var dictionary in fullDictionaries)
+        {
+            foreach (var dictionaryWord in dictionary.words)
+            {
+                DictionaryWord newDictionary = new DictionaryWord();
+                newDictionary.answers = dictionaryWord.answers;
+                newDictionary.definitions = new List<string>(dictionaryWord.definitions);
+                workDictionaries[0].words.Add(newDictionary);
+            }
+        }
+    }
 }

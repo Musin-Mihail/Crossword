@@ -55,23 +55,6 @@ public class Generation
                     await Task.Delay(Global.taskDelay);
                     TestWordEnd.Get(newWord);
                 }
-
-                newWord.goodInsert++;
-                if (newWord.goodInsert > Global.maxError)
-                {
-                    if (Global.visualization.IsChecked == true)
-                    {
-                        TestWordStart.Get(newWord, Brushes.Yellow);
-                        await Task.Delay(Global.taskDelay);
-                        TestWordEnd.Get(newWord);
-                    }
-
-                    newWord.goodInsert = 0;
-                    TestWordEnd.Get(newWord);
-                    await StepBack.Get(newWord);
-                    continue;
-                }
-
                 Global.index++;
                 continue;
             }
@@ -86,15 +69,8 @@ public class Generation
             newWord.error++;
             if (newWord.error > Global.maxError)
             {
+                newWord.RestoreDictionaries();
                 newWord.error = 0;
-                if (Global.index - 2 >= 0)
-                {
-                    newWord = Global.listWordsGrid[Global.index - 2];
-                }
-                else
-                {
-                    newWord = Global.listWordsGrid[0];
-                }
             }
 
             await StepBack.Get(newWord);
