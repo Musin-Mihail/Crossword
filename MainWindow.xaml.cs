@@ -416,6 +416,11 @@ namespace Crossword
                 CreatingThePlayingField();
             }
         }
+        private void Button_RequiredDictionary(object sender, RoutedEventArgs e)
+        {
+            var requiredDictionary = new RequiredDictionary();
+            requiredDictionary.ShowDialog();
+        }
 
         private void Button_DictionariesSelection(object sender, RoutedEventArgs e)
         {
