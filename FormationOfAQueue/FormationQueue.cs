@@ -1,4 +1,7 @@
-﻿namespace Crossword.FormationOfAQueue;
+﻿using System;
+using Crossword.Objects;
+
+namespace Crossword.FormationOfAQueue;
 
 public class FormationQueue
 {
@@ -7,7 +10,14 @@ public class FormationQueue
         Global.listWordsGrid.Clear();
         SearchForTheBeginningAndLengthOfAllWords.Get();
         SearchForConnectedWords.Get();
-        SortingWordsGrid.Get();
-        SortingConnectionWords.Get();
+        
+        Random rnd = new Random();
+        for (int i = 0; i < Global.listWordsGrid.Count; i++)
+        {
+            Word temp = Global.listWordsGrid[i];
+            int randomIndex = rnd.Next(0, Global.listWordsGrid.Count - 1);
+            Global.listWordsGrid[i] = Global.listWordsGrid[randomIndex];
+            Global.listWordsGrid[randomIndex] = temp;
+        }
     }
 }
