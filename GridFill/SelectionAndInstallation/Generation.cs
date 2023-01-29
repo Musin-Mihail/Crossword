@@ -11,6 +11,7 @@ public class Generation
     {
         StartGeneration.Get();
         ClearAllCell.Get();
+        DateTime startDate = DateTime.Now;
         DateTime date = DateTime.Now;
         Global.index = 0;
         int maxIndex = 0;
@@ -55,6 +56,7 @@ public class Generation
                     await Task.Delay(Global.taskDelay);
                     TestWordEnd.Get(newWord);
                 }
+
                 Global.index++;
                 continue;
             }
@@ -66,19 +68,12 @@ public class Generation
                 TestWordEnd.Get(newWord);
             }
 
-            newWord.error++;
-            if (newWord.error > Global.maxError)
-            {
-                newWord.RestoreDictionaries();
-                newWord.error = 0;
-            }
-
             await StepBack.Get(newWord);
         }
 
         if (Global.index >= Global.listWordsGrid.Count)
         {
-            Success.Get();
+            Success.Get(startDate);
         }
 
         StopGeneration.Get();

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
 using Crossword.Objects;
 
@@ -12,7 +11,7 @@ public class ListWordsRandomization
         try
         {
             Random rnd = new Random();
-            foreach (var dictionary in word.workDictionaries)
+            foreach (var dictionary in word.fullDictionaries)
             {
                 for (int i = 0; i < dictionary.words.Count; i++)
                 {

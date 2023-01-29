@@ -8,7 +8,6 @@ public class ResetWord
     {
         ClearLabel.Get(word);
         word.full = false;
-        word.error = 0;
         word.wordString = "";
     }
 }

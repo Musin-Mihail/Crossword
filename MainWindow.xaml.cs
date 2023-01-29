@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Crossword.FormationOfAQueue;
-using Crossword.GridFill;
 using Crossword.GridFill.SelectionAndInstallation;
+using Crossword.Main;
 using Crossword.Objects;
 using Crossword.PlayingField;
 using Crossword.SaveLoad;
@@ -31,13 +29,14 @@ namespace Crossword
 
         private void CreatingThePlayingField()
         {
-            ResetDict();
             Global.windowsText = WindowsTextTop;
             Global.visualization = Visualization;
             Global.gridGeneration = GridGeneration;
             Global.startGeneration = GenButton;
             Global.stopGeneration = GenStopButton;
             Global.difficultyLevel = DifficultyLevel;
+            Global.selectedDictionary = SelectedDictionary;
+            ResetDict.Get();
 
             CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize);
             LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
@@ -46,39 +45,6 @@ namespace Crossword
             LineCenterV.Y1 = _numberOfCellsVertically * 30 / 2 + 30;
             LineCenterV.Y2 = _numberOfCellsVertically * 30 / 2 + 30;
             LineCenterV.X2 = _numberOfCellsHorizontally * 30 + 60;
-        }
-
-        private void ResetDict()
-        {
-            Global.listDictionaries.Clear();
-
-            Dictionary commonDictionary = CreateDictionary.Get("dict.txt");
-            Global.listDictionaries.Add(commonDictionary);
-            Global.listDictionaries[^1].name = "Общий";
-            Global.listDictionaries[^1].maxCount = commonDictionary.words.Count;
-
-            SelectedDictionary.Content = "Основной словарь";
-        }
-
-        private async Task GridFill()
-        {
-            await Task.Delay(100);
-            SearchForEmptyCells.Get();
-            if (Global.listEmptyCellStruct.Count > 0)
-            {
-                FormationQueue.Get();
-                try
-                {
-                    Global.maxSeconds = int.Parse(MaxSeconds.Text);
-                    Global.taskDelay = int.Parse(TaskDelay.Text);
-                }
-                catch
-                {
-                    MessageBox.Show("ОШИБКА. Водите только цифры");
-                }
-
-                SelectionAndInstallationOfWords.Get();
-            }
         }
 
         private void AddingWatermarks()
@@ -375,7 +341,7 @@ namespace Crossword
 
         private void Button_ClickGen(object sender, RoutedEventArgs e)
         {
-            GridFill();
+            GridFillMain.Get(MaxSeconds.Text, TaskDelay.Text);
         }
 
         private void Button_ClickStop(object sender, RoutedEventArgs e)
@@ -416,6 +382,7 @@ namespace Crossword
                 CreatingThePlayingField();
             }
         }
+
         private void Button_RequiredDictionary(object sender, RoutedEventArgs e)
         {
             var requiredDictionary = new RequiredDictionary();
@@ -461,7 +428,7 @@ namespace Crossword
 
         private void Button_Basic_Dictionary(object sender, RoutedEventArgs e)
         {
-            ResetDict();
+            ResetDict.Get();
             MessageBox.Show("Выбран основной словарь");
         }
 

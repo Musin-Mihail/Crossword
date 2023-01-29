@@ -23,7 +23,7 @@ public class SearchWord
             }
 
             ListWordsRandomization.Get(word);
-            foreach (var dictionary in word.workDictionaries)
+            foreach (var dictionary in word.fullDictionaries)
             {
                 if (!CheckDictionary.Get(dictionary.name))
                 {
@@ -51,7 +51,6 @@ public class SearchWord
                                     Global.allInsertedWords.Add(dictionaryWord.answers);
                                     string answers = dictionaryWord.answers;
                                     SearchDictionaryEntryAdd.Get(answers);
-                                    dictionaryWord.answers = "";
                                     return answers;
                                 }
                             }
