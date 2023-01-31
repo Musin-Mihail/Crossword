@@ -50,7 +50,7 @@ public class SearchWord
                                 {
                                     Global.allInsertedWords.Add(dictionaryWord.answers);
                                     string answers = dictionaryWord.answers;
-                                    SearchDictionaryEntryAdd.Get(answers);
+                                    SearchDictionaryEntryAdd.Get(answers, word);
                                     return answers;
                                 }
                             }

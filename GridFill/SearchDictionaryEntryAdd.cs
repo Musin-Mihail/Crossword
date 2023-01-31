@@ -1,8 +1,10 @@
-﻿namespace Crossword.GridFill;
+﻿using Crossword.Objects;
+
+namespace Crossword.GridFill;
 
 public class SearchDictionaryEntryAdd
 {
-    public static void Get(string answers)
+    public static void Get(string answers, Word word)
     {
         foreach (var dictionary in Global.listDictionaries)
         {
@@ -15,6 +17,11 @@ public class SearchDictionaryEntryAdd
             {
                 if (dictionaryWord.answers == answers)
                 {
+                    if (dictionary.name == "!ОБЯЗАТЕЛЬНЫЕ")
+                    {
+                        word.fix = true;
+                    }
+
                     dictionary.currentCount++;
                     return;
                 }

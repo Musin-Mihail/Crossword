@@ -12,4 +12,5 @@ public class Word
     public string wordString = "";
     public bool right = false;
     public List<Dictionary> fullDictionaries = new();
+    public bool fix = false;
 }

@@ -20,7 +20,7 @@ public class StepBack
 
         foreach (var word in newWord.connectionWords)
         {
-            if (word.full)
+            if (word is { full: true, fix: false })
             {
                 ClearConnectionLabel.Get(word);
 

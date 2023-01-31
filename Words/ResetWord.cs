@@ -9,5 +9,6 @@ public class ResetWord
         ClearLabel.Get(word);
         word.full = false;
         word.wordString = "";
+        word.fix = false;
     }
 }
