@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Windows;
 using Crossword.GridFill.SelectionAndInstallation;
 
@@ -7,7 +6,7 @@ namespace Crossword.GridFill;
 
 public class SelectionAndInstallationOfWords
 {
-    public static async Task Get()
+    public static async void Get()
     {
         try
         {
