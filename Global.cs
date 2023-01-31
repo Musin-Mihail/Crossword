@@ -18,11 +18,11 @@ public static class Global
     public static int maxSeconds = 0;
     public static int taskDelay = 0;
 
-    public static Label? windowsText;
-    public static Label? difficultyLevel;
-    public static Label? selectedDictionary;
-    public static CheckBox? visualization;
-    public static Grid? gridGeneration;
-    public static Button? startGeneration;
-    public static Button? stopGeneration;
+    public static Label windowsText;
+    public static Label difficultyLevel;
+    public static Label selectedDictionary;
+    public static CheckBox visualization;
+    public static Grid gridGeneration;
+    public static Button startGeneration;
+    public static Button stopGeneration;
 }

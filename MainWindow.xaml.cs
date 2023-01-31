@@ -23,7 +23,7 @@ namespace Crossword
         public MainWindow()
         {
             InitializeComponent();
-            AddingWatermarks();
+            // AddingWatermarks();
             CreatingThePlayingField();
         }
 

@@ -19,7 +19,6 @@ public class InsertWordGrid
 
         word.full = true;
         word.wordString = answer;
-
         return false;
     }
 }

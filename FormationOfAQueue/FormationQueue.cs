@@ -10,7 +10,6 @@ public class FormationQueue
         Global.listWordsGrid.Clear();
         SearchForTheBeginningAndLengthOfAllWords.Get();
         SearchForConnectedWords.Get();
-        
         Random rnd = new Random();
         for (int i = 0; i < Global.listWordsGrid.Count; i++)
         {

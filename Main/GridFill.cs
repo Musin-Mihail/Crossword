@@ -25,7 +25,7 @@ public class GridFillMain
                 MessageBox.Show("ОШИБКА. Водите только цифры");
             }
 
-            SelectionAndInstallationOfWords.Get();
+            await SelectionAndInstallationOfWords.Get();
         }
     }
 }

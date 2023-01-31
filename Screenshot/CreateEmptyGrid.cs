@@ -19,7 +19,6 @@ public class CreateEmptyGrid
         int count = 0;
         graphics.FillRectangle(blackBrush, 0, 0, (downMaxX - topMaxX + 1) * sizeCell, (rightMaxY - leftMaxY + 1) * sizeCell);
         graphics.DrawRectangle(blackPen, 0, 0, (downMaxX - topMaxX + 1) * sizeCell, (rightMaxY - leftMaxY + 1) * sizeCell);
-        AddingWatermarks.Get(graphics);
         foreach (Cell cell in Global.listAllCellStruct)
         {
             if (cell.border.Background == Brushes.Transparent)

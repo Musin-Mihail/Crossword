@@ -5,7 +5,7 @@ namespace Crossword.GridFill;
 
 public class RemoveInsertWord
 {
-    public static async Task Get(Word word)
+    public static void Get(Word word)
     {
         int index = Global.allInsertedWords.IndexOf(word.wordString);
         if (index >= 0)

@@ -26,6 +26,7 @@ public class CheckConnectionLabel
                 }
             }
         }
+
         return false;
     }
 }

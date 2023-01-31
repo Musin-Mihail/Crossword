@@ -22,7 +22,7 @@ public class StepBack
         {
             if (word.full)
             {
-                await ClearConnectionLabel.Get(word);
+                ClearConnectionLabel.Get(word);
 
                 if (!InsertWordGrid.Get(newWord))
                 {

@@ -5,7 +5,7 @@ namespace Crossword.GridFill.SelectionAndInstallation;
 
 public class ClearConnectionLabel
 {
-    public static async Task Get(Word word)
+    public static void Get(Word word)
     {
         foreach (var label in word.listLabel)
         {
@@ -15,6 +15,6 @@ public class ClearConnectionLabel
             }
         }
 
-        await RemoveInsertWord.Get(word);
+        RemoveInsertWord.Get(word);
     }
 }

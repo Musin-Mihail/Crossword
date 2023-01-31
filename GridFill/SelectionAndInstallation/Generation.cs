@@ -10,20 +10,18 @@ public class Generation
     public static async Task Get()
     {
         StartGeneration.Get();
-        ClearAllCell.Get();
+        int maxIndex = 0;
         DateTime startDate = DateTime.Now;
         DateTime date = DateTime.Now;
-        Global.index = 0;
-        int maxIndex = 0;
+        RestartGeneration.Get();
         while (Global.index < Global.listWordsGrid.Count)
         {
             var time = DateTime.Now - date;
             if (time.TotalSeconds > Global.maxSeconds)
             {
-                Global.index = 0;
                 maxIndex = 0;
-                ClearAllCell.Get();
                 date = DateTime.Now;
+                RestartGeneration.Get();
                 continue;
             }
 

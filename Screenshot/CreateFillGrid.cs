@@ -13,7 +13,6 @@ public class CreateFillGrid
         Pen blackPen = new Pen(Color.Black, 1);
         Font font = new Font("Arial", 7);
         graphics.Clear(Color.White);
-        AddingWatermarks.Get(graphics);
         foreach (Cell cell in Global.listAllCellStruct)
         {
             if (cell.border.Background == Brushes.Black)
