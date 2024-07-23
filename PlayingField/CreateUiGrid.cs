@@ -8,7 +8,8 @@ namespace Crossword.PlayingField;
 
 public class CreateUiGrid
 {
-    public static void Get(Grid theGrid, MouseEventHandler moveChangeColor, MouseButtonEventHandler clickChangeColor, int numberOfCellsHorizontally, int numberOfCellsVertically, int cellSize)
+    public static void Get(Grid theGrid, MouseEventHandler moveChangeColor, MouseButtonEventHandler clickChangeColor,
+        int numberOfCellsHorizontally, int numberOfCellsVertically, int cellSize)
     {
         Global.listAllCellStruct.Clear();
         theGrid.Children.Clear();
@@ -22,7 +23,7 @@ public class CreateUiGrid
                 Label label = CreateLabel.Get();
                 label.FontSize = 20;
                 border.Child = label;
-                label.Margin = new Thickness(0, -4, 0, 0);
+                label.Margin = new Thickness(0, -1, 0, 0);
                 cell.AddBorderLabelXy(border, label, x, y);
                 Global.listAllCellStruct.Add(cell);
             }
@@ -42,7 +43,7 @@ public class CreateUiGrid
             Label label = CreateLabel.Get();
             label.FontSize = 16;
             border.Child = label;
-            label.Margin = new Thickness(0, -4, 0, 0);
+            label.Margin = new Thickness(0, -1, 0, 0);
             label.Content = y;
         }
 
@@ -60,7 +61,7 @@ public class CreateUiGrid
             Label label = CreateLabel.Get();
             label.FontSize = 16;
             border.Child = label;
-            label.Margin = new Thickness(0, -4, 0, 0);
+            label.Margin = new Thickness(0, -1, 0, 0);
             label.Content = x;
         }
 

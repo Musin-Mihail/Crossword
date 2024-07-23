@@ -23,7 +23,6 @@ namespace Crossword
         public MainWindow()
         {
             InitializeComponent();
-            // AddingWatermarks();
             CreatingThePlayingField();
         }
 
@@ -38,26 +37,14 @@ namespace Crossword
             Global.selectedDictionary = SelectedDictionary;
             ResetDict.Get();
 
-            CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize);
+            CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally,
+                _numberOfCellsVertically, CellSize);
             LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
             LineCenterH.X2 = _numberOfCellsHorizontally * 30 / 2 + 30;
             LineCenterH.Y2 = _numberOfCellsVertically * 30 + 60;
             LineCenterV.Y1 = _numberOfCellsVertically * 30 / 2 + 30;
             LineCenterV.Y2 = _numberOfCellsVertically * 30 / 2 + 30;
             LineCenterV.X2 = _numberOfCellsHorizontally * 30 + 60;
-        }
-
-        private void AddingWatermarks()
-        {
-            for (int i = 0; i < 50; i++)
-            {
-                for (int y = 0; y < 6; y++)
-                {
-                    MusinMihail.Content += "Разработчик Мусин Михаил. ";
-                }
-
-                MusinMihail.Content += "\n";
-            }
         }
 
         private void Button_ClickSaveGrid(object sender, RoutedEventArgs e)
@@ -70,7 +57,7 @@ namespace Crossword
         {
             var loadGrid = new LoadGrid();
             loadGrid.ShowDialog();
-            if (loadGrid.ready == true)
+            if (loadGrid.ready)
             {
                 Load.Get(loadGrid.listEmptyCellStruct);
             }
