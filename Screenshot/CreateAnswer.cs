@@ -12,7 +12,7 @@ public class CreateAnswer
         {
             List<string> newListWord = new List<string>(listDefinitionRight[i].Split(';'));
             string word = newListWord[1];
-            answerString += newListWord[0] + "." + word + ". ";
+            answerString += newListWord[0] + ". " + word + ". ";
         }
 
         answerString += "\nПо вертикали: ";
@@ -20,7 +20,7 @@ public class CreateAnswer
         {
             List<string> newListWord = new List<string>(listDefinitionDown[i].Split(';'));
             string word = newListWord[1];
-            answerString += newListWord[0] + "." + word + ". ";
+            answerString += newListWord[0] + ". " + word + ". ";
         }
 
         File.WriteAllText("Answer.txt", answerString);

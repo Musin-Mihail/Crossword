@@ -30,7 +30,7 @@ public class CreateDefinition
                     {
                         Random rnd = new Random();
                         int randomIndex = rnd.Next(0, definition.definitions.Count - 1);
-                        definitionString += newListWord[0] + "." + definition.definitions[randomIndex] + ". ";
+                        definitionString += newListWord[0] + ". " + definition.definitions[randomIndex] + ". ";
                         break;
                     }
                 }
@@ -48,7 +48,7 @@ public class CreateDefinition
                     {
                         Random rnd = new Random();
                         int randomIndex = rnd.Next(0, definition.definitions.Count - 1);
-                        definitionString += newListWord[0] + "." + definition.definitions[randomIndex] + ". ";
+                        definitionString += newListWord[0] + ". " + definition.definitions[randomIndex] + ". ";
                         break;
                     }
                 }
