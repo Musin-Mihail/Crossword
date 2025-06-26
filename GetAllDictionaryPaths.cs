@@ -8,7 +8,7 @@ public class GetAllDictionaryPaths
 {
     public static List<string> Get()
     {
-        List<string> dictionariesPaths = Directory.GetFiles("Dictionaries/").ToList();
+        var dictionariesPaths = Directory.GetFiles("Dictionaries/").ToList();
         return dictionariesPaths;
     }
 }

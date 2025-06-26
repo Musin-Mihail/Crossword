@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
-using Crossword.Objects;
 using Brushes = System.Windows.Media.Brushes;
 
 namespace Crossword.Screenshot;
@@ -9,30 +8,30 @@ public class CreateFillGrid
 {
     public static void Get(Bitmap img, Graphics graphics, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell)
     {
-        SolidBrush blackBrush = new SolidBrush(Color.Black);
-        Pen blackPen = new Pen(Color.Black, 1);
-        Font font = new Font("Arial", 7);
+        var blackBrush = new SolidBrush(Color.Black);
+        var blackPen = new Pen(Color.Black, 1);
+        var font = new Font("Arial", 7);
         graphics.Clear(Color.White);
-        foreach (Cell cell in Global.listAllCellStruct)
+        foreach (var cell in Global.ListAllCellStruct)
         {
-            if (cell.border.Background == Brushes.Black)
+            if (cell.Border.Background == Brushes.Black)
             {
-                if (cell.x >= topMaxX && cell.x <= downMaxX)
+                if (cell.X >= topMaxX && cell.X <= downMaxX)
                 {
-                    if (cell.y >= leftMaxY && cell.y <= rightMaxY)
+                    if (cell.Y >= leftMaxY && cell.Y <= rightMaxY)
                     {
-                        graphics.FillRectangle(blackBrush, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
-                        graphics.DrawRectangle(blackPen, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
+                        graphics.FillRectangle(blackBrush, (cell.X - topMaxX) * sizeCell, (cell.Y - leftMaxY) * sizeCell, sizeCell, sizeCell);
+                        graphics.DrawRectangle(blackPen, (cell.X - topMaxX) * sizeCell, (cell.Y - leftMaxY) * sizeCell, sizeCell, sizeCell);
                     }
                 }
             }
             else
             {
-                StringFormat format = new StringFormat();
+                var format = new StringFormat();
                 format.LineAlignment = StringAlignment.Center;
                 format.Alignment = StringAlignment.Center;
-                graphics.DrawRectangle(blackPen, (cell.x - topMaxX) * sizeCell, (cell.y - leftMaxY) * sizeCell, sizeCell, sizeCell);
-                graphics.DrawString(cell.label.Content.ToString(), font, blackBrush, ((cell.x - topMaxX) * sizeCell) + 19, ((cell.y - leftMaxY) * sizeCell) + 21, format);
+                graphics.DrawRectangle(blackPen, (cell.X - topMaxX) * sizeCell, (cell.Y - leftMaxY) * sizeCell, sizeCell, sizeCell);
+                graphics.DrawString(cell.Label.Content.ToString(), font, blackBrush, ((cell.X - topMaxX) * sizeCell) + 19, ((cell.Y - leftMaxY) * sizeCell) + 21, format);
             }
         }
 

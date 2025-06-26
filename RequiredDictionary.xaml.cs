@@ -15,7 +15,7 @@ public partial class RequiredDictionary : Window
 
     private void ButtonBase_Create(object sender, RoutedEventArgs e)
     {
-        List<string> words = Words.Text.Split(' ').ToList();
+        var words = Words.Text.Split(' ').ToList();
         List<DictionaryWord> dictionaryWords = new();
         foreach (var word in words)
         {
@@ -30,13 +30,13 @@ public partial class RequiredDictionary : Window
         MessageBox.Show("Словарь сформирован\n!ОБЯЗАТЕЛЬНЫЕ.txt");
     }
 
-    bool SearchMatch(string word, List<DictionaryWord> dictionaryWords)
+    private bool SearchMatch(string word, List<DictionaryWord> dictionaryWords)
     {
-        foreach (var dictionary in Global.listDictionaries)
+        foreach (var dictionary in Global.ListDictionaries)
         {
-            foreach (var dictionaryWord in dictionary.words)
+            foreach (var dictionaryWord in dictionary.Words)
             {
-                if (dictionaryWord.answers.ToLower() == word.ToLower())
+                if (dictionaryWord.Answers.ToLower() == word.ToLower())
                 {
                     dictionaryWords.Add(dictionaryWord);
                     return true;
@@ -47,13 +47,13 @@ public partial class RequiredDictionary : Window
         return false;
     }
 
-    void SaveFile(List<DictionaryWord> dictionaryWords)
+    private void SaveFile(List<DictionaryWord> dictionaryWords)
     {
-        List<string> newDictionary = new List<string>();
+        var newDictionary = new List<string>();
         foreach (var dictionaryWord in dictionaryWords)
         {
-            string line = dictionaryWord.answers;
-            foreach (var definition in dictionaryWord.definitions)
+            var line = dictionaryWord.Answers;
+            foreach (var definition in dictionaryWord.Definitions)
             {
                 line += ";" + definition;
             }
@@ -61,7 +61,7 @@ public partial class RequiredDictionary : Window
             newDictionary.Add(line);
         }
 
-        var path = "Dictionaries/!ОБЯЗАТЕЛЬНЫЕ.txt";
+        const string path = "Dictionaries/!ОБЯЗАТЕЛЬНЫЕ.txt";
         File.WriteAllLines(path, newDictionary);
     }
 }

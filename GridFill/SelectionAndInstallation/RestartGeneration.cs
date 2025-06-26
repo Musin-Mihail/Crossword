@@ -1,5 +1,4 @@
 ﻿using System;
-using Crossword.Objects;
 
 namespace Crossword.GridFill.SelectionAndInstallation;
 
@@ -9,18 +8,18 @@ public class RestartGeneration
     {
         Global.index = 0;
         ClearAllCell.Get();
-        foreach (var dictionary in Global.listDictionaries)
+        foreach (var dictionary in Global.ListDictionaries)
         {
-            dictionary.currentCount = 0;
+            dictionary.CurrentCount = 0;
         }
 
-        Random rnd = new Random();
-        for (int i = 0; i < Global.listWordsGrid.Count; i++)
+        var rnd = new Random();
+        for (var i = 0; i < Global.ListWordsGrid.Count; i++)
         {
-            Word temp = Global.listWordsGrid[i];
-            int randomIndex = rnd.Next(0, Global.listWordsGrid.Count - 1);
-            Global.listWordsGrid[i] = Global.listWordsGrid[randomIndex];
-            Global.listWordsGrid[randomIndex] = temp;
+            var temp = Global.ListWordsGrid[i];
+            var randomIndex = rnd.Next(0, Global.ListWordsGrid.Count - 1);
+            Global.ListWordsGrid[i] = Global.ListWordsGrid[randomIndex];
+            Global.ListWordsGrid[randomIndex] = temp;
         }
     }
 }

@@ -7,7 +7,7 @@ public class SearchForMatches
 {
     public static bool Get(Word word, Label matchLabel)
     {
-        if (word.listLabel.Contains(matchLabel) == true)
+        if (word.ListLabel.Contains(matchLabel))
         {
             return true;
         }

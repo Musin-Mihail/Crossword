@@ -4,13 +4,13 @@ public class SearchDictionaryEntryRemove
 {
     public static void Get(string answers)
     {
-        foreach (var dictionary in Global.listDictionaries)
+        foreach (var dictionary in Global.ListDictionaries)
         {
-            foreach (var dictionaryWord in dictionary.words)
+            foreach (var dictionaryWord in dictionary.Words)
             {
-                if (dictionaryWord.answers == answers)
+                if (dictionaryWord.Answers == answers)
                 {
-                    dictionary.currentCount--;
+                    dictionary.CurrentCount--;
                     return;
                 }
             }

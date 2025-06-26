@@ -5,12 +5,12 @@ namespace Crossword.Objects;
 
 public class Word
 {
-    public List<Label> listLabel = new();
-    public readonly List<Label> connectionLabel = new();
-    public List<Word> connectionWords = new();
-    public bool full = false;
-    public string wordString = "";
-    public bool right = false;
-    public List<Dictionary> fullDictionaries = new();
-    public bool fix = false;
+    public List<Label> ListLabel = new();
+    public readonly List<Label> ConnectionLabel = new();
+    public readonly List<Word> ConnectionWords = new();
+    public bool Full = false;
+    public string WordString = "";
+    public bool Right = false;
+    public readonly List<Dictionary> FullDictionaries = new();
+    public bool Fix = false;
 }

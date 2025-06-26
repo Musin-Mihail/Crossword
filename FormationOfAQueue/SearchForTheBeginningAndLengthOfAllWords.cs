@@ -6,37 +6,37 @@ public class SearchForTheBeginningAndLengthOfAllWords
 {
     public static void Get()
     {
-        foreach (Cell cell in Global.listEmptyCellStruct)
+        foreach (Cell cell in Global.ListEmptyCellStruct)
         {
-            int x = cell.x;
-            int y = cell.y;
-            bool black = true;
+            var x = cell.X;
+            var y = cell.Y;
+            var black = true;
 
-            foreach (Cell cell2 in Global.listEmptyCellStruct)
+            foreach (var cell2 in Global.ListEmptyCellStruct)
             {
-                if (cell2.x == x - 1 && cell2.y == y)
+                if (cell2.X == x - 1 && cell2.Y == y)
                 {
                     black = false;
                     break;
                 }
             }
 
-            if (black == true)
+            if (black)
             {
                 SaveWordRight.Get(x, y);
             }
 
             black = true;
-            foreach (Cell cell2 in Global.listEmptyCellStruct)
+            foreach (var cell2 in Global.ListEmptyCellStruct)
             {
-                if (cell2.x == x && cell2.y == y - 1)
+                if (cell2.X == x && cell2.Y == y - 1)
                 {
                     black = false;
                     break;
                 }
             }
 
-            if (black == true)
+            if (black)
             {
                 SaveWordDown.Get(x, y);
             }

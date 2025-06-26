@@ -4,11 +4,11 @@ public class CheckDictionary
 {
     public static bool Get(string nameDictionary)
     {
-        foreach (var dictionary in Global.listDictionaries)
+        foreach (var dictionary in Global.ListDictionaries)
         {
-            if (dictionary.name == nameDictionary)
+            if (dictionary.Name == nameDictionary)
             {
-                if (dictionary.currentCount >= dictionary.maxCount)
+                if (dictionary.CurrentCount >= dictionary.MaxCount)
                 {
                     return false;
                 }

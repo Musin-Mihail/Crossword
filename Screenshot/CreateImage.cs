@@ -11,19 +11,19 @@ public class CreateImage
     {
         try
         {
-            int topMaxX = 99;
-            int leftMaxY = 99;
-            int downMaxX = 99;
-            int rightMaxY = 99;
-            float sizeCell = 37.938105f;
+            var topMaxX = 99;
+            var leftMaxY = 99;
+            var downMaxX = 99;
+            var rightMaxY = 99;
+            const float sizeCell = 37.938105f;
             MaxCoordinateSearch.Get(ref topMaxX, ref downMaxX, ref leftMaxY, ref rightMaxY);
-            int width = (int)((downMaxX - topMaxX + 1) * sizeCell);
-            int height = (int)((rightMaxY - leftMaxY + 1) * sizeCell);
-            Bitmap img = new Bitmap(width, height);
+            var width = (int)((downMaxX - topMaxX + 1) * sizeCell);
+            var height = (int)((rightMaxY - leftMaxY + 1) * sizeCell);
+            var img = new Bitmap(width, height);
             img.SetResolution(300, 300);
-            Graphics graphics = Graphics.FromImage(img);
-            List<string> listDefinitionRight = new List<string>();
-            List<string> listDefinitionDown = new List<string>();
+            var graphics = Graphics.FromImage(img);
+            var listDefinitionRight = new List<string>();
+            var listDefinitionDown = new List<string>();
             CreateEmptyGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, listDefinitionRight, listDefinitionDown);
             CreateFillGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell);
             CreateAnswer.Get(listDefinitionRight, listDefinitionDown);

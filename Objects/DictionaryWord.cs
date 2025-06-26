@@ -4,6 +4,6 @@ namespace Crossword.Objects;
 
 public class DictionaryWord
 {
-    public string answers = "";
-    public List<string> definitions = new();
+    public string Answers = "";
+    public readonly List<string> Definitions = new();
 }

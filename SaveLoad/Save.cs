@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
-using Crossword.Objects;
 
 namespace Crossword.SaveLoad;
 
@@ -9,13 +8,13 @@ public class Save
 {
     public static void Get()
     {
-        string saveFile = "";
-        foreach (Cell cell in Global.listEmptyCellStruct)
+        var saveFile = "";
+        foreach (var cell in Global.ListEmptyCellStruct)
         {
-            saveFile += cell.x + ";" + cell.y + "\n";
+            saveFile += cell.X + ";" + cell.Y + "\n";
         }
 
-        string name = DateTime.Now.ToString("MM_dd_yyyy-HH_mm_ss");
+        var name = DateTime.Now.ToString("MM_dd_yyyy-HH_mm_ss");
         File.WriteAllText(@"SaveGrid\" + name + ".grid", saveFile);
         MessageBox.Show("Сетка сохранена");
     }

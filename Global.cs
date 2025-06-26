@@ -7,17 +7,14 @@ namespace Crossword;
 public static class Global
 {
     public static bool stop = false;
-
-    public static List<Cell> listEmptyCellStruct = new();
-    public static List<Cell> listAllCellStruct = new();
-    public static List<Dictionary> listDictionaries = new();
-    public static List<Word> listWordsGrid = new();
-    public static List<string> allInsertedWords = new();
-
+    public static readonly List<Cell> ListEmptyCellStruct = new();
+    public static readonly List<Cell> ListAllCellStruct = new();
+    public static readonly List<Dictionary> ListDictionaries = new();
+    public static readonly List<Word> ListWordsGrid = new();
+    public static readonly List<string> AllInsertedWords = new();
     public static int index = 0;
     public static int maxSeconds = 0;
     public static int taskDelay = 0;
-
     public static Label windowsText;
     public static Label difficultyLevel;
     public static Label selectedDictionary;

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 
 namespace Crossword;
 
 public partial class сhangeFill : Window
 {
-    public bool ready = false;
-    public int numberOfCellsHorizontally = 30;
-    public int numberOfCellsVertically = 30;
+    public bool Ready;
+    public int NumberOfCellsHorizontally = 30;
+    public int NumberOfCellsVertically = 30;
 
     public сhangeFill()
     {
@@ -16,27 +15,27 @@ public partial class сhangeFill : Window
 
     private void Button_ClickGen(object sender, RoutedEventArgs e)
     {
-        int height = Int32.Parse(Horizontally.Text);
-        int width = Int32.Parse(Vertically.Text);
+        var height = int.Parse(Horizontally.Text);
+        var width = int.Parse(Vertically.Text);
         if (height > 30)
         {
-            numberOfCellsHorizontally = 30;
+            NumberOfCellsHorizontally = 30;
         }
         else
         {
-            numberOfCellsHorizontally = height;
+            NumberOfCellsHorizontally = height;
         }
 
         if (width > 30)
         {
-            numberOfCellsVertically = 30;
+            NumberOfCellsVertically = 30;
         }
         else
         {
-            numberOfCellsVertically = width;
+            NumberOfCellsVertically = width;
         }
 
-        ready = true;
+        Ready = true;
         DialogResult = false;
     }
 }

@@ -9,11 +9,11 @@ public class Success
     {
         var time = DateTime.Now - startDate;
         Global.windowsText.Content = "ГЕНЕРАЦИЯ УДАЛАСЬ\n";
-        string message = "";
-        foreach (var dictionary in Global.listDictionaries)
+        var message = "";
+        foreach (var dictionary in Global.ListDictionaries)
         {
-            message += "\n" + dictionary.name + " - " + dictionary.currentCount + "/" + dictionary.maxCount;
-            dictionary.currentCount = 0;
+            message += "\n" + dictionary.Name + " - " + dictionary.CurrentCount + "/" + dictionary.MaxCount;
+            dictionary.CurrentCount = 0;
         }
 
         MessageBox.Show("ГЕНЕРАЦИЯ УДАЛАСЬ\n" + "за " + Math.Round((decimal)time.TotalSeconds, 2) + " секунд\n" + message);

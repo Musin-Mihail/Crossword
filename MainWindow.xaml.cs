@@ -36,7 +36,6 @@ namespace Crossword
             Global.difficultyLevel = DifficultyLevel;
             Global.selectedDictionary = SelectedDictionary;
             ResetDict.Get();
-
             CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally,
                 _numberOfCellsVertically, CellSize);
             LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
@@ -57,9 +56,9 @@ namespace Crossword
         {
             var loadGrid = new LoadGrid();
             loadGrid.ShowDialog();
-            if (loadGrid.ready)
+            if (loadGrid.Ready)
             {
-                Load.Get(loadGrid.listEmptyCellStruct);
+                Load.Get(loadGrid.ListEmptyCellStruct);
             }
         }
 
@@ -77,7 +76,7 @@ namespace Crossword
         {
             if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
-                Border myBorder = (Border)sender;
+                var myBorder = (Border)sender;
                 if (VerticallyMirror.IsChecked == true)
                 {
                     ColoringHorizontal(myBorder, Brushes.Transparent);
@@ -105,7 +104,7 @@ namespace Crossword
             }
             else if (Mouse.RightButton == MouseButtonState.Pressed)
             {
-                Border myBorder = (Border)sender;
+                var myBorder = (Border)sender;
                 if (VerticallyMirror.IsChecked == true)
                 {
                     ColoringHorizontal(myBorder, Brushes.Black);
@@ -133,26 +132,26 @@ namespace Crossword
             }
         }
 
-        static void ColoringVerticalRevers(Border myBorder, Brush color)
+        private static void ColoringVerticalRevers(Border myBorder, Brush color)
         {
-            int x = 0;
-            int y = 0;
-            foreach (Cell cell in Global.listAllCellStruct)
+            var x = 0;
+            var y = 0;
+            foreach (var cell in Global.ListAllCellStruct)
             {
-                if (cell.border == myBorder)
+                if (cell.Border == myBorder)
                 {
-                    x = cell.x;
-                    y = cell.y;
+                    x = cell.X;
+                    y = cell.Y;
                     break;
                 }
             }
 
-            int center = _numberOfCellsHorizontally / 2;
+            var center = _numberOfCellsHorizontally / 2;
             if (x <= center)
             {
                 myBorder.Background = color;
-                int mirrorX = _numberOfCellsHorizontally - x + 1;
-                int mirrorY = _numberOfCellsVertically - y + 1;
+                var mirrorX = _numberOfCellsHorizontally - x + 1;
+                var mirrorY = _numberOfCellsVertically - y + 1;
                 ColoringCell(mirrorX, mirrorY, color);
             }
 
@@ -165,25 +164,25 @@ namespace Crossword
             }
         }
 
-        static void ColoringVertical(Border myBorder, Brush color)
+        private static void ColoringVertical(Border myBorder, Brush color)
         {
-            int x = 0;
-            int y = 0;
-            foreach (Cell cell in Global.listAllCellStruct)
+            var x = 0;
+            var y = 0;
+            foreach (Cell cell in Global.ListAllCellStruct)
             {
-                if (cell.border == myBorder)
+                if (cell.Border == myBorder)
                 {
-                    x = cell.x;
-                    y = cell.y;
+                    x = cell.X;
+                    y = cell.Y;
                     break;
                 }
             }
 
-            int center = _numberOfCellsHorizontally / 2;
+            var center = _numberOfCellsHorizontally / 2;
             if (x <= center)
             {
                 myBorder.Background = color;
-                int mirrorX = _numberOfCellsHorizontally - x + 1;
+                var mirrorX = _numberOfCellsHorizontally - x + 1;
                 ColoringCell(mirrorX, y, color);
             }
 
@@ -196,26 +195,26 @@ namespace Crossword
             }
         }
 
-        static void ColoringHorizontalRevers(Border myBorder, Brush color)
+        private static void ColoringHorizontalRevers(Border myBorder, Brush color)
         {
-            int x = 0;
-            int y = 0;
-            foreach (Cell cell in Global.listAllCellStruct)
+            var x = 0;
+            var y = 0;
+            foreach (var cell in Global.ListAllCellStruct)
             {
-                if (cell.border == myBorder)
+                if (cell.Border == myBorder)
                 {
-                    x = cell.x;
-                    y = cell.y;
+                    x = cell.X;
+                    y = cell.Y;
                     break;
                 }
             }
 
-            int center = _numberOfCellsVertically / 2;
+            var center = _numberOfCellsVertically / 2;
+            var mirrorY = _numberOfCellsVertically - y + 1;
             if (y <= center)
             {
                 myBorder.Background = color;
-                int mirrorX = _numberOfCellsHorizontally - x + 1;
-                int mirrorY = _numberOfCellsVertically - y + 1;
+                var mirrorX = _numberOfCellsHorizontally - x + 1;
                 ColoringCell(mirrorX, mirrorY, color);
             }
 
@@ -228,25 +227,25 @@ namespace Crossword
             }
         }
 
-        static void ColoringHorizontal(Border myBorder, Brush color)
+        private static void ColoringHorizontal(Border myBorder, Brush color)
         {
-            int x = 0;
-            int y = 0;
-            foreach (Cell cell in Global.listAllCellStruct)
+            var x = 0;
+            var y = 0;
+            foreach (var cell in Global.ListAllCellStruct)
             {
-                if (cell.border == myBorder)
+                if (cell.Border == myBorder)
                 {
-                    x = cell.x;
-                    y = cell.y;
+                    x = cell.X;
+                    y = cell.Y;
                     break;
                 }
             }
 
-            int center = _numberOfCellsVertically / 2;
+            var center = _numberOfCellsVertically / 2;
             if (y <= center)
             {
                 myBorder.Background = color;
-                int mirrorY = _numberOfCellsVertically - y + 1;
+                var mirrorY = _numberOfCellsVertically - y + 1;
                 ColoringCell(x, mirrorY, color);
             }
 
@@ -259,27 +258,27 @@ namespace Crossword
             }
         }
 
-        static void ColoringAll(Border myBorder, Brush color)
+        private static void ColoringAll(Border myBorder, Brush color)
         {
-            int x = 0;
-            int y = 0;
-            foreach (Cell cell in Global.listAllCellStruct)
+            var x = 0;
+            var y = 0;
+            foreach (var cell in Global.ListAllCellStruct)
             {
-                if (cell.border == myBorder)
+                if (cell.Border == myBorder)
                 {
-                    x = cell.x;
-                    y = cell.y;
+                    x = cell.X;
+                    y = cell.Y;
                     break;
                 }
             }
 
-            int centerH = _numberOfCellsHorizontally / 2;
-            int centerV = _numberOfCellsVertically / 2;
+            var centerH = _numberOfCellsHorizontally / 2;
+            var centerV = _numberOfCellsVertically / 2;
             if (x <= centerH && y <= centerV)
             {
                 myBorder.Background = color;
-                int mirrorX = _numberOfCellsHorizontally - x + 1;
-                int mirrorY = _numberOfCellsVertically - y + 1;
+                var mirrorX = _numberOfCellsHorizontally - x + 1;
+                var mirrorY = _numberOfCellsVertically - y + 1;
                 ColoringCell(mirrorX, y, color);
                 ColoringCell(x, mirrorY, color);
                 ColoringCell(mirrorX, mirrorY, color);
@@ -290,17 +289,17 @@ namespace Crossword
                 if (x == centerH + 1 && y <= centerV)
                 {
                     myBorder.Background = color;
-                    int mirrorY = _numberOfCellsVertically - y + 1;
+                    var mirrorY = _numberOfCellsVertically - y + 1;
                     ColoringCell(x, mirrorY, color);
                 }
             }
 
             if (_numberOfCellsVertically % 2 != 0)
             {
+                int mirrorX = _numberOfCellsHorizontally - x + 1;
                 if (x <= centerH && y == centerV + 1)
                 {
                     myBorder.Background = color;
-                    int mirrorX = _numberOfCellsHorizontally - x + 1;
                     ColoringCell(mirrorX, y, color);
                 }
             }
@@ -314,13 +313,13 @@ namespace Crossword
             }
         }
 
-        static void ColoringCell(int x, int y, Brush color)
+        private static void ColoringCell(int x, int y, Brush color)
         {
-            foreach (Cell cell in Global.listAllCellStruct)
+            foreach (var cell in Global.ListAllCellStruct)
             {
-                if (cell.x == x && cell.y == y)
+                if (cell.X == x && cell.Y == y)
                 {
-                    cell.border.Background = color;
+                    cell.Border.Background = color;
                     break;
                 }
             }
@@ -339,16 +338,16 @@ namespace Crossword
 
         private void Button_Reset(object sender, RoutedEventArgs e)
         {
-            foreach (Cell cell in Global.listAllCellStruct)
+            foreach (var cell in Global.ListAllCellStruct)
             {
-                cell.label.Content = null;
-                cell.border.Background = Brushes.Black;
+                cell.Label.Content = null;
+                cell.Border.Background = Brushes.Black;
             }
         }
 
         private void Button_Screenshot(object sender, RoutedEventArgs e)
         {
-            if (Global.listEmptyCellStruct.Count > 1)
+            if (Global.ListEmptyCellStruct.Count > 1)
             {
                 CreateImage.Get();
             }
@@ -362,10 +361,10 @@ namespace Crossword
         {
             var сhangeFill = new сhangeFill();
             сhangeFill.ShowDialog();
-            if (сhangeFill.ready == true)
+            if (сhangeFill.Ready)
             {
-                _numberOfCellsHorizontally = сhangeFill.numberOfCellsHorizontally;
-                _numberOfCellsVertically = сhangeFill.numberOfCellsVertically;
+                _numberOfCellsHorizontally = сhangeFill.NumberOfCellsHorizontally;
+                _numberOfCellsVertically = сhangeFill.NumberOfCellsVertically;
                 CreatingThePlayingField();
             }
         }
@@ -380,34 +379,33 @@ namespace Crossword
         {
             var dictionariesSelection = new DictionariesSelection();
             dictionariesSelection.ShowDialog();
-            if (dictionariesSelection.ready == true)
+            if (dictionariesSelection.Ready)
             {
-                Global.listDictionaries.Clear();
-                string message = "Выбранные словари:\n";
-                List<string> dictionariesPaths = Directory.GetFiles("Dictionaries/").ToList();
-                foreach (var selectedDictionaries in dictionariesSelection.selectedDictionaries)
+                Global.ListDictionaries.Clear();
+                var message = "Выбранные словари:\n";
+                var dictionariesPaths = Directory.GetFiles("Dictionaries/").ToList();
+                foreach (var selectedDictionaries in dictionariesSelection.SelectedDictionaries)
                 {
-                    List<string> list = new List<string>(selectedDictionaries.Split(';'));
+                    var list = new List<string>(selectedDictionaries.Split(';'));
                     foreach (var path in dictionariesPaths)
                     {
-                        string name = Path.GetFileNameWithoutExtension(path);
+                        var name = Path.GetFileNameWithoutExtension(path);
                         if (list[0] == name)
                         {
                             message += selectedDictionaries + "\n";
-                            Dictionary dictionary = CreateDictionary.Get(path);
-                            dictionary.name = name;
-                            dictionary.maxCount = int.Parse(list[1]);
-                            Global.listDictionaries.Add(dictionary);
+                            var dictionary = CreateDictionary.Get(path);
+                            dictionary.Name = name;
+                            dictionary.MaxCount = int.Parse(list[1]);
+                            Global.ListDictionaries.Add(dictionary);
                             break;
                         }
                     }
                 }
 
-                Dictionary commonDictionary = CreateDictionary.Get("dict.txt");
-
-                Global.listDictionaries.Add(commonDictionary);
-                Global.listDictionaries[^1].name = "Общий";
-                Global.listDictionaries[^1].maxCount = commonDictionary.words.Count;
+                var commonDictionary = CreateDictionary.Get("dict.txt");
+                Global.ListDictionaries.Add(commonDictionary);
+                Global.ListDictionaries[^1].Name = "Общий";
+                Global.ListDictionaries[^1].MaxCount = commonDictionary.Words.Count;
                 MessageBox.Show(message);
                 SelectedDictionary.Content = message;
             }

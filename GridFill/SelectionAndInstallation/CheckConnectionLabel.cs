@@ -7,15 +7,15 @@ public class CheckConnectionLabel
 {
     public static bool Get(Word word, Label label)
     {
-        foreach (var labelConnection in word.connectionLabel)
+        foreach (var labelConnection in word.ConnectionLabel)
         {
             if (label == labelConnection)
             {
-                foreach (var wordConnection in word.connectionWords)
+                foreach (var wordConnection in word.ConnectionWords)
                 {
-                    if (wordConnection.full)
+                    if (wordConnection.Full)
                     {
-                        foreach (var labelConnectionWord in wordConnection.connectionLabel)
+                        foreach (var labelConnectionWord in wordConnection.ConnectionLabel)
                         {
                             if (label == labelConnectionWord)
                             {

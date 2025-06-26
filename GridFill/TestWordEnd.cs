@@ -7,7 +7,7 @@ public class TestWordEnd
 {
     public static void Get(Word word)
     {
-        foreach (var item in word.listLabel)
+        foreach (var item in word.ListLabel)
         {
             item.Background = Brushes.Transparent;
         }

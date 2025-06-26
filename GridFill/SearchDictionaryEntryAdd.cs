@@ -6,23 +6,23 @@ public class SearchDictionaryEntryAdd
 {
     public static void Get(string answers, Word word)
     {
-        foreach (var dictionary in Global.listDictionaries)
+        foreach (var dictionary in Global.ListDictionaries)
         {
-            if (dictionary.currentCount >= dictionary.maxCount)
+            if (dictionary.CurrentCount >= dictionary.MaxCount)
             {
                 continue;
             }
 
-            foreach (var dictionaryWord in dictionary.words)
+            foreach (var dictionaryWord in dictionary.Words)
             {
-                if (dictionaryWord.answers == answers)
+                if (dictionaryWord.Answers == answers)
                 {
-                    if (dictionary.name == "!ОБЯЗАТЕЛЬНЫЕ")
+                    if (dictionary.Name == "!ОБЯЗАТЕЛЬНЫЕ")
                     {
-                        word.fix = true;
+                        word.Fix = true;
                     }
 
-                    dictionary.currentCount++;
+                    dictionary.CurrentCount++;
                     return;
                 }
             }

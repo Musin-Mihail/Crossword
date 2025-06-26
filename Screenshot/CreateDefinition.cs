@@ -13,42 +13,40 @@ public class CreateDefinition
         try
         {
             List<DictionaryWord> listWordsString = new();
-            foreach (var dictionary in Global.listDictionaries)
+            foreach (var dictionary in Global.ListDictionaries)
             {
-                listWordsString.AddRange(dictionary.words);
+                listWordsString.AddRange(dictionary.Words);
             }
 
-            string definitionString = "По горизонтали: ";
-            for (int i = 0; i < listDefinitionRight.Count; i++)
+            var definitionString = "По горизонтали: ";
+            for (var i = 0; i < listDefinitionRight.Count; i++)
             {
-                List<string> newListWord = new List<string>(listDefinitionRight[i].Split(';'));
-                string word1 = newListWord[1];
-                foreach (DictionaryWord definition in listWordsString)
+                var newListWord = new List<string>(listDefinitionRight[i].Split(';'));
+                var word1 = newListWord[1];
+                foreach (var definition in listWordsString)
                 {
-                    string word2 = definition.answers;
-                    if (word1 == word2)
-                    {
-                        Random rnd = new Random();
-                        int randomIndex = rnd.Next(0, definition.definitions.Count - 1);
-                        definitionString += newListWord[0] + ". " + definition.definitions[randomIndex] + ". ";
-                        break;
-                    }
+                    var word2 = definition.Answers;
+                    if (word1 != word2) continue;
+                    var rnd = new Random();
+                    var randomIndex = rnd.Next(0, definition.Definitions.Count - 1);
+                    definitionString += newListWord[0] + ". " + definition.Definitions[randomIndex] + ". ";
+                    break;
                 }
             }
 
             definitionString += "\nПо вертикали: ";
-            for (int i = 0; i < listDefinitionDown.Count; i++)
+            for (var i = 0; i < listDefinitionDown.Count; i++)
             {
-                List<string> newListWord = new List<string>(listDefinitionDown[i].Split(';'));
-                string word1 = newListWord[1];
-                foreach (DictionaryWord definition in listWordsString)
+                var newListWord = new List<string>(listDefinitionDown[i].Split(';'));
+                var word1 = newListWord[1];
+                foreach (var definition in listWordsString)
                 {
-                    string word2 = definition.answers;
+                    var word2 = definition.Answers;
                     if (word1 == word2)
                     {
-                        Random rnd = new Random();
-                        int randomIndex = rnd.Next(0, definition.definitions.Count - 1);
-                        definitionString += newListWord[0] + ". " + definition.definitions[randomIndex] + ". ";
+                        var rnd = new Random();
+                        var randomIndex = rnd.Next(0, definition.Definitions.Count - 1);
+                        definitionString += newListWord[0] + ". " + definition.Definitions[randomIndex] + ". ";
                         break;
                     }
                 }

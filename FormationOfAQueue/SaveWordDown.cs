@@ -8,15 +8,15 @@ public class SaveWordDown
 {
     public static void Get(int x, int y)
     {
-        List<Label> newListLabel = new List<Label>();
-        for (int i = y; i < 31; i++)
+        var newListLabel = new List<Label>();
+        for (var i = y; i < 31; i++)
         {
-            bool match = false;
-            foreach (Cell cell in Global.listEmptyCellStruct)
+            var match = false;
+            foreach (var cell in Global.ListEmptyCellStruct)
             {
-                if (cell.y == i && cell.x == x)
+                if (cell.Y == i && cell.X == x)
                 {
-                    newListLabel.Add(cell.label);
+                    newListLabel.Add(cell.Label);
                     match = true;
                     break;
                 }
@@ -30,9 +30,11 @@ public class SaveWordDown
 
         if (newListLabel.Count > 1)
         {
-            Word newWord = new Word();
-            newWord.listLabel = newListLabel;
-            Global.listWordsGrid.Add(newWord);
+            var newWord = new Word
+            {
+                ListLabel = newListLabel
+            };
+            Global.ListWordsGrid.Add(newWord);
         }
     }
 }

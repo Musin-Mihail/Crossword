@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Crossword.Objects;
 
@@ -9,19 +8,21 @@ public static class CreateDictionary
 {
     public static Dictionary Get(string path)
     {
-        string[] listWordsString = File.ReadAllLines(path);
-        Dictionary dictionary = new Dictionary();
+        var listWordsString = File.ReadAllLines(path);
+        var dictionary = new Dictionary();
         foreach (var word in listWordsString)
         {
-            List<string> answerAndDefinition = word.Split(';').ToList();
-            DictionaryWord dictionaryWord = new DictionaryWord();
-            dictionaryWord.answers = answerAndDefinition[0];
-            for (int i = 1; i < answerAndDefinition.Count; i++)
+            var answerAndDefinition = word.Split(';').ToList();
+            var dictionaryWord = new DictionaryWord
             {
-                dictionaryWord.definitions.Add(answerAndDefinition[i]);
+                Answers = answerAndDefinition[0]
+            };
+            for (var i = 1; i < answerAndDefinition.Count; i++)
+            {
+                dictionaryWord.Definitions.Add(answerAndDefinition[i]);
             }
 
-            dictionary.words.Add(dictionaryWord);
+            dictionary.Words.Add(dictionaryWord);
         }
 
         return dictionary;

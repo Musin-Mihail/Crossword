@@ -10,15 +10,15 @@ public class ListWordsRandomization
     {
         try
         {
-            Random rnd = new Random();
-            foreach (var dictionary in word.fullDictionaries)
+            var rnd = new Random();
+            foreach (var dictionary in word.FullDictionaries)
             {
-                for (int i = 0; i < dictionary.words.Count; i++)
+                for (var i = 0; i < dictionary.Words.Count; i++)
                 {
-                    DictionaryWord temp = dictionary.words[i];
-                    int randomIndex = rnd.Next(0, dictionary.words.Count - 1);
-                    dictionary.words[i] = dictionary.words[randomIndex];
-                    dictionary.words[randomIndex] = temp;
+                    var temp = dictionary.Words[i];
+                    var randomIndex = rnd.Next(0, dictionary.Words.Count - 1);
+                    dictionary.Words[i] = dictionary.Words[randomIndex];
+                    dictionary.Words[randomIndex] = temp;
                 }
             }
         }

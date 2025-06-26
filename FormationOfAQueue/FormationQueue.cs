@@ -4,7 +4,7 @@ public class FormationQueue
 {
     public static void Get()
     {
-        Global.listWordsGrid.Clear();
+        Global.ListWordsGrid.Clear();
         SearchForTheBeginningAndLengthOfAllWords.Get();
         SearchForConnectedWords.Get();
     }

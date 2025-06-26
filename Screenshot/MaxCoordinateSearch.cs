@@ -1,5 +1,4 @@
 ﻿using System.Windows.Media;
-using Crossword.Objects;
 
 namespace Crossword.Screenshot;
 
@@ -11,28 +10,28 @@ public class MaxCoordinateSearch
         leftMaxY = 99;
         downMaxX = 0;
         rightMaxY = 0;
-        foreach (Cell cell in Global.listAllCellStruct)
+        foreach (var cell in Global.ListAllCellStruct)
         {
-            if (cell.border.Background == Brushes.Transparent)
+            if (cell.Border.Background == Brushes.Transparent)
             {
-                if (cell.x < topMaxX)
+                if (cell.X < topMaxX)
                 {
-                    topMaxX = cell.x;
+                    topMaxX = cell.X;
                 }
 
-                if (cell.y < leftMaxY)
+                if (cell.Y < leftMaxY)
                 {
-                    leftMaxY = cell.y;
+                    leftMaxY = cell.Y;
                 }
 
-                if (cell.x > downMaxX)
+                if (cell.X > downMaxX)
                 {
-                    downMaxX = cell.x;
+                    downMaxX = cell.X;
                 }
 
-                if (cell.y > rightMaxY)
+                if (cell.Y > rightMaxY)
                 {
-                    rightMaxY = cell.y;
+                    rightMaxY = cell.Y;
                 }
             }
         }

@@ -9,11 +9,7 @@
     <Grid Name="GridD">
         <ScrollViewer Margin="0,0,0,50" VerticalAlignment="Top">
             <ItemsControl Name="ItemsControl" />
-
         </ScrollViewer>
-
         <Button Content="Выбрать" Height="40" Width="100" VerticalAlignment="Bottom" Click="ButtonBase_OnClick" />
-
     </Grid>
-
 </Window>

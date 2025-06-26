@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Crossword.Objects;
+﻿using Crossword.Objects;
 
 namespace Crossword.GridFill;
 
@@ -7,14 +6,14 @@ public class RemoveInsertWord
 {
     public static void Get(Word word)
     {
-        int index = Global.allInsertedWords.IndexOf(word.wordString);
+        var index = Global.AllInsertedWords.IndexOf(word.WordString);
         if (index >= 0)
         {
-            SearchDictionaryEntryRemove.Get(word.wordString);
-            Global.allInsertedWords.RemoveAt(index);
+            SearchDictionaryEntryRemove.Get(word.WordString);
+            Global.AllInsertedWords.RemoveAt(index);
         }
 
-        word.wordString = "";
-        word.full = false;
+        word.WordString = "";
+        word.Full = false;
     }
 }

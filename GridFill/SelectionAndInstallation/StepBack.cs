@@ -9,18 +9,18 @@ public class StepBack
 {
     public static async Task Get(Word newWord)
     {
-        Random rnd = new Random();
-        for (int i = 0; i < newWord.connectionWords.Count; i++)
+        var rnd = new Random();
+        for (var i = 0; i < newWord.ConnectionWords.Count; i++)
         {
-            Word temp = newWord.connectionWords[i];
-            int randomIndex = rnd.Next(0, newWord.connectionWords.Count - 1);
-            newWord.connectionWords[i] = newWord.connectionWords[randomIndex];
-            newWord.connectionWords[randomIndex] = temp;
+            var temp = newWord.ConnectionWords[i];
+            var randomIndex = rnd.Next(0, newWord.ConnectionWords.Count - 1);
+            newWord.ConnectionWords[i] = newWord.ConnectionWords[randomIndex];
+            newWord.ConnectionWords[randomIndex] = temp;
         }
 
-        foreach (var word in newWord.connectionWords)
+        foreach (var word in newWord.ConnectionWords)
         {
-            if (word is { full: true, fix: false })
+            if (word is { Full: true, Fix: false })
             {
                 ClearConnectionLabel.Get(word);
 

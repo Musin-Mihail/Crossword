@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows.Controls;
-using Crossword.Objects;
-using Crossword.Words;
+﻿using Crossword.Words;
 
 namespace Crossword.FormationOfAQueue;
 
@@ -9,24 +6,24 @@ public class SearchForConnectedWords
 {
     public static void Get()
     {
-        foreach (Word word in Global.listWordsGrid)
+        foreach (var word in Global.ListWordsGrid)
         {
-            List<Label> tempListLabel = word.listLabel;
+            var tempListLabel = word.ListLabel;
             CreateWordDictionary.Get(word);
-            foreach (Label label in tempListLabel)
+            foreach (var label in tempListLabel)
             {
-                foreach (Word word2 in Global.listWordsGrid)
+                foreach (var word2 in Global.ListWordsGrid)
                 {
-                    if (word != word2 && SearchForMatches.Get(word2, label) == true)
+                    if (word != word2 && SearchForMatches.Get(word2, label))
                     {
-                        if (word.connectionWords.Contains(word2) == false)
+                        if (word.ConnectionWords.Contains(word2) == false)
                         {
-                            word.connectionWords.Add(word2);
+                            word.ConnectionWords.Add(word2);
                         }
 
-                        if (word.connectionLabel.Contains(label) == false)
+                        if (word.ConnectionLabel.Contains(label) == false)
                         {
-                            word.connectionLabel.Add(label);
+                            word.ConnectionLabel.Add(label);
                         }
                     }
                 }

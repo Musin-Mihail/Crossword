@@ -7,8 +7,8 @@ public class ResetWord
     public static void Get(Word word)
     {
         ClearLabel.Get(word);
-        word.full = false;
-        word.wordString = "";
-        word.fix = false;
+        word.Full = false;
+        word.WordString = "";
+        word.Fix = false;
     }
 }

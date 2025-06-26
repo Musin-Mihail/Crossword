@@ -7,9 +7,11 @@ public class CreateLabel
 {
     public static Label Get()
     {
-        Label myLabel = new Label();
-        myLabel.HorizontalAlignment = HorizontalAlignment.Center;
-        myLabel.VerticalAlignment = VerticalAlignment.Center;
+        var myLabel = new Label
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
         return myLabel;
     }
 }

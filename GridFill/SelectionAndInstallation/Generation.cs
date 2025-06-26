@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using Crossword.Objects;
 
 namespace Crossword.GridFill.SelectionAndInstallation;
 
@@ -10,11 +9,11 @@ public class Generation
     public static async Task Get()
     {
         StartGeneration.Get();
-        int maxIndex = 0;
-        DateTime startDate = DateTime.Now;
-        DateTime date = DateTime.Now;
+        var maxIndex = 0;
+        var startDate = DateTime.Now;
+        var date = DateTime.Now;
         RestartGeneration.Get();
-        while (Global.index < Global.listWordsGrid.Count)
+        while (Global.index < Global.ListWordsGrid.Count)
         {
             var time = DateTime.Now - date;
             if (time.TotalSeconds > Global.maxSeconds)
@@ -29,7 +28,7 @@ public class Generation
             {
                 date = DateTime.Now;
                 maxIndex = Global.index;
-                Global.windowsText.Content = "Подобрано " + Global.index + " из " + Global.listWordsGrid.Count;
+                Global.windowsText.Content = "Подобрано " + Global.index + " из " + Global.ListWordsGrid.Count;
                 await Task.Delay(1);
             }
 
@@ -39,8 +38,8 @@ public class Generation
                 return;
             }
 
-            Word newWord = Global.listWordsGrid[Global.index];
-            if (newWord.full)
+            var newWord = Global.ListWordsGrid[Global.index];
+            if (newWord.Full)
             {
                 Global.index++;
                 continue;
@@ -69,7 +68,7 @@ public class Generation
             await StepBack.Get(newWord);
         }
 
-        if (Global.index >= Global.listWordsGrid.Count)
+        if (Global.index >= Global.ListWordsGrid.Count)
         {
             Success.Get(startDate);
         }

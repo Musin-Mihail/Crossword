@@ -7,10 +7,10 @@ public class SearchWord
 {
     public static string Get(Word word)
     {
-        if (word.listLabel.Count > 1)
+        if (word.ListLabel.Count > 1)
         {
-            string gridWord = "";
-            foreach (var label in word.listLabel)
+            var gridWord = "";
+            foreach (var label in word.ListLabel)
             {
                 if (label.Content != null)
                 {
@@ -23,33 +23,33 @@ public class SearchWord
             }
 
             ListWordsRandomization.Get(word);
-            foreach (var dictionary in word.fullDictionaries)
+            foreach (var dictionary in word.FullDictionaries)
             {
-                if (!CheckDictionary.Get(dictionary.name))
+                if (!CheckDictionary.Get(dictionary.Name))
                 {
                     continue;
                 }
 
-                foreach (var dictionaryWord in dictionary.words)
+                foreach (var dictionaryWord in dictionary.Words)
                 {
-                    if (dictionaryWord.answers.Length == gridWord.Length)
+                    if (dictionaryWord.Answers.Length == gridWord.Length)
                     {
-                        for (int i = 0; i < gridWord.Length; i++)
+                        for (var i = 0; i < gridWord.Length; i++)
                         {
                             if (gridWord[i] != '*')
                             {
-                                if (dictionaryWord.answers[i] != gridWord[i])
+                                if (dictionaryWord.Answers[i] != gridWord[i])
                                 {
                                     break;
                                 }
                             }
 
-                            if (i == dictionaryWord.answers.Length - 1)
+                            if (i == dictionaryWord.Answers.Length - 1)
                             {
-                                if (Global.allInsertedWords.Contains(dictionaryWord.answers) == false)
+                                if (Global.AllInsertedWords.Contains(dictionaryWord.Answers) == false)
                                 {
-                                    Global.allInsertedWords.Add(dictionaryWord.answers);
-                                    string answers = dictionaryWord.answers;
+                                    Global.AllInsertedWords.Add(dictionaryWord.Answers);
+                                    var answers = dictionaryWord.Answers;
                                     SearchDictionaryEntryAdd.Get(answers, word);
                                     return answers;
                                 }

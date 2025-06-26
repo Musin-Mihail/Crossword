@@ -13,7 +13,7 @@
         <Grid>
             <Line x:Name="LineCenterH" X1="500" Y1="0" X2="500" Y2="1000" Stroke="Green" StrokeThickness="4" Visibility="Hidden" />
             <Line x:Name="LineCenterV" X1="0" Y1="500" X2="1000" Y2="500" Stroke="Green" StrokeThickness="4" Visibility="Hidden" />
-            <Line X1="500" Y1="0" X2="500" Y2="1000" Stroke="Green" StrokeThickness="4"  Visibility="Hidden" />
+            <Line X1="500" Y1="0" X2="500" Y2="1000" Stroke="Green" StrokeThickness="4" Visibility="Hidden" />
             <Button Content="Изменить поле" Click="Button_ChangeFill" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,10,0,0" />
             <Canvas Margin="0,-100,0,0">
                 <Label x:Name="DifficultyLevel" Content="Сложность" HorizontalAlignment="Left" Margin="1000,190,0,0" VerticalAlignment="Top" Width="276" FontSize="20" />

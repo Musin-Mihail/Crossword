@@ -1,5 +1,4 @@
 ﻿using System.Windows.Media;
-using Crossword.Objects;
 
 namespace Crossword.PlayingField;
 
@@ -7,12 +6,12 @@ public class SearchForEmptyCells
 {
     public static void Get()
     {
-        Global.listEmptyCellStruct.Clear();
-        foreach (Cell cell in Global.listAllCellStruct)
+        Global.ListEmptyCellStruct.Clear();
+        foreach (var cell in Global.ListAllCellStruct)
         {
-            if (cell.border.Background == Brushes.Transparent)
+            if (cell.Border.Background == Brushes.Transparent)
             {
-                Global.listEmptyCellStruct.Add(cell);
+                Global.ListEmptyCellStruct.Add(cell);
             }
         }
     }

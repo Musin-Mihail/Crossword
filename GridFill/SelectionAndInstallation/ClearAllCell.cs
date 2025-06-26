@@ -1,5 +1,4 @@
 ﻿using System.Windows.Media;
-using Crossword.Objects;
 using Crossword.Words;
 
 namespace Crossword.GridFill.SelectionAndInstallation;
@@ -8,16 +7,16 @@ public class ClearAllCell
 {
     public static void Get()
     {
-        Global.allInsertedWords.Clear();
-        foreach (Word word in Global.listWordsGrid)
+        Global.AllInsertedWords.Clear();
+        foreach (var word in Global.ListWordsGrid)
         {
             ResetWord.Get(word);
         }
 
-        foreach (Cell cell in Global.listEmptyCellStruct)
+        foreach (var cell in Global.ListEmptyCellStruct)
         {
-            cell.label.Content = null;
-            cell.label.Background = Brushes.Transparent;
+            cell.Label.Content = null;
+            cell.Label.Background = Brushes.Transparent;
         }
     }
 }

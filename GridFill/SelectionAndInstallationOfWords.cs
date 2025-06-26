@@ -10,7 +10,7 @@ public class SelectionAndInstallationOfWords
     {
         try
         {
-            Global.allInsertedWords.Clear();
+            Global.AllInsertedWords.Clear();
             Global.difficultyLevel.Content = "Сложность - " + DifficultyLevel.Get();
             await Generation.Get();
         }

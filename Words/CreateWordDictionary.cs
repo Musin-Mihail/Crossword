@@ -11,27 +11,29 @@ public class CreateWordDictionary
 {
     public static void Get(Word word)
     {
-        bool zero = true;
-        foreach (var dictionary in Global.listDictionaries)
+        var zero = true;
+        foreach (var dictionary in Global.ListDictionaries)
         {
-            Dictionary newDictionary = new();
-            newDictionary.name = dictionary.name;
             List<DictionaryWord> newDictionaryWord = new();
-            foreach (var dictionaryWord in dictionary.words)
+            foreach (var dictionaryWord in dictionary.Words)
             {
-                if (dictionaryWord.answers.Length == word.listLabel.Count)
+                if (dictionaryWord.Answers.Length == word.ListLabel.Count)
                 {
                     newDictionaryWord.Add(dictionaryWord);
                 }
             }
 
-            newDictionary.words = new List<DictionaryWord>(newDictionaryWord);
-            if (newDictionary.words.Count > 0)
+            Dictionary newDictionary = new()
+            {
+                Name = dictionary.Name,
+                Words = new List<DictionaryWord>(newDictionaryWord)
+            };
+            if (newDictionary.Words.Count > 0)
             {
                 zero = false;
             }
 
-            word.fullDictionaries.Add(newDictionary);
+            word.FullDictionaries.Add(newDictionary);
         }
 
         if (zero)

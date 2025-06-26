@@ -7,7 +7,7 @@ public class TestWordStart
 {
     public static void Get(Word wordOld, SolidColorBrush color)
     {
-        foreach (var item in wordOld.listLabel)
+        foreach (var item in wordOld.ListLabel)
         {
             item.Background = color;
         }

@@ -6,19 +6,19 @@ public class InsertWordGrid
 {
     public static bool Get(Word word)
     {
-        string answer = SearchWord.Get(word);
+        var answer = SearchWord.Get(word);
         if (answer == "")
         {
             return true;
         }
 
-        for (int i = 0; i < word.listLabel.Count; i++)
+        for (var i = 0; i < word.ListLabel.Count; i++)
         {
-            word.listLabel[i].Content = answer[i];
+            word.ListLabel[i].Content = answer[i];
         }
 
-        word.full = true;
-        word.wordString = answer;
+        word.Full = true;
+        word.WordString = answer;
         return false;
     }
 }

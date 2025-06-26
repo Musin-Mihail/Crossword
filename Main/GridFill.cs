@@ -10,7 +10,7 @@ public class GridFillMain
     public static void Get(string maxSeconds, string taskDelay)
     {
         SearchForEmptyCells.Get();
-        if (Global.listEmptyCellStruct.Count > 0)
+        if (Global.ListEmptyCellStruct.Count > 0)
         {
             FormationQueue.Get();
             try
