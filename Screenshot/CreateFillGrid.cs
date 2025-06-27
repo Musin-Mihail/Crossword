@@ -6,13 +6,13 @@ namespace Crossword.Screenshot;
 
 public class CreateFillGrid
 {
-    public static void Get(Bitmap img, Graphics graphics, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell)
+    public static void Get(Bitmap img, Graphics graphics, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell, CrosswordState gameState)
     {
         var blackBrush = new SolidBrush(Color.Black);
         var blackPen = new Pen(Color.Black, 1);
         var font = new Font("Arial", 7);
         graphics.Clear(Color.White);
-        foreach (var cell in App.GameState.ListAllCellStruct)
+        foreach (var cell in gameState.ListAllCellStruct)
         {
             if (cell.Border.Background == Brushes.Black)
             {

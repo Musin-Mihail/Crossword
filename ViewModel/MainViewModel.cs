@@ -15,10 +15,13 @@ namespace Crossword.ViewModel;
 
 public class MainViewModel : ViewModelBase
 {
-    private string _statusMessage = App.GameState.StatusMessage;
-    private bool _isGenerating = App.GameState.IsGenerating;
-    private string _difficulty = App.GameState.Difficulty;
-    private string _selectedDictionaryInfo = App.GameState.SelectedDictionaryInfo;
+    private readonly CrosswordState _gameState;
+    private readonly GenerationService _generationService;
+
+    private string _statusMessage;
+    private bool _isGenerating;
+    private string _difficulty;
+    private string _selectedDictionaryInfo;
 
     public ICommand StartGenerationCommand { get; }
     public ICommand StopGenerationCommand { get; }
@@ -29,8 +32,14 @@ public class MainViewModel : ViewModelBase
     public ICommand CreateRequiredDictionaryCommand { get; }
     public ICommand ScreenshotCommand { get; }
 
-    public MainViewModel()
+    public MainViewModel(CrosswordState gameState, GenerationService generationService)
     {
+        _gameState = gameState;
+        _generationService = generationService;
+        _statusMessage = _gameState.StatusMessage;
+        _isGenerating = _gameState.IsGenerating;
+        _difficulty = _gameState.Difficulty;
+        _selectedDictionaryInfo = _gameState.SelectedDictionaryInfo;
         StartGenerationCommand = new RelayCommand(async _ => await StartGenerationAsync(), _ => !IsGenerating);
         StopGenerationCommand = new RelayCommand(_ => StopGeneration(), _ => IsGenerating);
         SaveGridCommand = new RelayCommand(_ => SaveGrid(), _ => !IsGenerating);
@@ -48,6 +57,7 @@ public class MainViewModel : ViewModelBase
         set
         {
             _statusMessage = value;
+            _gameState.StatusMessage = value;
             OnPropertyChanged();
         }
     }
@@ -58,9 +68,10 @@ public class MainViewModel : ViewModelBase
         private set
         {
             _isGenerating = value;
-            App.GameState.IsGenerating = value;
+            _gameState.IsGenerating = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsUiEnabled));
+            CommandManager.InvalidateRequerySuggested();
         }
     }
 
@@ -72,6 +83,7 @@ public class MainViewModel : ViewModelBase
         set
         {
             _difficulty = value;
+            _gameState.Difficulty = value;
             OnPropertyChanged();
         }
     }
@@ -82,12 +94,13 @@ public class MainViewModel : ViewModelBase
         set
         {
             _selectedDictionaryInfo = value;
+            _gameState.SelectedDictionaryInfo = value;
             OnPropertyChanged();
         }
     }
 
-    public string MaxSecondsText { get; set; } = "5";
-    public string TaskDelayText { get; set; } = "10";
+    public string MaxSecondsText { get; set; } = "2";
+    public string TaskDelayText { get; set; } = "100";
     public bool IsVisualizationChecked { get; set; } = false;
 
     private async Task StartGenerationAsync()
@@ -96,8 +109,8 @@ public class MainViewModel : ViewModelBase
 
         try
         {
-            App.GameState.MaxSeconds = int.Parse(MaxSecondsText);
-            App.GameState.TaskDelay = int.Parse(TaskDelayText);
+            _gameState.MaxSeconds = int.Parse(MaxSecondsText);
+            _gameState.TaskDelay = int.Parse(TaskDelayText);
         }
         catch
         {
@@ -105,8 +118,8 @@ public class MainViewModel : ViewModelBase
             return;
         }
 
-        SearchForEmptyCells.Get();
-        if (App.GameState.ListEmptyCellStruct.Count == 0)
+        SearchForEmptyCells.Get(_gameState);
+        if (_gameState.ListEmptyCellStruct.Count == 0)
         {
             MessageBox.Show("На поле нет пустых ячеек для генерации.");
             return;
@@ -115,11 +128,9 @@ public class MainViewModel : ViewModelBase
         IsGenerating = true;
         try
         {
-            App.GameState.IsVisualizationEnabled = IsVisualizationChecked;
-            var generationService = new GenerationService(App.GameState);
+            _gameState.IsVisualizationEnabled = IsVisualizationChecked;
             UpdateStatus();
-
-            await Task.Run(() => generationService.GenerateAsync());
+            await Task.Run(() => _generationService.GenerateAsync());
         }
         catch (Exception ex)
         {
@@ -134,13 +145,13 @@ public class MainViewModel : ViewModelBase
 
     private void StopGeneration()
     {
-        App.GameState.Stop = true;
+        _gameState.Stop = true;
     }
 
     private void SaveGrid()
     {
-        SearchForEmptyCells.Get();
-        Save.Get();
+        SearchForEmptyCells.Get(_gameState);
+        Save.Get(_gameState);
     }
 
     private void LoadGrid()
@@ -149,26 +160,27 @@ public class MainViewModel : ViewModelBase
         loadGrid.ShowDialog();
         if (loadGrid.Ready)
         {
-            Load.Get(loadGrid.ListEmptyCellStruct);
+            Load.Get(loadGrid.ListEmptyCellStruct, _gameState);
         }
     }
 
     private void Screenshot()
     {
-        if (App.GameState.ListEmptyCellStruct.Count > 1)
+        if (_gameState.ListWordsGrid.Count > 0 && _gameState.ListEmptyCellStruct.Count > 1)
         {
             CreateImage.Get();
         }
         else
         {
-            MessageBox.Show("Ячеек меньше двух\nИли не было генерации");
+            MessageBox.Show("Сетка не заполнена словами после генерации.");
         }
     }
 
     private void ResetDictionaries()
     {
-        ResetDict.Get();
-        SelectedDictionaryInfo = App.GameState.SelectedDictionaryInfo;
+        var resetDict = new ResetDict(_gameState);
+        resetDict.Get();
+        SelectedDictionaryInfo = _gameState.SelectedDictionaryInfo;
         MessageBox.Show("Выбран основной словарь");
     }
 
@@ -178,7 +190,7 @@ public class MainViewModel : ViewModelBase
         dictionariesSelection.ShowDialog();
         if (dictionariesSelection.Ready)
         {
-            App.GameState.ListDictionaries.Clear();
+            _gameState.ListDictionaries.Clear();
             var message = "Выбранные словари:\n";
             var dictionariesPaths = Directory.GetFiles("Dictionaries/").ToList();
             foreach (var selectedDictionaries in dictionariesSelection.SelectedDictionaries)
@@ -193,16 +205,16 @@ public class MainViewModel : ViewModelBase
                         var dictionary = CreateDictionary.Get(path);
                         dictionary.Name = name;
                         dictionary.MaxCount = int.Parse(list[1]);
-                        App.GameState.ListDictionaries.Add(dictionary);
+                        _gameState.ListDictionaries.Add(dictionary);
                         break;
                     }
                 }
             }
 
             var commonDictionary = CreateDictionary.Get("dict.txt");
-            App.GameState.ListDictionaries.Add(commonDictionary);
-            App.GameState.ListDictionaries[^1].Name = "Общий";
-            App.GameState.ListDictionaries[^1].MaxCount = commonDictionary.Words.Count;
+            _gameState.ListDictionaries.Add(commonDictionary);
+            _gameState.ListDictionaries[^1].Name = "Общий";
+            _gameState.ListDictionaries[^1].MaxCount = commonDictionary.Words.Count;
             MessageBox.Show(message);
             SelectedDictionaryInfo = message;
         }
@@ -217,12 +229,12 @@ public class MainViewModel : ViewModelBase
     {
         while (IsGenerating)
         {
-            StatusMessage = App.GameState.StatusMessage;
-            Difficulty = App.GameState.Difficulty;
+            StatusMessage = _gameState.StatusMessage;
+            Difficulty = _gameState.Difficulty;
             await Task.Delay(100);
         }
 
-        StatusMessage = App.GameState.StatusMessage;
-        Difficulty = App.GameState.Difficulty;
+        StatusMessage = _gameState.StatusMessage;
+        Difficulty = _gameState.Difficulty;
     }
 }

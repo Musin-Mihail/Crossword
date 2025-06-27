@@ -6,10 +6,10 @@ namespace Crossword.SaveLoad;
 
 public class Save
 {
-    public static void Get()
+    public static void Get(CrosswordState gameState)
     {
         var saveFile = "";
-        foreach (var cell in App.GameState.ListEmptyCellStruct)
+        foreach (var cell in gameState.ListEmptyCellStruct)
         {
             saveFile += cell.X + ";" + cell.Y + "\n";
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Crossword.Screenshot;
 
@@ -9,6 +10,7 @@ public class CreateImage
 {
     public static void Get()
     {
+        var gameState = App.ServiceProvider.GetRequiredService<CrosswordState>();
         try
         {
             var topMaxX = 99;
@@ -16,7 +18,7 @@ public class CreateImage
             var downMaxX = 99;
             var rightMaxY = 99;
             const float sizeCell = 37.938105f;
-            MaxCoordinateSearch.Get(ref topMaxX, ref downMaxX, ref leftMaxY, ref rightMaxY);
+            MaxCoordinateSearch.Get(ref topMaxX, ref downMaxX, ref leftMaxY, ref rightMaxY, gameState);
             var width = (int)((downMaxX - topMaxX + 1) * sizeCell);
             var height = (int)((rightMaxY - leftMaxY + 1) * sizeCell);
             var img = new Bitmap(width, height);
@@ -24,10 +26,10 @@ public class CreateImage
             var graphics = Graphics.FromImage(img);
             var listDefinitionRight = new List<string>();
             var listDefinitionDown = new List<string>();
-            CreateEmptyGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, listDefinitionRight, listDefinitionDown);
-            CreateFillGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell);
+            CreateEmptyGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, listDefinitionRight, listDefinitionDown, gameState);
+            CreateFillGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, gameState);
             CreateAnswer.Get(listDefinitionRight, listDefinitionDown);
-            CreateDefinition.Get(listDefinitionRight, listDefinitionDown);
+            CreateDefinition.Get(listDefinitionRight, listDefinitionDown, gameState);
             MessageBox.Show("Кросворд сохранён");
         }
         catch (Exception e)

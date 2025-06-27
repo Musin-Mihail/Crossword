@@ -5,9 +5,9 @@ namespace Crossword.SaveLoad;
 
 public class Load
 {
-    public static void Get(string[] listEmptyCellStruct)
+    public static void Get(string[] listEmptyCellStruct, CrosswordState gameState)
     {
-        foreach (var cell in App.GameState.ListAllCellStruct)
+        foreach (var cell in gameState.ListAllCellStruct)
         {
             cell.Label.Content = null;
             cell.Border.Background = Brushes.Black;
@@ -18,7 +18,7 @@ public class Load
             var strings = new List<string>(item.Split(';'));
             var x = int.Parse(strings[0]);
             var y = int.Parse(strings[1]);
-            foreach (var cell in App.GameState.ListAllCellStruct)
+            foreach (var cell in gameState.ListAllCellStruct)
             {
                 if (cell.X == x)
                 {

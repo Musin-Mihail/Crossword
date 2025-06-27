@@ -5,6 +5,7 @@ using System.Windows.Media;
 using Crossword.Main;
 using Crossword.PlayingField;
 using Crossword.ViewModel;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Crossword;
 
@@ -13,11 +14,14 @@ public partial class MainWindow : Window
     private static int _numberOfCellsHorizontally = 30;
     private static int _numberOfCellsVertically = 30;
     private const int CellSize = 30;
+    private readonly CrosswordState _gameState;
 
     public MainWindow()
     {
         InitializeComponent();
-        DataContext = new MainViewModel();
+        DataContext = App.ServiceProvider.GetRequiredService<MainViewModel>();
+        _gameState = App.ServiceProvider.GetRequiredService<CrosswordState>();
+
         CreatingThePlayingField();
     }
 
@@ -25,8 +29,9 @@ public partial class MainWindow : Window
 
     private void CreatingThePlayingField()
     {
-        ResetDict.Get();
-        CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize);
+        var resetDict = new ResetDict(_gameState);
+        resetDict.Get();
+        CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize, _gameState);
         LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
         LineCenterH.X2 = _numberOfCellsHorizontally * 30 / 2 + 30;
         LineCenterH.Y2 = _numberOfCellsVertically * 30 + 60;
@@ -69,10 +74,10 @@ public partial class MainWindow : Window
         }
     }
 
-    private static void ColoringVerticalRevers(Border b, Brush c)
+    private void ColoringVerticalRevers(Border b, Brush c)
     {
         int x = 0, y = 0;
-        foreach (var cell in App.GameState.ListAllCellStruct)
+        foreach (var cell in _gameState.ListAllCellStruct)
             if (cell.Border == b)
             {
                 x = cell.X;
@@ -92,10 +97,10 @@ public partial class MainWindow : Window
         if (_numberOfCellsHorizontally % 2 != 0 && x == center + 1) b.Background = c;
     }
 
-    private static void ColoringVertical(Border b, Brush c)
+    private void ColoringVertical(Border b, Brush c)
     {
         int x = 0, y = 0;
-        foreach (var cell in App.GameState.ListAllCellStruct)
+        foreach (var cell in _gameState.ListAllCellStruct)
             if (cell.Border == b)
             {
                 x = cell.X;
@@ -114,10 +119,10 @@ public partial class MainWindow : Window
         if (_numberOfCellsHorizontally % 2 != 0 && x == center + 1) b.Background = c;
     }
 
-    private static void ColoringHorizontalRevers(Border b, Brush c)
+    private void ColoringHorizontalRevers(Border b, Brush c)
     {
         int x = 0, y = 0;
-        foreach (var cell in App.GameState.ListAllCellStruct)
+        foreach (var cell in _gameState.ListAllCellStruct)
             if (cell.Border == b)
             {
                 x = cell.X;
@@ -137,10 +142,10 @@ public partial class MainWindow : Window
         if (_numberOfCellsVertically % 2 != 0 && y == center + 1) b.Background = c;
     }
 
-    private static void ColoringHorizontal(Border b, Brush c)
+    private void ColoringHorizontal(Border b, Brush c)
     {
         int x = 0, y = 0;
-        foreach (var cell in App.GameState.ListAllCellStruct)
+        foreach (var cell in _gameState.ListAllCellStruct)
             if (cell.Border == b)
             {
                 x = cell.X;
@@ -159,10 +164,10 @@ public partial class MainWindow : Window
         if (_numberOfCellsVertically % 2 != 0 && y == center + 1) b.Background = c;
     }
 
-    private static void ColoringAll(Border b, Brush c)
+    private void ColoringAll(Border b, Brush c)
     {
         int x = 0, y = 0;
-        foreach (var cell in App.GameState.ListAllCellStruct)
+        foreach (var cell in _gameState.ListAllCellStruct)
             if (cell.Border == b)
             {
                 x = cell.X;
@@ -202,9 +207,9 @@ public partial class MainWindow : Window
         if (_numberOfCellsHorizontally % 2 != 0 && _numberOfCellsVertically % 2 != 0 && x == cH + 1 && y == cV + 1) b.Background = c;
     }
 
-    private static void ColoringCell(int x, int y, Brush color)
+    private void ColoringCell(int x, int y, Brush color)
     {
-        foreach (var cell in App.GameState.ListAllCellStruct)
+        foreach (var cell in _gameState.ListAllCellStruct)
             if (cell.X == x && cell.Y == y)
             {
                 cell.Border.Background = color;

@@ -7,7 +7,7 @@ namespace Crossword.Screenshot;
 
 public class CreateEmptyGrid
 {
-    public static void Get(Bitmap img, Graphics graphics, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell, List<string> listDefinitionRight, List<string> listDefinitionDown)
+    public static void Get(Bitmap img, Graphics graphics, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell, List<string> listDefinitionRight, List<string> listDefinitionDown, CrosswordState gameState)
     {
         var blackBrush = new SolidBrush(Color.Black);
         var whiteBrush = new SolidBrush(Color.White);
@@ -17,14 +17,14 @@ public class CreateEmptyGrid
         var count = 0;
         graphics.FillRectangle(blackBrush, 0, 0, (downMaxX - topMaxX + 1) * sizeCell, (rightMaxY - leftMaxY + 1) * sizeCell);
         graphics.DrawRectangle(blackPen, 0, 0, (downMaxX - topMaxX + 1) * sizeCell, (rightMaxY - leftMaxY + 1) * sizeCell);
-        foreach (var cell in App.GameState.ListAllCellStruct)
+        foreach (var cell in gameState.ListAllCellStruct)
         {
             if (cell.Border.Background == Brushes.Transparent)
             {
                 graphics.FillRectangle(whiteBrush, (cell.X - topMaxX) * sizeCell, (cell.Y - leftMaxY) * sizeCell, sizeCell, sizeCell);
                 graphics.DrawRectangle(blackPen, (cell.X - topMaxX) * sizeCell, (cell.Y - leftMaxY) * sizeCell, sizeCell, sizeCell);
                 var match = false;
-                foreach (var word in App.GameState.ListWordsGrid)
+                foreach (var word in gameState.ListWordsGrid)
                 {
                     if (cell.Label == word.ListLabel[0])
                     {

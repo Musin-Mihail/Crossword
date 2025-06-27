@@ -4,13 +4,20 @@ namespace Crossword.Main;
 
 public class ResetDict
 {
-    public static void Get()
+    private readonly CrosswordState _gameState;
+
+    public ResetDict(CrosswordState gameState)
     {
-        App.GameState.ListDictionaries.Clear();
+        _gameState = gameState;
+    }
+
+    public void Get()
+    {
+        _gameState.ListDictionaries.Clear();
         var commonDictionary = CreateDictionary.Get("dict.txt");
-        App.GameState.ListDictionaries.Add(commonDictionary);
-        App.GameState.ListDictionaries[^1].Name = "Общий";
-        App.GameState.ListDictionaries[^1].MaxCount = commonDictionary.Words.Count;
-        App.GameState.SelectedDictionaryInfo = "Основной словарь";
+        _gameState.ListDictionaries.Add(commonDictionary);
+        _gameState.ListDictionaries[^1].Name = "Общий";
+        _gameState.ListDictionaries[^1].MaxCount = commonDictionary.Words.Count;
+        _gameState.SelectedDictionaryInfo = "Основной словарь";
     }
 }

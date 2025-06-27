@@ -14,10 +14,11 @@ public class CreateUiGrid
         MouseButtonEventHandler clickChangeColor,
         int numberOfCellsHorizontally,
         int numberOfCellsVertically,
-        int cellSize
+        int cellSize,
+        CrosswordState gameState
     )
     {
-        App.GameState.ListAllCellStruct.Clear();
+        gameState.ListAllCellStruct.Clear();
         theGrid.Children.Clear();
         for (var y = 0 + 1; y < numberOfCellsVertically + 1; y++)
         {
@@ -31,7 +32,7 @@ public class CreateUiGrid
                 border.Child = label;
                 label.Margin = new Thickness(0, -1, 0, 0);
                 cell.AddBorderLabelXy(border, label, x, y);
-                App.GameState.ListAllCellStruct.Add(cell);
+                gameState.ListAllCellStruct.Add(cell);
             }
         }
 

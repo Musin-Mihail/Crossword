@@ -3,14 +3,18 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using Crossword.Objects;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Crossword;
 
 public partial class RequiredDictionary : Window
 {
+    private readonly CrosswordState _gameState;
+
     public RequiredDictionary()
     {
         InitializeComponent();
+        _gameState = App.ServiceProvider.GetRequiredService<CrosswordState>();
     }
 
     private void ButtonBase_Create(object sender, RoutedEventArgs e)
@@ -32,7 +36,7 @@ public partial class RequiredDictionary : Window
 
     private bool SearchMatch(string word, List<DictionaryWord> dictionaryWords)
     {
-        foreach (var dictionary in App.GameState.ListDictionaries)
+        foreach (var dictionary in _gameState.ListDictionaries)
         {
             foreach (var dictionaryWord in dictionary.Words)
             {
