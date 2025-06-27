@@ -6,20 +6,20 @@ public class RestartGeneration
 {
     public static void Get()
     {
-        Global.index = 0;
+        App.GameState.Index = 0;
         ClearAllCell.Get();
-        foreach (var dictionary in Global.ListDictionaries)
+        foreach (var dictionary in App.GameState.ListDictionaries)
         {
             dictionary.CurrentCount = 0;
         }
 
         var rnd = new Random();
-        for (var i = 0; i < Global.ListWordsGrid.Count; i++)
+        for (var i = 0; i < App.GameState.ListWordsGrid.Count; i++)
         {
-            var temp = Global.ListWordsGrid[i];
-            var randomIndex = rnd.Next(0, Global.ListWordsGrid.Count - 1);
-            Global.ListWordsGrid[i] = Global.ListWordsGrid[randomIndex];
-            Global.ListWordsGrid[randomIndex] = temp;
+            var temp = App.GameState.ListWordsGrid[i];
+            var randomIndex = rnd.Next(0, App.GameState.ListWordsGrid.Count - 1);
+            App.GameState.ListWordsGrid[i] = App.GameState.ListWordsGrid[randomIndex];
+            App.GameState.ListWordsGrid[randomIndex] = temp;
         }
     }
 }

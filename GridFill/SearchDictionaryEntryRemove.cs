@@ -4,7 +4,7 @@ public class SearchDictionaryEntryRemove
 {
     public static void Get(string answers)
     {
-        foreach (var dictionary in Global.ListDictionaries)
+        foreach (var dictionary in App.GameState.ListDictionaries)
         {
             foreach (var dictionaryWord in dictionary.Words)
             {

@@ -1,16 +1,17 @@
-﻿using Crossword.PlayingField;
+﻿using System.Windows.Controls;
+using Crossword.PlayingField;
 
 namespace Crossword.Main;
 
 public class ResetDict
 {
-    public static void Get()
+    public static void Get(Label selectedDictionary)
     {
-        Global.ListDictionaries.Clear();
+        App.GameState.ListDictionaries.Clear();
         var commonDictionary = CreateDictionary.Get("dict.txt");
-        Global.ListDictionaries.Add(commonDictionary);
-        Global.ListDictionaries[^1].Name = "Общий";
-        Global.ListDictionaries[^1].MaxCount = commonDictionary.Words.Count;
-        Global.selectedDictionary.Content = "Основной словарь";
+        App.GameState.ListDictionaries.Add(commonDictionary);
+        App.GameState.ListDictionaries[^1].Name = "Общий";
+        App.GameState.ListDictionaries[^1].MaxCount = commonDictionary.Words.Count;
+        selectedDictionary.Content = "Основной словарь";
     }
 }

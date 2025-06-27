@@ -5,25 +5,25 @@ using Crossword.PlayingField;
 
 namespace Crossword.Main;
 
-public class GridFillMain
+public class GridFill
 {
-    public static void Get(string maxSeconds, string taskDelay)
+    public static void Get(GenerationParameters genParams)
     {
         SearchForEmptyCells.Get();
-        if (Global.ListEmptyCellStruct.Count > 0)
+        if (App.GameState.ListEmptyCellStruct.Count > 0)
         {
-            FormationQueue.Get();
+            FormationQueue.Get(genParams);
             try
             {
-                Global.maxSeconds = int.Parse(maxSeconds);
-                Global.taskDelay = int.Parse(taskDelay);
+                App.GameState.MaxSeconds = int.Parse(genParams.MaxSeconds);
+                App.GameState.TaskDelay = int.Parse(genParams.TaskDelay);
             }
             catch
             {
                 MessageBox.Show("ОШИБКА. Водите только цифры");
             }
 
-            SelectionAndInstallationOfWords.Get();
+            SelectionAndInstallationOfWords.Get(genParams);
         }
     }
 }

@@ -13,7 +13,7 @@ public class CreateDefinition
         try
         {
             List<DictionaryWord> listWordsString = new();
-            foreach (var dictionary in Global.ListDictionaries)
+            foreach (var dictionary in App.GameState.ListDictionaries)
             {
                 listWordsString.AddRange(dictionary.Words);
             }

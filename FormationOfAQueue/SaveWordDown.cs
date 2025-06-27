@@ -12,7 +12,7 @@ public class SaveWordDown
         for (var i = y; i < 31; i++)
         {
             var match = false;
-            foreach (var cell in Global.ListEmptyCellStruct)
+            foreach (var cell in App.GameState.ListEmptyCellStruct)
             {
                 if (cell.Y == i && cell.X == x)
                 {
@@ -22,19 +22,13 @@ public class SaveWordDown
                 }
             }
 
-            if (match == false)
-            {
-                break;
-            }
+            if (match == false) break;
         }
 
         if (newListLabel.Count > 1)
         {
-            var newWord = new Word
-            {
-                ListLabel = newListLabel
-            };
-            Global.ListWordsGrid.Add(newWord);
+            var newWord = new Word { ListLabel = newListLabel };
+            App.GameState.ListWordsGrid.Add(newWord);
         }
     }
 }

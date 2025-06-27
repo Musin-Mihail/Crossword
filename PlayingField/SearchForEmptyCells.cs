@@ -6,12 +6,12 @@ public class SearchForEmptyCells
 {
     public static void Get()
     {
-        Global.ListEmptyCellStruct.Clear();
-        foreach (var cell in Global.ListAllCellStruct)
+        App.GameState.ListEmptyCellStruct.Clear();
+        foreach (var cell in App.GameState.ListAllCellStruct)
         {
             if (cell.Border.Background == Brushes.Transparent)
             {
-                Global.ListEmptyCellStruct.Add(cell);
+                App.GameState.ListEmptyCellStruct.Add(cell);
             }
         }
     }

@@ -7,7 +7,7 @@ public class Load
 {
     public static void Get(string[] listEmptyCellStruct)
     {
-        foreach (var cell in Global.ListAllCellStruct)
+        foreach (var cell in App.GameState.ListAllCellStruct)
         {
             cell.Label.Content = null;
             cell.Border.Background = Brushes.Black;
@@ -18,7 +18,7 @@ public class Load
             var strings = new List<string>(item.Split(';'));
             var x = int.Parse(strings[0]);
             var y = int.Parse(strings[1]);
-            foreach (var cell in Global.ListAllCellStruct)
+            foreach (var cell in App.GameState.ListAllCellStruct)
             {
                 if (cell.X == x)
                 {

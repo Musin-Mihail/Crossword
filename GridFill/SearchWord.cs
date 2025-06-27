@@ -46,9 +46,9 @@ public class SearchWord
 
                             if (i == dictionaryWord.Answers.Length - 1)
                             {
-                                if (Global.AllInsertedWords.Contains(dictionaryWord.Answers) == false)
+                                if (App.GameState.AllInsertedWords.Contains(dictionaryWord.Answers) == false)
                                 {
-                                    Global.AllInsertedWords.Add(dictionaryWord.Answers);
+                                    App.GameState.AllInsertedWords.Add(dictionaryWord.Answers);
                                     var answers = dictionaryWord.Answers;
                                     SearchDictionaryEntryAdd.Get(answers, word);
                                     return answers;

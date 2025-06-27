@@ -2,10 +2,10 @@
 
 public class FormationQueue
 {
-    public static void Get()
+    public static void Get(GenerationParameters genParams)
     {
-        Global.ListWordsGrid.Clear();
+        App.GameState.ListWordsGrid.Clear();
         SearchForTheBeginningAndLengthOfAllWords.Get();
-        SearchForConnectedWords.Get();
+        SearchForConnectedWords.Get(genParams);
     }
 }

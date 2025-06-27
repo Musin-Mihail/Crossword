@@ -9,7 +9,7 @@ public class Save
     public static void Get()
     {
         var saveFile = "";
-        foreach (var cell in Global.ListEmptyCellStruct)
+        foreach (var cell in App.GameState.ListEmptyCellStruct)
         {
             saveFile += cell.X + ";" + cell.Y + "\n";
         }

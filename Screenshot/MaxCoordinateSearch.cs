@@ -10,7 +10,7 @@ public class MaxCoordinateSearch
         leftMaxY = 99;
         downMaxX = 0;
         rightMaxY = 0;
-        foreach (var cell in Global.ListAllCellStruct)
+        foreach (var cell in App.GameState.ListAllCellStruct)
         {
             if (cell.Border.Background == Brushes.Transparent)
             {

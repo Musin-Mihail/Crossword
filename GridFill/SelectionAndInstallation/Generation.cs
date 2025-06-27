@@ -6,17 +6,17 @@ namespace Crossword.GridFill.SelectionAndInstallation;
 
 public class Generation
 {
-    public static async Task Get()
+    public static async Task Get(GenerationParameters genParams)
     {
-        StartGeneration.Get();
+        StartGeneration.Get(genParams.GridGeneration, genParams.GenStartButton, genParams.GenStopButton);
         var maxIndex = 0;
         var startDate = DateTime.Now;
         var date = DateTime.Now;
         RestartGeneration.Get();
-        while (Global.index < Global.ListWordsGrid.Count)
+        while (App.GameState.Index < App.GameState.ListWordsGrid.Count)
         {
             var time = DateTime.Now - date;
-            if (time.TotalSeconds > Global.maxSeconds)
+            if (time.TotalSeconds > App.GameState.MaxSeconds)
             {
                 maxIndex = 0;
                 date = DateTime.Now;
@@ -24,55 +24,55 @@ public class Generation
                 continue;
             }
 
-            if (Global.index > maxIndex)
+            if (App.GameState.Index > maxIndex)
             {
                 date = DateTime.Now;
-                maxIndex = Global.index;
-                Global.windowsText.Content = "Подобрано " + Global.index + " из " + Global.ListWordsGrid.Count;
+                maxIndex = App.GameState.Index;
+                genParams.WindowsTextTop.Content = "Подобрано " + App.GameState.Index + " из " + App.GameState.ListWordsGrid.Count;
                 await Task.Delay(1);
             }
 
-            if (Global.stop)
+            if (App.GameState.Stop)
             {
-                Global.stop = false;
+                App.GameState.Stop = false;
                 return;
             }
 
-            var newWord = Global.ListWordsGrid[Global.index];
+            var newWord = App.GameState.ListWordsGrid[App.GameState.Index];
             if (newWord.Full)
             {
-                Global.index++;
+                App.GameState.Index++;
                 continue;
             }
 
             if (!InsertWordGrid.Get(newWord))
             {
-                if (Global.visualization.IsChecked == true)
+                if (genParams.Visualization.IsChecked == true)
                 {
                     TestWordStart.Get(newWord, Brushes.Green);
-                    await Task.Delay(Global.taskDelay);
+                    await Task.Delay(App.GameState.TaskDelay);
                     TestWordEnd.Get(newWord);
                 }
 
-                Global.index++;
+                App.GameState.Index++;
                 continue;
             }
 
-            if (Global.visualization.IsChecked == true)
+            if (genParams.Visualization.IsChecked == true)
             {
                 TestWordStart.Get(newWord, Brushes.Red);
-                await Task.Delay(Global.taskDelay);
+                await Task.Delay(App.GameState.TaskDelay);
                 TestWordEnd.Get(newWord);
             }
 
-            await StepBack.Get(newWord);
+            await StepBack.Get(newWord, genParams);
         }
 
-        if (Global.index >= Global.ListWordsGrid.Count)
+        if (App.GameState.Index >= App.GameState.ListWordsGrid.Count)
         {
-            Success.Get(startDate);
+            Success.Get(startDate, genParams.WindowsTextTop);
         }
 
-        StopGeneration.Get();
+        StopGeneration.Get(genParams.GridGeneration, genParams.GenStartButton, genParams.GenStopButton);
     }
 }

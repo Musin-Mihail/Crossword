@@ -32,7 +32,7 @@ public partial class RequiredDictionary : Window
 
     private bool SearchMatch(string word, List<DictionaryWord> dictionaryWords)
     {
-        foreach (var dictionary in Global.ListDictionaries)
+        foreach (var dictionary in App.GameState.ListDictionaries)
         {
             foreach (var dictionaryWord in dictionary.Words)
             {

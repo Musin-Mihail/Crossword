@@ -12,7 +12,7 @@ public class CreateFillGrid
         var blackPen = new Pen(Color.Black, 1);
         var font = new Font("Arial", 7);
         graphics.Clear(Color.White);
-        foreach (var cell in Global.ListAllCellStruct)
+        foreach (var cell in App.GameState.ListAllCellStruct)
         {
             if (cell.Border.Background == Brushes.Black)
             {

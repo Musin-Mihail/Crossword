@@ -4,7 +4,7 @@ public class CheckDictionary
 {
     public static bool Get(string nameDictionary)
     {
-        foreach (var dictionary in Global.ListDictionaries)
+        foreach (var dictionary in App.GameState.ListDictionaries)
         {
             if (dictionary.Name == nameDictionary)
             {

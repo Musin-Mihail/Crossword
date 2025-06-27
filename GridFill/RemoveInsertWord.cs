@@ -6,11 +6,11 @@ public class RemoveInsertWord
 {
     public static void Get(Word word)
     {
-        var index = Global.AllInsertedWords.IndexOf(word.WordString);
+        var index = App.GameState.AllInsertedWords.IndexOf(word.WordString);
         if (index >= 0)
         {
             SearchDictionaryEntryRemove.Get(word.WordString);
-            Global.AllInsertedWords.RemoveAt(index);
+            App.GameState.AllInsertedWords.RemoveAt(index);
         }
 
         word.WordString = "";

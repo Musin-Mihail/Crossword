@@ -7,7 +7,7 @@ namespace Crossword.GridFill.SelectionAndInstallation;
 
 public class StepBack
 {
-    public static async Task Get(Word newWord)
+    public static async Task Get(Word newWord, GenerationParameters genParams)
     {
         var rnd = new Random();
         for (var i = 0; i < newWord.ConnectionWords.Count; i++)
@@ -26,10 +26,10 @@ public class StepBack
 
                 if (!InsertWordGrid.Get(newWord))
                 {
-                    if (Global.visualization.IsChecked == true)
+                    if (genParams.Visualization.IsChecked == true)
                     {
                         TestWordStart.Get(newWord, Brushes.Green);
-                        await Task.Delay(Global.taskDelay);
+                        await Task.Delay(App.GameState.TaskDelay);
                         TestWordEnd.Get(newWord);
                     }
 
@@ -38,6 +38,6 @@ public class StepBack
             }
         }
 
-        Global.index = 0;
+        App.GameState.Index = 0;
     }
 }

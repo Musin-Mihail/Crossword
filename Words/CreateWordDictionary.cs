@@ -9,10 +9,10 @@ namespace Crossword.Words;
 
 public class CreateWordDictionary
 {
-    public static void Get(Word word)
+    public static void Get(Word word, GenerationParameters genParams)
     {
         var zero = true;
-        foreach (var dictionary in Global.ListDictionaries)
+        foreach (var dictionary in App.GameState.ListDictionaries)
         {
             List<DictionaryWord> newDictionaryWord = new();
             foreach (var dictionaryWord in dictionary.Words)
@@ -41,8 +41,8 @@ public class CreateWordDictionary
             TestWordStart.Get(word, Brushes.Red);
             MessageBox.Show("Для этого места нет подходящих слов.");
             TestWordEnd.Get(word);
-            StopGeneration.Get();
-            Global.stop = true;
+            StopGeneration.Get(genParams.GridGeneration, genParams.GenStartButton, genParams.GenStopButton);
+            App.GameState.Stop = true;
         }
     }
 }

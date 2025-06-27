@@ -28,16 +28,15 @@ namespace Crossword
 
         private void CreatingThePlayingField()
         {
-            Global.windowsText = WindowsTextTop;
-            Global.visualization = Visualization;
-            Global.gridGeneration = GridGeneration;
-            Global.startGeneration = GenButton;
-            Global.stopGeneration = GenStopButton;
-            Global.difficultyLevel = DifficultyLevel;
-            Global.selectedDictionary = SelectedDictionary;
-            ResetDict.Get();
-            CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally,
-                _numberOfCellsVertically, CellSize);
+            // Прямое обращение к элементам UI вместо сохранения их в Global
+            ResetDict.Get(SelectedDictionary);
+            CreateUiGrid.Get(
+                TheGrid,
+                MoveChangeColor,
+                ClickChangeColor,
+                _numberOfCellsHorizontally,
+                _numberOfCellsVertically,
+                CellSize);
             LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
             LineCenterH.X2 = _numberOfCellsHorizontally * 30 / 2 + 30;
             LineCenterH.Y2 = _numberOfCellsVertically * 30 + 60;
@@ -136,7 +135,7 @@ namespace Crossword
         {
             var x = 0;
             var y = 0;
-            foreach (var cell in Global.ListAllCellStruct)
+            foreach (var cell in App.GameState.ListAllCellStruct)
             {
                 if (cell.Border == myBorder)
                 {
@@ -168,7 +167,7 @@ namespace Crossword
         {
             var x = 0;
             var y = 0;
-            foreach (Cell cell in Global.ListAllCellStruct)
+            foreach (Cell cell in App.GameState.ListAllCellStruct)
             {
                 if (cell.Border == myBorder)
                 {
@@ -199,7 +198,7 @@ namespace Crossword
         {
             var x = 0;
             var y = 0;
-            foreach (var cell in Global.ListAllCellStruct)
+            foreach (var cell in App.GameState.ListAllCellStruct)
             {
                 if (cell.Border == myBorder)
                 {
@@ -231,7 +230,7 @@ namespace Crossword
         {
             var x = 0;
             var y = 0;
-            foreach (var cell in Global.ListAllCellStruct)
+            foreach (var cell in App.GameState.ListAllCellStruct)
             {
                 if (cell.Border == myBorder)
                 {
@@ -262,7 +261,7 @@ namespace Crossword
         {
             var x = 0;
             var y = 0;
-            foreach (var cell in Global.ListAllCellStruct)
+            foreach (var cell in App.GameState.ListAllCellStruct)
             {
                 if (cell.Border == myBorder)
                 {
@@ -315,7 +314,7 @@ namespace Crossword
 
         private static void ColoringCell(int x, int y, Brush color)
         {
-            foreach (var cell in Global.ListAllCellStruct)
+            foreach (var cell in App.GameState.ListAllCellStruct)
             {
                 if (cell.X == x && cell.Y == y)
                 {
@@ -327,18 +326,29 @@ namespace Crossword
 
         private void Button_ClickGen(object sender, RoutedEventArgs e)
         {
-            GridFillMain.Get(MaxSeconds.Text, TaskDelay.Text);
+            var genParams = new GenerationParameters
+            {
+                MaxSeconds = MaxSeconds.Text,
+                TaskDelay = TaskDelay.Text,
+                Visualization = Visualization,
+                GridGeneration = GridGeneration,
+                GenStartButton = GenButton,
+                GenStopButton = GenStopButton,
+                WindowsTextTop = WindowsTextTop,
+                DifficultyLevel = DifficultyLevel
+            };
+            Main.GridFill.Get(genParams);
         }
 
         private void Button_ClickStop(object sender, RoutedEventArgs e)
         {
-            StopGeneration.Get();
-            Global.stop = true;
+            StopGeneration.Get(GridGeneration, GenButton, GenStopButton);
+            App.GameState.Stop = true;
         }
 
         private void Button_Reset(object sender, RoutedEventArgs e)
         {
-            foreach (var cell in Global.ListAllCellStruct)
+            foreach (var cell in App.GameState.ListAllCellStruct)
             {
                 cell.Label.Content = null;
                 cell.Border.Background = Brushes.Black;
@@ -347,7 +357,7 @@ namespace Crossword
 
         private void Button_Screenshot(object sender, RoutedEventArgs e)
         {
-            if (Global.ListEmptyCellStruct.Count > 1)
+            if (App.GameState.ListEmptyCellStruct.Count > 1)
             {
                 CreateImage.Get();
             }
@@ -381,7 +391,7 @@ namespace Crossword
             dictionariesSelection.ShowDialog();
             if (dictionariesSelection.Ready)
             {
-                Global.ListDictionaries.Clear();
+                App.GameState.ListDictionaries.Clear();
                 var message = "Выбранные словари:\n";
                 var dictionariesPaths = Directory.GetFiles("Dictionaries/").ToList();
                 foreach (var selectedDictionaries in dictionariesSelection.SelectedDictionaries)
@@ -396,16 +406,16 @@ namespace Crossword
                             var dictionary = CreateDictionary.Get(path);
                             dictionary.Name = name;
                             dictionary.MaxCount = int.Parse(list[1]);
-                            Global.ListDictionaries.Add(dictionary);
+                            App.GameState.ListDictionaries.Add(dictionary);
                             break;
                         }
                     }
                 }
 
                 var commonDictionary = CreateDictionary.Get("dict.txt");
-                Global.ListDictionaries.Add(commonDictionary);
-                Global.ListDictionaries[^1].Name = "Общий";
-                Global.ListDictionaries[^1].MaxCount = commonDictionary.Words.Count;
+                App.GameState.ListDictionaries.Add(commonDictionary);
+                App.GameState.ListDictionaries[^1].Name = "Общий";
+                App.GameState.ListDictionaries[^1].MaxCount = commonDictionary.Words.Count;
                 MessageBox.Show(message);
                 SelectedDictionary.Content = message;
             }
@@ -413,7 +423,7 @@ namespace Crossword
 
         private void Button_Basic_Dictionary(object sender, RoutedEventArgs e)
         {
-            ResetDict.Get();
+            ResetDict.Get(SelectedDictionary);
             MessageBox.Show("Выбран основной словарь");
         }
 
@@ -450,5 +460,17 @@ namespace Crossword
                 LineCenterV.Visibility = Visibility.Hidden;
             }
         }
+    }
+
+    public class GenerationParameters
+    {
+        public string MaxSeconds { get; set; }
+        public string TaskDelay { get; set; }
+        public CheckBox Visualization { get; set; }
+        public Grid GridGeneration { get; set; }
+        public Button GenStartButton { get; set; }
+        public Button GenStopButton { get; set; }
+        public Label WindowsTextTop { get; set; }
+        public Label DifficultyLevel { get; set; }
     }
 }

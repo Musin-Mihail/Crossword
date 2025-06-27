@@ -1,13 +1,14 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace Crossword.GridFill.SelectionAndInstallation;
 
 public class StartGeneration
 {
-    public static void Get()
+    public static void Get(Grid gridGeneration, Button genStartButton, Button genStopButton)
     {
-        Global.gridGeneration.Visibility = Visibility.Hidden;
-        Global.startGeneration.Visibility = Visibility.Hidden;
-        Global.stopGeneration.Visibility = Visibility.Visible;
+        gridGeneration.Visibility = Visibility.Hidden;
+        genStartButton.Visibility = Visibility.Hidden;
+        genStopButton.Visibility = Visibility.Visible;
     }
 }

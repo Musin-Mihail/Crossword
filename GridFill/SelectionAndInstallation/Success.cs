@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace Crossword.GridFill.SelectionAndInstallation;
 
 public class Success
 {
-    public static void Get(DateTime startDate)
+    public static void Get(DateTime startDate, Label windowsTextTop)
     {
         var time = DateTime.Now - startDate;
-        Global.windowsText.Content = "ГЕНЕРАЦИЯ УДАЛАСЬ\n";
+        windowsTextTop.Content = "ГЕНЕРАЦИЯ УДАЛАСЬ\n";
         var message = "";
-        foreach (var dictionary in Global.ListDictionaries)
+        foreach (var dictionary in App.GameState.ListDictionaries)
         {
             message += "\n" + dictionary.Name + " - " + dictionary.CurrentCount + "/" + dictionary.MaxCount;
             dictionary.CurrentCount = 0;

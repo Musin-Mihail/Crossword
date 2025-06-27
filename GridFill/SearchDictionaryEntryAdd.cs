@@ -6,7 +6,7 @@ public class SearchDictionaryEntryAdd
 {
     public static void Get(string answers, Word word)
     {
-        foreach (var dictionary in Global.ListDictionaries)
+        foreach (var dictionary in App.GameState.ListDictionaries)
         {
             if (dictionary.CurrentCount >= dictionary.MaxCount)
             {

@@ -8,10 +8,16 @@ namespace Crossword.PlayingField;
 
 public class CreateUiGrid
 {
-    public static void Get(Grid theGrid, MouseEventHandler moveChangeColor, MouseButtonEventHandler clickChangeColor,
-        int numberOfCellsHorizontally, int numberOfCellsVertically, int cellSize)
+    public static void Get(
+        Grid theGrid,
+        MouseEventHandler moveChangeColor,
+        MouseButtonEventHandler clickChangeColor,
+        int numberOfCellsHorizontally,
+        int numberOfCellsVertically,
+        int cellSize
+    )
     {
-        Global.ListAllCellStruct.Clear();
+        App.GameState.ListAllCellStruct.Clear();
         theGrid.Children.Clear();
         for (var y = 0 + 1; y < numberOfCellsVertically + 1; y++)
         {
@@ -25,11 +31,11 @@ public class CreateUiGrid
                 border.Child = label;
                 label.Margin = new Thickness(0, -1, 0, 0);
                 cell.AddBorderLabelXy(border, label, x, y);
-                Global.ListAllCellStruct.Add(cell);
+                App.GameState.ListAllCellStruct.Add(cell);
             }
         }
 
-        for (int y = 0; y < numberOfCellsVertically + 1; y++)
+        for (var y = 0; y < numberOfCellsVertically + 1; y++)
         {
             var label = CreateLabel.Get();
             label.FontSize = 16;

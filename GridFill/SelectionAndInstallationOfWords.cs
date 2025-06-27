@@ -6,13 +6,13 @@ namespace Crossword.GridFill;
 
 public class SelectionAndInstallationOfWords
 {
-    public static async void Get()
+    public static async void Get(GenerationParameters genParams)
     {
         try
         {
-            Global.AllInsertedWords.Clear();
-            Global.difficultyLevel.Content = "Сложность - " + DifficultyLevel.Get();
-            await Generation.Get();
+            App.GameState.AllInsertedWords.Clear();
+            genParams.DifficultyLevel.Content = "Сложность - " + DifficultyLevel.Get();
+            await Generation.Get(genParams);
         }
         catch (Exception e)
         {

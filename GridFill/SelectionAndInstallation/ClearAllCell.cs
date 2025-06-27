@@ -7,13 +7,13 @@ public class ClearAllCell
 {
     public static void Get()
     {
-        Global.AllInsertedWords.Clear();
-        foreach (var word in Global.ListWordsGrid)
+        App.GameState.AllInsertedWords.Clear();
+        foreach (var word in App.GameState.ListWordsGrid)
         {
             ResetWord.Get(word);
         }
 
-        foreach (var cell in Global.ListEmptyCellStruct)
+        foreach (var cell in App.GameState.ListEmptyCellStruct)
         {
             cell.Label.Content = null;
             cell.Label.Background = Brushes.Transparent;

@@ -7,5 +7,6 @@ namespace Crossword
     /// </summary>
     public partial class App : Application
     {
+        public static CrosswordState GameState { get; } = new();
     }
 }
