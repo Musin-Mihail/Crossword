@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using Crossword.Main;
 using Crossword.PlayingField;
+using Crossword.SaveLoad;
 using Crossword.Services;
 
 namespace Crossword.ViewModel;
@@ -13,6 +18,26 @@ public class MainViewModel : ViewModelBase
     private bool _isGenerating = App.GameState.IsGenerating;
     private string _difficulty = App.GameState.Difficulty;
     private string _selectedDictionaryInfo = App.GameState.SelectedDictionaryInfo;
+
+    public ICommand StartGenerationCommand { get; }
+    public ICommand StopGenerationCommand { get; }
+    public ICommand SaveGridCommand { get; }
+    public ICommand LoadGridCommand { get; }
+    public ICommand ResetDictionariesCommand { get; }
+    public ICommand SelectDictionariesCommand { get; }
+    public ICommand CreateRequiredDictionaryCommand { get; }
+
+    public MainViewModel()
+    {
+        StartGenerationCommand = new RelayCommand(async _ => await StartGenerationAsync(), _ => !IsGenerating);
+        StopGenerationCommand = new RelayCommand(_ => StopGeneration(), _ => IsGenerating);
+        SaveGridCommand = new RelayCommand(_ => SaveGrid(), _ => !IsGenerating);
+        LoadGridCommand = new RelayCommand(_ => LoadGrid(), _ => !IsGenerating);
+        ResetDictionariesCommand = new RelayCommand(_ => ResetDictionaries(), _ => !IsGenerating);
+        SelectDictionariesCommand = new RelayCommand(_ => SelectDictionaries(), _ => !IsGenerating);
+        CreateRequiredDictionaryCommand = new RelayCommand(_ => CreateRequiredDictionary(), _ => !IsGenerating);
+        ResetDictionaries();
+    }
 
     public string StatusMessage
     {
@@ -62,12 +87,7 @@ public class MainViewModel : ViewModelBase
     public string TaskDelayText { get; set; } = "10";
     public bool IsVisualizationChecked { get; set; } = false;
 
-    public MainViewModel()
-    {
-        ResetDictionaries();
-    }
-
-    public async Task StartGenerationAsync()
+    private async Task StartGenerationAsync()
     {
         if (IsGenerating) return;
 
@@ -78,7 +98,7 @@ public class MainViewModel : ViewModelBase
         }
         catch
         {
-            MessageBox.Show("ОШИБКА. Водите только цифры");
+            MessageBox.Show("ОШИБКА. Вводите только цифры");
             return;
         }
 
@@ -109,15 +129,73 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    public void StopGeneration()
+    private void StopGeneration()
     {
         App.GameState.Stop = true;
+    }
+
+    private void SaveGrid()
+    {
+        SearchForEmptyCells.Get();
+        Save.Get();
+    }
+
+    private void LoadGrid()
+    {
+        var loadGrid = new LoadGrid();
+        loadGrid.ShowDialog();
+        if (loadGrid.Ready)
+        {
+            Load.Get(loadGrid.ListEmptyCellStruct);
+        }
     }
 
     public void ResetDictionaries()
     {
         ResetDict.Get();
         SelectedDictionaryInfo = App.GameState.SelectedDictionaryInfo;
+        MessageBox.Show("Выбран основной словарь");
+    }
+
+    private void SelectDictionaries()
+    {
+        var dictionariesSelection = new DictionariesSelection();
+        dictionariesSelection.ShowDialog();
+        if (dictionariesSelection.Ready)
+        {
+            App.GameState.ListDictionaries.Clear();
+            var message = "Выбранные словари:\n";
+            var dictionariesPaths = Directory.GetFiles("Dictionaries/").ToList();
+            foreach (var selectedDictionaries in dictionariesSelection.SelectedDictionaries)
+            {
+                var list = new List<string>(selectedDictionaries.Split(';'));
+                foreach (var path in dictionariesPaths)
+                {
+                    var name = Path.GetFileNameWithoutExtension(path);
+                    if (list[0] == name)
+                    {
+                        message += selectedDictionaries + "\n";
+                        var dictionary = CreateDictionary.Get(path);
+                        dictionary.Name = name;
+                        dictionary.MaxCount = int.Parse(list[1]);
+                        App.GameState.ListDictionaries.Add(dictionary);
+                        break;
+                    }
+                }
+            }
+
+            var commonDictionary = CreateDictionary.Get("dict.txt");
+            App.GameState.ListDictionaries.Add(commonDictionary);
+            App.GameState.ListDictionaries[^1].Name = "Общий";
+            App.GameState.ListDictionaries[^1].MaxCount = commonDictionary.Words.Count;
+            MessageBox.Show(message);
+            SelectedDictionaryInfo = message;
+        }
+    }
+
+    private void CreateRequiredDictionary()
+    {
+        new RequiredDictionary().ShowDialog();
     }
 
     private async void UpdateStatus()

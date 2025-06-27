@@ -1,13 +1,9 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Crossword.Main;
 using Crossword.PlayingField;
-using Crossword.SaveLoad;
 using Crossword.Screenshot;
 using Crossword.ViewModel;
 
@@ -15,7 +11,6 @@ namespace Crossword;
 
 public partial class MainWindow : Window
 {
-    private readonly MainViewModel _viewModel;
     private static int _numberOfCellsHorizontally = 30;
     private static int _numberOfCellsVertically = 30;
     private const int CellSize = 30;
@@ -23,30 +18,15 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        _viewModel = new MainViewModel();
-        DataContext = _viewModel;
+        DataContext = new MainViewModel();
         CreatingThePlayingField();
     }
 
-    private async void Button_ClickGen(object sender, RoutedEventArgs e)
-    {
-        _viewModel.MaxSecondsText = MaxSeconds.Text;
-        _viewModel.TaskDelayText = TaskDelay.Text;
-        _viewModel.IsVisualizationChecked = Visualization.IsChecked ?? false;
-        await _viewModel.StartGenerationAsync();
-    }
-
-    private void Button_ClickStop(object sender, RoutedEventArgs e)
-    {
-        _viewModel.StopGeneration();
-    }
-
-    #region Unchanged_Code
+    #region Unchanged_Code (UI-specific logic remains here)
 
     private void CreatingThePlayingField()
     {
         ResetDict.Get();
-        SelectedDictionary.Content = App.GameState.SelectedDictionaryInfo;
         CreateUiGrid.Get(TheGrid, MoveChangeColor, ClickChangeColor, _numberOfCellsHorizontally, _numberOfCellsVertically, CellSize);
         LineCenterH.X1 = _numberOfCellsHorizontally * 30 / 2 + 30;
         LineCenterH.X2 = _numberOfCellsHorizontally * 30 / 2 + 30;
@@ -54,28 +34,6 @@ public partial class MainWindow : Window
         LineCenterV.Y1 = _numberOfCellsVertically * 30 / 2 + 30;
         LineCenterV.Y2 = _numberOfCellsVertically * 30 / 2 + 30;
         LineCenterV.X2 = _numberOfCellsHorizontally * 30 + 60;
-    }
-
-    private void Button_Basic_Dictionary(object sender, RoutedEventArgs e)
-    {
-        _viewModel.ResetDictionaries();
-        MessageBox.Show("Выбран основной словарь");
-    }
-
-    private void Button_ClickSaveGrid(object sender, RoutedEventArgs e)
-    {
-        SearchForEmptyCells.Get();
-        Save.Get();
-    }
-
-    private void Button_ClickLoadGrid(object sender, RoutedEventArgs e)
-    {
-        var loadGrid = new LoadGrid();
-        loadGrid.ShowDialog();
-        if (loadGrid.Ready)
-        {
-            Load.Get(loadGrid.ListEmptyCellStruct);
-        }
     }
 
     private void MoveChangeColor(object sender, MouseEventArgs e)
@@ -279,47 +237,6 @@ public partial class MainWindow : Window
             _numberOfCellsHorizontally = w.NumberOfCellsHorizontally;
             _numberOfCellsVertically = w.NumberOfCellsVertically;
             CreatingThePlayingField();
-        }
-    }
-
-    private void Button_RequiredDictionary(object s, RoutedEventArgs e)
-    {
-        new RequiredDictionary().ShowDialog();
-    }
-
-    private void Button_DictionariesSelection(object sender, RoutedEventArgs e)
-    {
-        var dictionariesSelection = new DictionariesSelection();
-        dictionariesSelection.ShowDialog();
-        if (dictionariesSelection.Ready)
-        {
-            App.GameState.ListDictionaries.Clear();
-            var message = "Выбранные словари:\n";
-            var dictionariesPaths = Directory.GetFiles("Dictionaries/").ToList();
-            foreach (var selectedDictionaries in dictionariesSelection.SelectedDictionaries)
-            {
-                var list = new List<string>(selectedDictionaries.Split(';'));
-                foreach (var path in dictionariesPaths)
-                {
-                    var name = Path.GetFileNameWithoutExtension(path);
-                    if (list[0] == name)
-                    {
-                        message += selectedDictionaries + "\n";
-                        var dictionary = CreateDictionary.Get(path);
-                        dictionary.Name = name;
-                        dictionary.MaxCount = int.Parse(list[1]);
-                        App.GameState.ListDictionaries.Add(dictionary);
-                        break;
-                    }
-                }
-            }
-
-            var commonDictionary = CreateDictionary.Get("dict.txt");
-            App.GameState.ListDictionaries.Add(commonDictionary);
-            App.GameState.ListDictionaries[^1].Name = "Общий";
-            App.GameState.ListDictionaries[^1].MaxCount = commonDictionary.Words.Count;
-            MessageBox.Show(message);
-            _viewModel.SelectedDictionaryInfo = message;
         }
     }
 
