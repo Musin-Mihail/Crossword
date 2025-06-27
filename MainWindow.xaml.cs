@@ -4,7 +4,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Crossword.Main;
 using Crossword.PlayingField;
-using Crossword.Screenshot;
 using Crossword.ViewModel;
 
 namespace Crossword;
@@ -211,21 +210,6 @@ public partial class MainWindow : Window
                 cell.Border.Background = color;
                 break;
             }
-    }
-
-    private void Button_Reset(object s, RoutedEventArgs e)
-    {
-        foreach (var cell in App.GameState.ListAllCellStruct)
-        {
-            cell.Label.Content = null;
-            cell.Border.Background = Brushes.Black;
-        }
-    }
-
-    private void Button_Screenshot(object s, RoutedEventArgs e)
-    {
-        if (App.GameState.ListEmptyCellStruct.Count > 1) CreateImage.Get();
-        else MessageBox.Show("Ячеек меньше двух\nИли не было генерации");
     }
 
     private void Button_ChangeFill(object s, RoutedEventArgs e)

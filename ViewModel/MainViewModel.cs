@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Crossword.Main;
 using Crossword.PlayingField;
 using Crossword.SaveLoad;
+using Crossword.Screenshot;
 using Crossword.Services;
 
 namespace Crossword.ViewModel;
@@ -26,6 +27,7 @@ public class MainViewModel : ViewModelBase
     public ICommand ResetDictionariesCommand { get; }
     public ICommand SelectDictionariesCommand { get; }
     public ICommand CreateRequiredDictionaryCommand { get; }
+    public ICommand ScreenshotCommand { get; }
 
     public MainViewModel()
     {
@@ -36,6 +38,7 @@ public class MainViewModel : ViewModelBase
         ResetDictionariesCommand = new RelayCommand(_ => ResetDictionaries(), _ => !IsGenerating);
         SelectDictionariesCommand = new RelayCommand(_ => SelectDictionaries(), _ => !IsGenerating);
         CreateRequiredDictionaryCommand = new RelayCommand(_ => CreateRequiredDictionary(), _ => !IsGenerating);
+        ScreenshotCommand = new RelayCommand(_ => Screenshot(), _ => !IsGenerating);
         ResetDictionaries();
     }
 
@@ -150,7 +153,19 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    public void ResetDictionaries()
+    private void Screenshot()
+    {
+        if (App.GameState.ListEmptyCellStruct.Count > 1)
+        {
+            CreateImage.Get();
+        }
+        else
+        {
+            MessageBox.Show("Ячеек меньше двух\nИли не было генерации");
+        }
+    }
+
+    private void ResetDictionaries()
     {
         ResetDict.Get();
         SelectedDictionaryInfo = App.GameState.SelectedDictionaryInfo;
