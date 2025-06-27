@@ -26,7 +26,7 @@
                 <CheckBox x:Name="Visualization" Content="Визуализация" IsChecked="{Binding IsVisualizationChecked, Mode=TwoWay}" HorizontalAlignment="Left" Margin="1042,399,0,0" VerticalAlignment="Top" />
                 <Label Content="Задержка" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" FontSize="18" Margin="1165,350,0,0" />
                 <TextBox x:Name="TaskDelay" Text="{Binding TaskDelayText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Height="30" Width="120" Margin="1150,390,0,0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
-                <Button x:Name="GenButton" Content="Генерация" Click="Button_ClickGen" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,425,0,0" />
+                <Button x:Name="GenButton" Content="Генерация" Click="Button_ClickGen" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,425,0,0" Visibility="{Binding IsUiEnabled, Converter={StaticResource BoolToVis}}" />
                 <Button x:Name="GenStopButton" Content="Стоп" Click="Button_ClickStop" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,425,0,0" Visibility="{Binding IsGenerating, Converter={StaticResource BoolToVis}}" />
             </Canvas>
             <Grid Name="GridGeneration">

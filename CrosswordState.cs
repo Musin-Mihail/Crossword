@@ -14,7 +14,6 @@ public class CrosswordState
     public int Index = 0;
     public int MaxSeconds = 0;
     public int TaskDelay = 0;
-
     public bool IsGenerating { get; set; }
     public bool IsVisualizationEnabled { get; set; }
     public string StatusMessage { get; set; } = "Готов к генерации.";

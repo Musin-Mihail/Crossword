@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using Crossword.Main;
 using Crossword.PlayingField;
+using Crossword.Services;
 
 namespace Crossword.ViewModel;
 
@@ -22,10 +24,10 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private bool IsGenerating
+    public bool IsGenerating
     {
         get => _isGenerating;
-        set
+        private set
         {
             _isGenerating = value;
             App.GameState.IsGenerating = value;
@@ -68,20 +70,43 @@ public class MainViewModel : ViewModelBase
     public async Task StartGenerationAsync()
     {
         if (IsGenerating) return;
-        IsGenerating = true;
-        App.GameState.IsVisualizationEnabled = IsVisualizationChecked;
+
+        try
+        {
+            App.GameState.MaxSeconds = int.Parse(MaxSecondsText);
+            App.GameState.TaskDelay = int.Parse(TaskDelayText);
+        }
+        catch
+        {
+            MessageBox.Show("ОШИБКА. Водите только цифры");
+            return;
+        }
+
         SearchForEmptyCells.Get();
         if (App.GameState.ListEmptyCellStruct.Count == 0)
         {
             MessageBox.Show("На поле нет пустых ячеек для генерации.");
-            IsGenerating = false;
             return;
         }
 
-        UpdateStatus();
-        await Task.Run(() => { Main.GridFill.Get(MaxSecondsText, TaskDelayText); });
+        IsGenerating = true;
+        try
+        {
+            App.GameState.IsVisualizationEnabled = IsVisualizationChecked;
+            var generationService = new GenerationService(App.GameState);
+            UpdateStatus();
 
-        IsGenerating = false;
+            await Task.Run(() => generationService.GenerateAsync());
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Произошла ошибка во время генерации:\n{ex.Message}");
+        }
+        finally
+        {
+            IsGenerating = false;
+            UpdateStatus();
+        }
     }
 
     public void StopGeneration()

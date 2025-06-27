@@ -6,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Crossword.Main;
-using Crossword.Objects;
 using Crossword.PlayingField;
 using Crossword.SaveLoad;
 using Crossword.Screenshot;
@@ -17,7 +16,6 @@ namespace Crossword;
 public partial class MainWindow : Window
 {
     private readonly MainViewModel _viewModel;
-
     private static int _numberOfCellsHorizontally = 30;
     private static int _numberOfCellsVertically = 30;
     private const int CellSize = 30;
@@ -30,6 +28,21 @@ public partial class MainWindow : Window
         CreatingThePlayingField();
     }
 
+    private async void Button_ClickGen(object sender, RoutedEventArgs e)
+    {
+        _viewModel.MaxSecondsText = MaxSeconds.Text;
+        _viewModel.TaskDelayText = TaskDelay.Text;
+        _viewModel.IsVisualizationChecked = Visualization.IsChecked ?? false;
+        await _viewModel.StartGenerationAsync();
+    }
+
+    private void Button_ClickStop(object sender, RoutedEventArgs e)
+    {
+        _viewModel.StopGeneration();
+    }
+
+    #region Unchanged_Code
+
     private void CreatingThePlayingField()
     {
         ResetDict.Get();
@@ -41,20 +54,6 @@ public partial class MainWindow : Window
         LineCenterV.Y1 = _numberOfCellsVertically * 30 / 2 + 30;
         LineCenterV.Y2 = _numberOfCellsVertically * 30 / 2 + 30;
         LineCenterV.X2 = _numberOfCellsHorizontally * 30 + 60;
-    }
-
-    private async void Button_ClickGen(object sender, RoutedEventArgs e)
-    {
-        _viewModel.MaxSecondsText = MaxSeconds.Text;
-        _viewModel.TaskDelayText = TaskDelay.Text;
-        _viewModel.IsVisualizationChecked = Visualization.IsChecked ?? false;
-
-        await _viewModel.StartGenerationAsync();
-    }
-
-    private void Button_ClickStop(object sender, RoutedEventArgs e)
-    {
-        _viewModel.StopGeneration();
     }
 
     private void Button_Basic_Dictionary(object sender, RoutedEventArgs e)
@@ -94,255 +93,169 @@ public partial class MainWindow : Window
         if (Mouse.LeftButton == MouseButtonState.Pressed)
         {
             var myBorder = (Border)sender;
-            if (VerticallyMirror.IsChecked == true)
-            {
-                ColoringHorizontal(myBorder, Brushes.Transparent);
-            }
-            else if (HorizontallyMirror.IsChecked == true)
-            {
-                ColoringVertical(myBorder, Brushes.Transparent);
-            }
-            else if (AllMirror.IsChecked == true)
-            {
-                ColoringAll(myBorder, Brushes.Transparent);
-            }
-            else if (VerticallyMirrorRevers.IsChecked == true)
-            {
-                ColoringHorizontalRevers(myBorder, Brushes.Transparent);
-            }
-            else if (HorizontallyMirrorRevers.IsChecked == true)
-            {
-                ColoringVerticalRevers(myBorder, Brushes.Transparent);
-            }
-            else
-            {
-                myBorder.Background = Brushes.Transparent;
-            }
+            if (VerticallyMirror.IsChecked == true) ColoringHorizontal(myBorder, Brushes.Transparent);
+            else if (HorizontallyMirror.IsChecked == true) ColoringVertical(myBorder, Brushes.Transparent);
+            else if (AllMirror.IsChecked == true) ColoringAll(myBorder, Brushes.Transparent);
+            else if (VerticallyMirrorRevers.IsChecked == true) ColoringHorizontalRevers(myBorder, Brushes.Transparent);
+            else if (HorizontallyMirrorRevers.IsChecked == true) ColoringVerticalRevers(myBorder, Brushes.Transparent);
+            else myBorder.Background = Brushes.Transparent;
         }
         else if (Mouse.RightButton == MouseButtonState.Pressed)
         {
             var myBorder = (Border)sender;
-            if (VerticallyMirror.IsChecked == true)
-            {
-                ColoringHorizontal(myBorder, Brushes.Black);
-            }
-            else if (HorizontallyMirror.IsChecked == true)
-            {
-                ColoringVertical(myBorder, Brushes.Black);
-            }
-            else if (AllMirror.IsChecked == true)
-            {
-                ColoringAll(myBorder, Brushes.Black);
-            }
-            else if (VerticallyMirrorRevers.IsChecked == true)
-            {
-                ColoringHorizontalRevers(myBorder, Brushes.Black);
-            }
-            else if (HorizontallyMirrorRevers.IsChecked == true)
-            {
-                ColoringVerticalRevers(myBorder, Brushes.Black);
-            }
-            else
-            {
-                myBorder.Background = Brushes.Black;
-            }
+            if (VerticallyMirror.IsChecked == true) ColoringHorizontal(myBorder, Brushes.Black);
+            else if (HorizontallyMirror.IsChecked == true) ColoringVertical(myBorder, Brushes.Black);
+            else if (AllMirror.IsChecked == true) ColoringAll(myBorder, Brushes.Black);
+            else if (VerticallyMirrorRevers.IsChecked == true) ColoringHorizontalRevers(myBorder, Brushes.Black);
+            else if (HorizontallyMirrorRevers.IsChecked == true) ColoringVerticalRevers(myBorder, Brushes.Black);
+            else myBorder.Background = Brushes.Black;
         }
     }
 
-    private static void ColoringVerticalRevers(Border myBorder, Brush color)
+    private static void ColoringVerticalRevers(Border b, Brush c)
     {
-        var x = 0;
-        var y = 0;
+        int x = 0, y = 0;
         foreach (var cell in App.GameState.ListAllCellStruct)
-        {
-            if (cell.Border == myBorder)
+            if (cell.Border == b)
             {
                 x = cell.X;
                 y = cell.Y;
                 break;
             }
-        }
 
         var center = _numberOfCellsHorizontally / 2;
         if (x <= center)
         {
-            myBorder.Background = color;
-            var mirrorX = _numberOfCellsHorizontally - x + 1;
-            var mirrorY = _numberOfCellsVertically - y + 1;
-            ColoringCell(mirrorX, mirrorY, color);
+            b.Background = c;
+            var mX = _numberOfCellsHorizontally - x + 1;
+            var mY = _numberOfCellsVertically - y + 1;
+            ColoringCell(mX, mY, c);
         }
 
-        if (_numberOfCellsHorizontally % 2 != 0)
-        {
-            if (x == center + 1)
-            {
-                myBorder.Background = color;
-            }
-        }
+        if (_numberOfCellsHorizontally % 2 != 0 && x == center + 1) b.Background = c;
     }
 
-    private static void ColoringVertical(Border myBorder, Brush color)
+    private static void ColoringVertical(Border b, Brush c)
     {
-        var x = 0;
-        var y = 0;
-        foreach (Cell cell in App.GameState.ListAllCellStruct)
-        {
-            if (cell.Border == myBorder)
+        int x = 0, y = 0;
+        foreach (var cell in App.GameState.ListAllCellStruct)
+            if (cell.Border == b)
             {
                 x = cell.X;
                 y = cell.Y;
                 break;
             }
-        }
 
         var center = _numberOfCellsHorizontally / 2;
         if (x <= center)
         {
-            myBorder.Background = color;
-            var mirrorX = _numberOfCellsHorizontally - x + 1;
-            ColoringCell(mirrorX, y, color);
+            b.Background = c;
+            var mX = _numberOfCellsHorizontally - x + 1;
+            ColoringCell(mX, y, c);
         }
 
-        if (_numberOfCellsHorizontally % 2 != 0)
-        {
-            if (x == center + 1)
-            {
-                myBorder.Background = color;
-            }
-        }
+        if (_numberOfCellsHorizontally % 2 != 0 && x == center + 1) b.Background = c;
     }
 
-    private static void ColoringHorizontalRevers(Border myBorder, Brush color)
+    private static void ColoringHorizontalRevers(Border b, Brush c)
     {
-        var x = 0;
-        var y = 0;
+        int x = 0, y = 0;
         foreach (var cell in App.GameState.ListAllCellStruct)
-        {
-            if (cell.Border == myBorder)
+            if (cell.Border == b)
             {
                 x = cell.X;
                 y = cell.Y;
                 break;
             }
-        }
 
         var center = _numberOfCellsVertically / 2;
-        var mirrorY = _numberOfCellsVertically - y + 1;
+        var mY = _numberOfCellsVertically - y + 1;
         if (y <= center)
         {
-            myBorder.Background = color;
-            var mirrorX = _numberOfCellsHorizontally - x + 1;
-            ColoringCell(mirrorX, mirrorY, color);
+            b.Background = c;
+            var mX = _numberOfCellsHorizontally - x + 1;
+            ColoringCell(mX, mY, c);
         }
 
-        if (_numberOfCellsVertically % 2 != 0)
-        {
-            if (y == center + 1)
-            {
-                myBorder.Background = color;
-            }
-        }
+        if (_numberOfCellsVertically % 2 != 0 && y == center + 1) b.Background = c;
     }
 
-    private static void ColoringHorizontal(Border myBorder, Brush color)
+    private static void ColoringHorizontal(Border b, Brush c)
     {
-        var x = 0;
-        var y = 0;
+        int x = 0, y = 0;
         foreach (var cell in App.GameState.ListAllCellStruct)
-        {
-            if (cell.Border == myBorder)
+            if (cell.Border == b)
             {
                 x = cell.X;
                 y = cell.Y;
                 break;
             }
-        }
 
         var center = _numberOfCellsVertically / 2;
         if (y <= center)
         {
-            myBorder.Background = color;
-            var mirrorY = _numberOfCellsVertically - y + 1;
-            ColoringCell(x, mirrorY, color);
+            b.Background = c;
+            var mY = _numberOfCellsVertically - y + 1;
+            ColoringCell(x, mY, c);
         }
 
-        if (_numberOfCellsVertically % 2 != 0)
-        {
-            if (y == center + 1)
-            {
-                myBorder.Background = color;
-            }
-        }
+        if (_numberOfCellsVertically % 2 != 0 && y == center + 1) b.Background = c;
     }
 
-    private static void ColoringAll(Border myBorder, Brush color)
+    private static void ColoringAll(Border b, Brush c)
     {
-        var x = 0;
-        var y = 0;
+        int x = 0, y = 0;
         foreach (var cell in App.GameState.ListAllCellStruct)
-        {
-            if (cell.Border == myBorder)
+            if (cell.Border == b)
             {
                 x = cell.X;
                 y = cell.Y;
                 break;
             }
+
+        var cH = _numberOfCellsHorizontally / 2;
+        var cV = _numberOfCellsVertically / 2;
+        if (x <= cH && y <= cV)
+        {
+            b.Background = c;
+            var mX = _numberOfCellsHorizontally - x + 1;
+            var mY = _numberOfCellsVertically - y + 1;
+            ColoringCell(mX, y, c);
+            ColoringCell(x, mY, c);
+            ColoringCell(mX, mY, c);
         }
 
-        var centerH = _numberOfCellsHorizontally / 2;
-        var centerV = _numberOfCellsVertically / 2;
-        if (x <= centerH && y <= centerV)
+        if (_numberOfCellsHorizontally % 2 != 0 && x == cH + 1 && y <= cV)
         {
-            myBorder.Background = color;
-            var mirrorX = _numberOfCellsHorizontally - x + 1;
-            var mirrorY = _numberOfCellsVertically - y + 1;
-            ColoringCell(mirrorX, y, color);
-            ColoringCell(x, mirrorY, color);
-            ColoringCell(mirrorX, mirrorY, color);
-        }
-
-        if (_numberOfCellsHorizontally % 2 != 0)
-        {
-            if (x == centerH + 1 && y <= centerV)
-            {
-                myBorder.Background = color;
-                var mirrorY = _numberOfCellsVertically - y + 1;
-                ColoringCell(x, mirrorY, color);
-            }
+            b.Background = c;
+            var mY = _numberOfCellsVertically - y + 1;
+            ColoringCell(x, mY, c);
         }
 
         if (_numberOfCellsVertically % 2 != 0)
         {
-            int mirrorX = _numberOfCellsHorizontally - x + 1;
-            if (x <= centerH && y == centerV + 1)
+            var mX = _numberOfCellsHorizontally - x + 1;
+            if (x <= cH && y == cV + 1)
             {
-                myBorder.Background = color;
-                ColoringCell(mirrorX, y, color);
+                b.Background = c;
+                ColoringCell(mX, y, c);
             }
         }
 
-        if (_numberOfCellsHorizontally % 2 != 0 && _numberOfCellsVertically % 2 != 0)
-        {
-            if (x == centerH + 1 && y == centerV + 1)
-            {
-                myBorder.Background = color;
-            }
-        }
+        if (_numberOfCellsHorizontally % 2 != 0 && _numberOfCellsVertically % 2 != 0 && x == cH + 1 && y == cV + 1) b.Background = c;
     }
 
     private static void ColoringCell(int x, int y, Brush color)
     {
         foreach (var cell in App.GameState.ListAllCellStruct)
-        {
             if (cell.X == x && cell.Y == y)
             {
                 cell.Border.Background = color;
                 break;
             }
-        }
     }
 
-    private void Button_Reset(object sender, RoutedEventArgs e)
+    private void Button_Reset(object s, RoutedEventArgs e)
     {
         foreach (var cell in App.GameState.ListAllCellStruct)
         {
@@ -351,34 +264,27 @@ public partial class MainWindow : Window
         }
     }
 
-    private void Button_Screenshot(object sender, RoutedEventArgs e)
+    private void Button_Screenshot(object s, RoutedEventArgs e)
     {
-        if (App.GameState.ListEmptyCellStruct.Count > 1)
-        {
-            CreateImage.Get();
-        }
-        else
-        {
-            MessageBox.Show("Ячеек меньше двух\nИли не было генерации");
-        }
+        if (App.GameState.ListEmptyCellStruct.Count > 1) CreateImage.Get();
+        else MessageBox.Show("Ячеек меньше двух\nИли не было генерации");
     }
 
-    private void Button_ChangeFill(object sender, RoutedEventArgs e)
+    private void Button_ChangeFill(object s, RoutedEventArgs e)
     {
-        var сhangeFill = new сhangeFill();
-        сhangeFill.ShowDialog();
-        if (сhangeFill.Ready)
+        var w = new сhangeFill();
+        w.ShowDialog();
+        if (w.Ready)
         {
-            _numberOfCellsHorizontally = сhangeFill.NumberOfCellsHorizontally;
-            _numberOfCellsVertically = сhangeFill.NumberOfCellsVertically;
+            _numberOfCellsHorizontally = w.NumberOfCellsHorizontally;
+            _numberOfCellsVertically = w.NumberOfCellsVertically;
             CreatingThePlayingField();
         }
     }
 
-    private void Button_RequiredDictionary(object sender, RoutedEventArgs e)
+    private void Button_RequiredDictionary(object s, RoutedEventArgs e)
     {
-        var requiredDictionary = new RequiredDictionary();
-        requiredDictionary.ShowDialog();
+        new RequiredDictionary().ShowDialog();
     }
 
     private void Button_DictionariesSelection(object sender, RoutedEventArgs e)
@@ -417,37 +323,18 @@ public partial class MainWindow : Window
         }
     }
 
-    private void ClearMirror_OnChecked(object sender, RoutedEventArgs e)
+    private void ClearMirror_OnChecked(object s, RoutedEventArgs e)
     {
-        if (VerticallyMirror.IsChecked == true)
-        {
-            LineCenterH.Visibility = Visibility.Hidden;
-            LineCenterV.Visibility = Visibility.Visible;
-        }
-        else if (HorizontallyMirror.IsChecked == true)
-        {
-            LineCenterH.Visibility = Visibility.Visible;
-            LineCenterV.Visibility = Visibility.Hidden;
-        }
-        else if (AllMirror.IsChecked == true)
+        LineCenterH.Visibility = Visibility.Hidden;
+        LineCenterV.Visibility = Visibility.Hidden;
+        if (VerticallyMirror.IsChecked == true || VerticallyMirrorRevers.IsChecked == true) LineCenterV.Visibility = Visibility.Visible;
+        if (HorizontallyMirror.IsChecked == true || HorizontallyMirrorRevers.IsChecked == true) LineCenterH.Visibility = Visibility.Visible;
+        if (AllMirror.IsChecked == true)
         {
             LineCenterH.Visibility = Visibility.Visible;
             LineCenterV.Visibility = Visibility.Visible;
-        }
-        else if (VerticallyMirrorRevers.IsChecked == true)
-        {
-            LineCenterH.Visibility = Visibility.Hidden;
-            LineCenterV.Visibility = Visibility.Visible;
-        }
-        else if (HorizontallyMirrorRevers.IsChecked == true)
-        {
-            LineCenterH.Visibility = Visibility.Visible;
-            LineCenterV.Visibility = Visibility.Hidden;
-        }
-        else
-        {
-            LineCenterH.Visibility = Visibility.Hidden;
-            LineCenterV.Visibility = Visibility.Hidden;
         }
     }
+
+    #endregion
 }
