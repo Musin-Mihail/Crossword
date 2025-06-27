@@ -1,4 +1,5 @@
-﻿using Crossword.Objects;
+﻿using System.Windows;
+using Crossword.Objects;
 
 namespace Crossword.GridFill;
 
@@ -12,11 +13,13 @@ public class InsertWordGrid
             return true;
         }
 
-        for (var i = 0; i < word.ListLabel.Count; i++)
+        Application.Current.Dispatcher.Invoke(() =>
         {
-            word.ListLabel[i].Content = answer[i];
-        }
-
+            for (var i = 0; i < word.ListLabel.Count; i++)
+            {
+                word.ListLabel[i].Content = answer[i];
+            }
+        });
         word.Full = true;
         word.WordString = answer;
         return false;

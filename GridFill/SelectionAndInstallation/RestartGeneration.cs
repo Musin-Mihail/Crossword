@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 
 namespace Crossword.GridFill.SelectionAndInstallation;
 
@@ -7,7 +8,7 @@ public class RestartGeneration
     public static void Get()
     {
         App.GameState.Index = 0;
-        ClearAllCell.Get();
+        Application.Current.Dispatcher.Invoke(() => { ClearAllCell.Get(); });
         foreach (var dictionary in App.GameState.ListDictionaries)
         {
             dictionary.CurrentCount = 0;

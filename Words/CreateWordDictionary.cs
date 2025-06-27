@@ -1,15 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Media;
-using Crossword.GridFill;
-using Crossword.GridFill.SelectionAndInstallation;
 using Crossword.Objects;
 
 namespace Crossword.Words;
 
 public class CreateWordDictionary
 {
-    public static void Get(Word word, GenerationParameters genParams)
+    public static void Get(Word word)
     {
         var zero = true;
         foreach (var dictionary in App.GameState.ListDictionaries)
@@ -38,10 +35,7 @@ public class CreateWordDictionary
 
         if (zero)
         {
-            TestWordStart.Get(word, Brushes.Red);
-            MessageBox.Show("Для этого места нет подходящих слов.");
-            TestWordEnd.Get(word);
-            StopGeneration.Get(genParams.GridGeneration, genParams.GenStartButton, genParams.GenStopButton);
+            MessageBox.Show("Для этого места нет подходящих слов. Генерация остановлена.");
             App.GameState.Stop = true;
         }
     }

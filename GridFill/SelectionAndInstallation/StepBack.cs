@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using Crossword.Objects;
 
@@ -7,7 +8,7 @@ namespace Crossword.GridFill.SelectionAndInstallation;
 
 public class StepBack
 {
-    public static async Task Get(Word newWord, GenerationParameters genParams)
+    public static async Task Get(Word newWord)
     {
         var rnd = new Random();
         for (var i = 0; i < newWord.ConnectionWords.Count; i++)
@@ -23,14 +24,13 @@ public class StepBack
             if (word is { Full: true, Fix: false })
             {
                 ClearConnectionLabel.Get(word);
-
                 if (!InsertWordGrid.Get(newWord))
                 {
-                    if (genParams.Visualization.IsChecked == true)
+                    if (App.GameState.IsVisualizationEnabled)
                     {
-                        TestWordStart.Get(newWord, Brushes.Green);
+                        Application.Current.Dispatcher.Invoke(() => TestWordStart.Get(newWord, Brushes.Green));
                         await Task.Delay(App.GameState.TaskDelay);
-                        TestWordEnd.Get(newWord);
+                        Application.Current.Dispatcher.Invoke(() => TestWordEnd.Get(newWord));
                     }
 
                     break;

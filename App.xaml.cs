@@ -1,12 +1,11 @@
 ﻿using System.Windows;
 
-namespace Crossword
+namespace Crossword;
+
+/// <summary>
+/// Interaction logic for App.xaml
+/// </summary>
+public partial class App : Application
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
-    {
-        public static CrosswordState GameState { get; } = new();
-    }
+    public static CrosswordState GameState { get; } = new();
 }

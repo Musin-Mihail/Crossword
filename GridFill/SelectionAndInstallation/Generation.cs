@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 
 namespace Crossword.GridFill.SelectionAndInstallation;
 
 public class Generation
 {
-    public static async Task Get(GenerationParameters genParams)
+    public static async Task Get()
     {
-        StartGeneration.Get(genParams.GridGeneration, genParams.GenStartButton, genParams.GenStopButton);
         var maxIndex = 0;
         var startDate = DateTime.Now;
         var date = DateTime.Now;
@@ -28,7 +28,7 @@ public class Generation
             {
                 date = DateTime.Now;
                 maxIndex = App.GameState.Index;
-                genParams.WindowsTextTop.Content = "Подобрано " + App.GameState.Index + " из " + App.GameState.ListWordsGrid.Count;
+                App.GameState.StatusMessage = "Подобрано " + App.GameState.Index + " из " + App.GameState.ListWordsGrid.Count;
                 await Task.Delay(1);
             }
 
@@ -47,32 +47,30 @@ public class Generation
 
             if (!InsertWordGrid.Get(newWord))
             {
-                if (genParams.Visualization.IsChecked == true)
+                if (App.GameState.IsVisualizationEnabled)
                 {
-                    TestWordStart.Get(newWord, Brushes.Green);
+                    Application.Current.Dispatcher.Invoke(() => TestWordStart.Get(newWord, Brushes.Green));
                     await Task.Delay(App.GameState.TaskDelay);
-                    TestWordEnd.Get(newWord);
+                    Application.Current.Dispatcher.Invoke(() => TestWordEnd.Get(newWord));
                 }
 
                 App.GameState.Index++;
                 continue;
             }
 
-            if (genParams.Visualization.IsChecked == true)
+            if (App.GameState.IsVisualizationEnabled)
             {
-                TestWordStart.Get(newWord, Brushes.Red);
+                Application.Current.Dispatcher.Invoke(() => TestWordStart.Get(newWord, Brushes.Red));
                 await Task.Delay(App.GameState.TaskDelay);
-                TestWordEnd.Get(newWord);
+                Application.Current.Dispatcher.Invoke(() => TestWordEnd.Get(newWord));
             }
 
-            await StepBack.Get(newWord, genParams);
+            await StepBack.Get(newWord);
         }
 
         if (App.GameState.Index >= App.GameState.ListWordsGrid.Count)
         {
-            Success.Get(startDate, genParams.WindowsTextTop);
+            Success.Get(startDate);
         }
-
-        StopGeneration.Get(genParams.GridGeneration, genParams.GenStartButton, genParams.GenStopButton);
     }
 }

@@ -1,29 +1,30 @@
 ﻿using System.Windows;
 using Crossword.FormationOfAQueue;
 using Crossword.GridFill;
-using Crossword.PlayingField;
 
 namespace Crossword.Main;
 
 public class GridFill
 {
-    public static void Get(GenerationParameters genParams)
+    public static void Get(string maxSeconds, string taskDelay)
     {
-        SearchForEmptyCells.Get();
         if (App.GameState.ListEmptyCellStruct.Count > 0)
         {
-            FormationQueue.Get(genParams);
+            FormationQueue.Get();
             try
             {
-                App.GameState.MaxSeconds = int.Parse(genParams.MaxSeconds);
-                App.GameState.TaskDelay = int.Parse(genParams.TaskDelay);
+                App.GameState.MaxSeconds = int.Parse(maxSeconds);
+                App.GameState.TaskDelay = int.Parse(taskDelay);
             }
             catch
             {
                 MessageBox.Show("ОШИБКА. Водите только цифры");
+                App.GameState.Stop = true;
+                App.GameState.IsGenerating = false;
             }
 
-            SelectionAndInstallationOfWords.Get(genParams);
+            if (!App.GameState.Stop)
+                SelectionAndInstallationOfWords.Get();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Crossword.Objects;
+﻿using System.Windows;
+using Crossword.Objects;
 using Crossword.Words;
 
 namespace Crossword.GridFill;
@@ -10,18 +11,20 @@ public class SearchWord
         if (word.ListLabel.Count > 1)
         {
             var gridWord = "";
-            foreach (var label in word.ListLabel)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                if (label.Content != null)
+                foreach (var label in word.ListLabel)
                 {
-                    gridWord += label.Content;
+                    if (label.Content != null)
+                    {
+                        gridWord += label.Content;
+                    }
+                    else
+                    {
+                        gridWord += '*';
+                    }
                 }
-                else
-                {
-                    gridWord += '*';
-                }
-            }
-
+            });
             ListWordsRandomization.Get(word);
             foreach (var dictionary in word.FullDictionaries)
             {

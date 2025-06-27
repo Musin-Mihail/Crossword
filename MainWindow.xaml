@@ -9,22 +9,25 @@
         Top="0"
         Left="0"
         FontFamily="Arial">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
+
     <ScrollViewer>
-        <Grid>
+        <Grid IsEnabled="{Binding IsUiEnabled}">
             <Line x:Name="LineCenterH" X1="500" Y1="0" X2="500" Y2="1000" Stroke="Green" StrokeThickness="4" Visibility="Hidden" />
             <Line x:Name="LineCenterV" X1="0" Y1="500" X2="1000" Y2="500" Stroke="Green" StrokeThickness="4" Visibility="Hidden" />
-            <Line X1="500" Y1="0" X2="500" Y2="1000" Stroke="Green" StrokeThickness="4" Visibility="Hidden" />
             <Button Content="Изменить поле" Click="Button_ChangeFill" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,10,0,0" />
             <Canvas Margin="0,-100,0,0">
-                <Label x:Name="DifficultyLevel" Content="Сложность" HorizontalAlignment="Left" Margin="1000,190,0,0" VerticalAlignment="Top" Width="276" FontSize="20" />
-                <Label x:Name="WindowsTextTop" Content="Слова" HorizontalAlignment="Left" Margin="1000,230,0,0" VerticalAlignment="Top" Width="276" FontSize="20" />
+                <Label x:Name="DifficultyLevel" Content="{Binding Difficulty}" HorizontalAlignment="Left" Margin="1000,190,0,0" VerticalAlignment="Top" Width="276" FontSize="20" />
+                <Label x:Name="WindowsTextTop" Content="{Binding StatusMessage}" HorizontalAlignment="Left" Margin="1000,230,0,0" VerticalAlignment="Top" Width="276" FontSize="20" />
                 <Label Content="Количество секунд на одно слово" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" FontSize="18" Margin="978,279,0,0" />
-                <TextBox x:Name="MaxSeconds" TextWrapping="Wrap" Text="2" Height="50" Width="120" Margin="1007,330,0,0" FontSize="36" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
-                <CheckBox x:Name="Visualization" Content="Визуализация" HorizontalAlignment="Left" Margin="1042,399,0,0" VerticalAlignment="Top" IsChecked="False" />
+                <TextBox x:Name="MaxSeconds" Text="{Binding MaxSecondsText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Height="50" Width="120" Margin="1007,330,0,0" FontSize="36" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
+                <CheckBox x:Name="Visualization" Content="Визуализация" IsChecked="{Binding IsVisualizationChecked, Mode=TwoWay}" HorizontalAlignment="Left" Margin="1042,399,0,0" VerticalAlignment="Top" />
                 <Label Content="Задержка" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" FontSize="18" Margin="1165,350,0,0" />
-                <TextBox x:Name="TaskDelay" TextWrapping="Wrap" Text="100" Height="30" Width="120" Margin="1150,390,0,0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
+                <TextBox x:Name="TaskDelay" Text="{Binding TaskDelayText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Height="30" Width="120" Margin="1150,390,0,0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
                 <Button x:Name="GenButton" Content="Генерация" Click="Button_ClickGen" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,425,0,0" />
-                <Button x:Name="GenStopButton" Content="Стоп" Click="Button_ClickStop" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,425,0,0" Visibility="Hidden" />
+                <Button x:Name="GenStopButton" Content="Стоп" Click="Button_ClickStop" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,425,0,0" Visibility="{Binding IsGenerating, Converter={StaticResource BoolToVis}}" />
             </Canvas>
             <Grid Name="GridGeneration">
                 <Canvas Margin="0,0,0,0">
@@ -50,7 +53,7 @@
                         <Button Content="Сохранить сетку" Click="Button_ClickSaveGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,780,0,0" />
                         <Button Content="Загрузить сетку" Click="Button_ClickLoadGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,840,0,0" />
                         <Button Content="Скриншот" Click="Button_Screenshot" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,900,0,0" />
-                        <Label x:Name="SelectedDictionary" Content="Основной словарь" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" Height="250" Width="120" Margin="1140,710,0,0" />
+                        <Label x:Name="SelectedDictionary" Content="{Binding SelectedDictionaryInfo}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" Height="250" Width="120" Margin="1140,710,0,0" />
                     </Canvas>
                 </Canvas>
             </Grid>
