@@ -19,9 +19,9 @@ public class MainViewModel : ViewModelBase
     private readonly IDialogService _dialogService;
     private readonly IDictionaryService _dictionaryService;
     private readonly IScreenshotService _screenshotService;
+    private readonly IGridManagerService _gridManagerService;
 
-    private readonly List<Cell> _listAllCellStruct = new();
-    private readonly List<Cell> _listEmptyCellStruct = new();
+    private List<Cell> _listEmptyCellStruct = new();
     private readonly List<Dictionary> _listDictionaries = new();
     private readonly List<Word> _listWordsGrid = new();
 
@@ -30,14 +30,14 @@ public class MainViewModel : ViewModelBase
     private string _difficulty = "Сложность: -";
     private string _selectedDictionaryInfo = "Основной словарь";
 
+    private int _numberOfCellsHorizontally = 30;
+    private int _numberOfCellsVertically = 30;
+
     private bool _isVerticallyMirror;
     private bool _isHorizontallyMirror;
     private bool _isAllMirror;
     private bool _isVerticallyMirrorRevers;
     private bool _isHorizontallyMirrorRevers;
-    private bool _isClearMirror = true;
-    private int _numberOfCellsHorizontally = 30;
-    private int _numberOfCellsVertically = 30;
 
     public ICommand StartGenerationCommand { get; }
     public ICommand StopGenerationCommand { get; }
@@ -49,15 +49,17 @@ public class MainViewModel : ViewModelBase
     public ICommand ScreenshotCommand { get; }
     public ICommand ChangeFieldSizeCommand { get; }
     public ICommand CellInteractionCommand { get; }
-    public ObservableCollection<CellViewModel> Cells { get; } = new();
-    public ObservableCollection<HeaderViewModel> Headers { get; } = new();
 
-    public MainViewModel(GenerationService generationService, IDialogService dialogService, IDictionaryService dictionaryService, IScreenshotService screenshotService)
+    public ObservableCollection<CellViewModel> Cells => _gridManagerService.Cells;
+    public ObservableCollection<HeaderViewModel> Headers => _gridManagerService.Headers;
+
+    public MainViewModel(GenerationService generationService, IDialogService dialogService, IDictionaryService dictionaryService, IScreenshotService screenshotService, IGridManagerService gridManagerService)
     {
         _generationService = generationService;
         _dialogService = dialogService;
         _dictionaryService = dictionaryService;
         _screenshotService = screenshotService;
+        _gridManagerService = gridManagerService;
 
         StartGenerationCommand = new RelayCommand(async _ => await StartGenerationAsync(), _ => !IsGenerating);
         StopGenerationCommand = new RelayCommand(_ => StopGeneration(), _ => IsGenerating);
@@ -77,8 +79,14 @@ public class MainViewModel : ViewModelBase
         _generationService.SetWordRequestHandler += OnSetWordRequest;
         _generationService.ClearWordRequestHandler += OnClearWordRequest;
 
-        CreatePlayingField();
+        _gridManagerService.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(IGridManagerService.FieldWidth)) OnPropertyChanged(nameof(FieldWidth));
+            if (e.PropertyName == nameof(IGridManagerService.FieldHeight)) OnPropertyChanged(nameof(FieldHeight));
+        };
+
         ResetDictionaries();
+        UpdateMirrorLines();
     }
 
     #region Service Event Handlers
@@ -101,13 +109,7 @@ public class MainViewModel : ViewModelBase
 
     private void OnClearGridVisualization()
     {
-        Application.Current.Dispatcher.Invoke(() =>
-        {
-            foreach (var cellVm in Cells)
-            {
-                cellVm.Content = null;
-            }
-        });
+        Application.Current.Dispatcher.Invoke(() => { _gridManagerService.ClearAllCellsContent(); });
     }
 
     private async Task OnVisualizeWordPlacementAsync(Word word, Brush color)
@@ -117,7 +119,7 @@ public class MainViewModel : ViewModelBase
             var vmsToAnimate = new List<CellViewModel>();
             foreach (var cell in word.Cells)
             {
-                var cellVm = FindCellVm(cell.X, cell.Y);
+                var cellVm = _gridManagerService.FindCellVm(cell.X, cell.Y);
                 if (cellVm != null)
                 {
                     vmsToAnimate.Add(cellVm);
@@ -151,7 +153,7 @@ public class MainViewModel : ViewModelBase
             var pattern = "";
             foreach (var cell in word.Cells)
             {
-                var cellVm = FindCellVm(cell.X, cell.Y);
+                var cellVm = _gridManagerService.FindCellVm(cell.X, cell.Y);
                 pattern += cellVm?.Content ?? "*";
             }
 
@@ -167,7 +169,7 @@ public class MainViewModel : ViewModelBase
             {
                 var cell = word.Cells[i];
                 cell.Content = answer[i].ToString();
-                var cellVm = FindCellVm(cell.X, cell.Y);
+                var cellVm = _gridManagerService.FindCellVm(cell.X, cell.Y);
                 if (cellVm != null)
                 {
                     cellVm.Content = cell.Content;
@@ -189,7 +191,7 @@ public class MainViewModel : ViewModelBase
                 if (!isIntersection)
                 {
                     cell.Content = null;
-                    var cellVm = FindCellVm(cell.X, cell.Y);
+                    var cellVm = _gridManagerService.FindCellVm(cell.X, cell.Y);
                     if (cellVm != null)
                     {
                         cellVm.Content = null;
@@ -198,8 +200,6 @@ public class MainViewModel : ViewModelBase
             }
         });
     }
-
-    private CellViewModel? FindCellVm(int x, int y) => Cells.FirstOrDefault(c => c.X == x && c.Y == y);
 
     #endregion
 
@@ -233,8 +233,9 @@ public class MainViewModel : ViewModelBase
     }
 
     public bool IsUiEnabled => !IsGenerating;
-    public int FieldWidth => (_numberOfCellsHorizontally + 1) * CellViewModel.CellSize;
-    public int FieldHeight => (_numberOfCellsVertically + 1) * CellViewModel.CellSize;
+
+    public int FieldWidth => _gridManagerService.FieldWidth;
+    public int FieldHeight => _gridManagerService.FieldHeight;
 
     public string Difficulty
     {
@@ -251,12 +252,6 @@ public class MainViewModel : ViewModelBase
     public string MaxSecondsText { get; set; } = "2";
     public string TaskDelayText { get; set; } = "100";
     public bool IsVisualizationChecked { get; set; }
-
-    public bool IsClearMirror
-    {
-        get => _isClearMirror;
-        set => SetProperty(ref _isClearMirror, value);
-    }
 
     public bool IsVerticallyMirror
     {
@@ -297,165 +292,31 @@ public class MainViewModel : ViewModelBase
 
     #endregion
 
-    #region Grid Creation and Interaction Logic
-
-    private void CreatePlayingField()
-    {
-        Cells.Clear();
-        Headers.Clear();
-        _listAllCellStruct.Clear();
-
-        for (var y = 1; y <= _numberOfCellsVertically; y++)
-        {
-            for (var x = 1; x <= _numberOfCellsHorizontally; x++)
-            {
-                var cellVm = new CellViewModel { X = x, Y = y };
-                Cells.Add(cellVm);
-                _listAllCellStruct.Add(new Cell(x, y));
-            }
-        }
-
-        for (var y = 0; y <= _numberOfCellsVertically; y++)
-        {
-            Headers.Add(new HeaderViewModel { Content = y == 0 ? "" : y.ToString(), X = 0, Y = y });
-        }
-
-        for (var x = 1; x <= _numberOfCellsHorizontally; x++)
-        {
-            Headers.Add(new HeaderViewModel { Content = x.ToString(), X = x, Y = 0 });
-        }
-
-        OnPropertyChanged(nameof(FieldWidth));
-        OnPropertyChanged(nameof(FieldHeight));
-        OnPropertyChanged(nameof(LineCenterH_X));
-        OnPropertyChanged(nameof(LineCenterH_Y2));
-        OnPropertyChanged(nameof(LineCenterV_Y));
-        OnPropertyChanged(nameof(LineCenterV_X2));
-    }
+    #region Grid Interaction Logic
 
     private void HandleCellInteraction(object? param)
     {
         if (param is not CellViewModel cellVm) return;
-        var newColor = (Mouse.LeftButton, Mouse.RightButton) switch
-        {
-            (MouseButtonState.Pressed, _) => Brushes.Transparent,
-            (_, MouseButtonState.Pressed) => Brushes.Black,
-            _ => cellVm.Background
-        };
-        if (newColor == cellVm.Background) return;
 
-        if (IsVerticallyMirror) ColoringHorizontal(cellVm, newColor);
-        else if (IsHorizontallyMirror) ColoringVertical(cellVm, newColor);
-        else if (IsAllMirror) ColoringAll(cellVm, newColor);
-        else if (IsVerticallyMirrorRevers) ColoringHorizontalRevers(cellVm, newColor);
-        else if (IsHorizontallyMirrorRevers) ColoringVerticalRevers(cellVm, newColor);
-        else cellVm.Background = newColor;
-    }
-
-    private void ColoringCell(int x, int y, Brush color)
-    {
-        var cellToColor = Cells.FirstOrDefault(c => c.X == x && c.Y == y);
-        if (cellToColor != null)
-        {
-            cellToColor.Background = color;
-        }
-    }
-
-    private void ColoringVertical(CellViewModel cell, Brush c)
-    {
-        var center = _numberOfCellsHorizontally / 2;
-        if (cell.X <= center)
-        {
-            cell.Background = c;
-            var mX = _numberOfCellsHorizontally - cell.X + 1;
-            ColoringCell(mX, cell.Y, c);
-        }
-
-        if (_numberOfCellsHorizontally % 2 != 0 && cell.X == center + 1) cell.Background = c;
-    }
-
-    private void ColoringHorizontal(CellViewModel cell, Brush c)
-    {
-        var center = _numberOfCellsVertically / 2;
-        if (cell.Y <= center)
-        {
-            cell.Background = c;
-            var mY = _numberOfCellsVertically - cell.Y + 1;
-            ColoringCell(cell.X, mY, c);
-        }
-
-        if (_numberOfCellsVertically % 2 != 0 && cell.Y == center + 1) cell.Background = c;
-    }
-
-    private void ColoringVerticalRevers(CellViewModel cell, Brush c)
-    {
-        var center = _numberOfCellsHorizontally / 2;
-        if (cell.X <= center)
-        {
-            cell.Background = c;
-            var mX = _numberOfCellsHorizontally - cell.X + 1;
-            var mY = _numberOfCellsVertically - cell.Y + 1;
-            ColoringCell(mX, mY, c);
-        }
-
-        if (_numberOfCellsHorizontally % 2 != 0 && cell.X == center + 1) cell.Background = c;
-    }
-
-    private void ColoringHorizontalRevers(CellViewModel cell, Brush c)
-    {
-        var center = _numberOfCellsVertically / 2;
-        if (cell.Y <= center)
-        {
-            cell.Background = c;
-            var mX = _numberOfCellsHorizontally - cell.X + 1;
-            var mY = _numberOfCellsVertically - cell.Y + 1;
-            ColoringCell(mX, mY, c);
-        }
-
-        if (_numberOfCellsVertically % 2 != 0 && cell.Y == center + 1) cell.Background = c;
-    }
-
-    private void ColoringAll(CellViewModel cell, Brush c)
-    {
-        var cH = _numberOfCellsHorizontally / 2;
-        var cV = _numberOfCellsVertically / 2;
-        if (cell.X <= cH && cell.Y <= cV)
-        {
-            cell.Background = c;
-            var mX = _numberOfCellsHorizontally - cell.X + 1;
-            var mY = _numberOfCellsVertically - cell.Y + 1;
-            ColoringCell(mX, cell.Y, c);
-            ColoringCell(cell.X, mY, c);
-            ColoringCell(mX, mY, c);
-        }
-
-        if (_numberOfCellsHorizontally % 2 != 0 && cell.X == cH + 1 && cell.Y <= cV)
-        {
-            cell.Background = c;
-            var mY = _numberOfCellsVertically - cell.Y + 1;
-            ColoringCell(cell.X, mY, c);
-        }
-
-        if (_numberOfCellsVertically % 2 != 0 && cell.X <= cH && cell.Y == cV + 1)
-        {
-            cell.Background = c;
-            var mX = _numberOfCellsHorizontally - cell.X + 1;
-            ColoringCell(mX, cell.Y, c);
-        }
-
-        if (_numberOfCellsHorizontally % 2 != 0 && _numberOfCellsVertically % 2 != 0 && cell.X == cH + 1 && cell.Y == cV + 1) cell.Background = c;
+        _gridManagerService.SetMirrorModes(IsVerticallyMirror, IsHorizontallyMirror, IsAllMirror, IsVerticallyMirrorRevers, IsHorizontallyMirrorRevers);
+        _gridManagerService.HandleCellInteraction(cellVm);
     }
 
     private void ChangeFieldSize()
     {
         _dialogService.ShowChangeFillDialog(ref _numberOfCellsHorizontally, ref _numberOfCellsVertically);
-        CreatePlayingField();
+        _gridManagerService.InitializeGrid(_numberOfCellsHorizontally, _numberOfCellsVertically);
+        UpdateMirrorLines(); // Обновляем вспомогательные линии
     }
 
     private void UpdateMirrorLines()
     {
         OnPropertyChanged(nameof(LineCenterVVisibility));
         OnPropertyChanged(nameof(LineCenterHVisibility));
+        OnPropertyChanged(nameof(LineCenterH_X));
+        OnPropertyChanged(nameof(LineCenterH_Y2));
+        OnPropertyChanged(nameof(LineCenterV_Y));
+        OnPropertyChanged(nameof(LineCenterV_X2));
     }
 
     protected override void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -481,12 +342,7 @@ public class MainViewModel : ViewModelBase
             return;
         }
 
-        _listEmptyCellStruct.Clear();
-        foreach (var cellVm in Cells.Where(c => c.Background == Brushes.Transparent))
-        {
-            var cellModel = _listAllCellStruct.First(c => c.X == cellVm.X && c.Y == cellVm.Y);
-            _listEmptyCellStruct.Add(cellModel);
-        }
+        _listEmptyCellStruct = _gridManagerService.GetEmptyCells();
 
         if (_listEmptyCellStruct.Count == 0)
         {
@@ -515,15 +371,9 @@ public class MainViewModel : ViewModelBase
 
     private void SaveGrid()
     {
-        _listEmptyCellStruct.Clear();
-        foreach (var cellVm in Cells.Where(c => c.Background == Brushes.Transparent))
-        {
-            var cellModel = _listAllCellStruct.First(c => c.X == cellVm.X && c.Y == cellVm.Y);
-            _listEmptyCellStruct.Add(cellModel);
-        }
-
+        var listEmptyCellStruct = _gridManagerService.GetEmptyCells();
         var saveFile = "";
-        foreach (var cell in _listEmptyCellStruct)
+        foreach (var cell in listEmptyCellStruct)
         {
             saveFile += $"{cell.X};{cell.Y}\n";
         }
@@ -545,32 +395,7 @@ public class MainViewModel : ViewModelBase
     {
         if (_dialogService.ShowLoadGridDialog(out var listEmptyCellStruct) == true && listEmptyCellStruct.Any())
         {
-            foreach (var cellVm in Cells)
-            {
-                cellVm.Background = Brushes.Black;
-                cellVm.Content = null;
-            }
-
-            _listEmptyCellStruct.Clear();
-
-            foreach (var item in listEmptyCellStruct)
-            {
-                var strings = item.Split(';');
-                if (strings.Length == 2 && int.TryParse(strings[0], out var x) && int.TryParse(strings[1], out var y))
-                {
-                    var cellVm = Cells.FirstOrDefault(c => c.X == x && c.Y == y);
-                    if (cellVm != null)
-                    {
-                        cellVm.Background = Brushes.Transparent;
-                    }
-
-                    var cellModel = _listAllCellStruct.FirstOrDefault(c => c.X == x && c.Y == y);
-                    if (cellModel != null)
-                    {
-                        _listEmptyCellStruct.Add(cellModel);
-                    }
-                }
-            }
+            _listEmptyCellStruct = _gridManagerService.LoadGridFromStruct(listEmptyCellStruct);
         }
     }
 

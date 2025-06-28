@@ -29,6 +29,7 @@ public partial class App : Application
         services.AddTransient<GenerationService>();
         services.AddTransient<IDictionaryService, DictionaryService>();
         services.AddTransient<IScreenshotService, ScreenshotService>();
+        services.AddSingleton<IGridManagerService, GridManagerService>();
         services.AddSingleton<MainWindow>();
         services.AddTransient<MainViewModel>();
         services.AddTransient<ChangeFillViewModel>();
