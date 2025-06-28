@@ -27,8 +27,14 @@ public partial class App : Application
     {
         services.AddSingleton<IDialogService, DialogService>();
         services.AddTransient<GenerationService>();
-        services.AddTransient<MainViewModel>();
+
         services.AddSingleton<MainWindow>();
+        services.AddTransient<MainViewModel>();
+
+        services.AddTransient<ChangeFillViewModel>();
+        services.AddTransient<DictionariesSelectionViewModel>();
+        services.AddTransient<LoadGridViewModel>();
+        services.AddTransient<RequiredDictionaryViewModel>();
     }
 
     protected override void OnStartup(StartupEventArgs e)

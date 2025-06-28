@@ -1,30 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows;
 using Crossword.Objects;
+using Crossword.ViewModel;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Crossword.Services;
 
 public class DialogService : IDialogService
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public DialogService(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+    }
+
     public bool? ShowChangeFillDialog(ref int horizontal, ref int vertical)
     {
-        var dialog = new ChangeFill();
+        var viewModel = _serviceProvider.GetRequiredService<ChangeFillViewModel>();
+        viewModel.Horizontal = horizontal.ToString();
+        viewModel.Vertical = vertical.ToString();
+        var dialog = new ChangeFill(viewModel);
         var result = dialog.ShowDialog();
-        if (dialog.Ready)
+        if (result == true)
         {
-            horizontal = dialog.NumberOfCellsHorizontally;
-            vertical = dialog.NumberOfCellsVertically;
+            horizontal = viewModel.ResultHorizontal;
+            vertical = viewModel.ResultVertical;
         }
-
         return result;
     }
 
     public bool? ShowLoadGridDialog(out string[] listEmptyCellStruct)
     {
-        var dialog = new LoadGrid();
+        var viewModel = _serviceProvider.GetRequiredService<LoadGridViewModel>();
+        var dialog = new LoadGrid(viewModel);
         var result = dialog.ShowDialog();
-        listEmptyCellStruct = dialog.Ready ? dialog.ListEmptyCellStruct : Array.Empty<string>();
+        listEmptyCellStruct = result == true ? viewModel.SelectedGridContent : Array.Empty<string>();
         return result;
     }
 
@@ -38,11 +49,14 @@ public class DialogService : IDialogService
 
     public void ShowRequiredDictionaryDialog(List<Dictionary> availableDictionaries)
     {
-        new RequiredDictionary(availableDictionaries).ShowDialog();
+        var viewModel = _serviceProvider.GetRequiredService<RequiredDictionaryViewModel>();
+        viewModel.Initialize(availableDictionaries);
+        var dialog = new RequiredDictionary(viewModel);
+        dialog.ShowDialog();
     }
 
     public void ShowMessage(string message)
     {
-        MessageBox.Show(message);
+        System.Windows.MessageBox.Show(message);
     }
 }

@@ -3,12 +3,29 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:viewModel="clr-namespace:Crossword.ViewModel"
         mc:Ignorable="d"
-        Title="RequiredDictionary" Height="450" Width="450"
-        WindowStartupLocation="CenterScreen">
+        Title="Обязательные слова" Height="450" Width="450"
+        WindowStartupLocation="CenterScreen"
+        d:DataContext="{d:DesignInstance viewModel:RequiredDictionaryViewModel}">
     <Grid>
         <Label Content="Введите слова через пробел" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="20" Height="40" Margin="0,0,0,0" />
-        <TextBox Name="Words" TextWrapping="Wrap" Text="" Width="400" Margin="0,50,0,0" VerticalContentAlignment="Center" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top" TextAlignment="Center" />
-        <Button Content="Сформировать словарь" Click="ButtonBase_Create" HorizontalAlignment="Center" VerticalAlignment="Bottom" Height="50" Width="150" Margin="0,0,0,10" />
+        <TextBox Text="{Binding WordsText, UpdateSourceTrigger=PropertyChanged}"
+                 TextWrapping="Wrap"
+                 Width="400"
+                 Height="300"
+                 Margin="0,50,0,0"
+                 FontSize="20"
+                 AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Auto"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Top" />
+        <Button Content="Сформировать словарь"
+                Command="{Binding CreateDictionaryCommand}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Height="50"
+                Width="150"
+                Margin="0,0,0,10" />
     </Grid>
 </Window>

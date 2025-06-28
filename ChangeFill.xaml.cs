@@ -1,41 +1,18 @@
 ﻿using System.Windows;
+using Crossword.ViewModel;
 
 namespace Crossword;
 
 public partial class ChangeFill : Window
 {
-    public bool Ready;
-    public int NumberOfCellsHorizontally = 30;
-    public int NumberOfCellsVertically = 30;
-
-    public ChangeFill()
+    public ChangeFill(ChangeFillViewModel viewModel)
     {
         InitializeComponent();
-    }
-
-    private void Button_ClickGen(object sender, RoutedEventArgs e)
-    {
-        var height = int.Parse(Horizontally.Text);
-        var width = int.Parse(Vertically.Text);
-        if (height > 30)
+        DataContext = viewModel;
+        viewModel.CloseRequested += (sender, result) =>
         {
-            NumberOfCellsHorizontally = 30;
-        }
-        else
-        {
-            NumberOfCellsHorizontally = height;
-        }
-
-        if (width > 30)
-        {
-            NumberOfCellsVertically = 30;
-        }
-        else
-        {
-            NumberOfCellsVertically = width;
-        }
-
-        Ready = true;
-        DialogResult = true;
+            DialogResult = result;
+            Close();
+        };
     }
 }
