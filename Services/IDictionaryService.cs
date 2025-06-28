@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using Crossword.Objects;
 
-namespace Crossword.Services
+namespace Crossword.Services;
+
+public interface IDictionaryService
 {
-    public interface IDictionaryService
-    {
-        IEnumerable<string> GetDictionaryPaths();
-        Dictionary LoadDictionary(string path);
-    }
+    IEnumerable<string> GetDictionaryPaths();
+    Dictionary LoadDictionary(string path);
 }

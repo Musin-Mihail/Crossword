@@ -19,9 +19,9 @@ public partial class MainWindow : Window
         {
             if (element.DataContext is CellViewModel cellVm)
             {
-                if (vm.CellInteractionCommand.CanExecute(cellVm))
+                if (vm.GridControls.CellInteractionCommand.CanExecute(cellVm))
                 {
-                    vm.CellInteractionCommand.Execute(cellVm);
+                    vm.GridControls.CellInteractionCommand.Execute(cellVm);
                 }
             }
         }

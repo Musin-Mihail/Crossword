@@ -3,45 +3,44 @@ using System.IO;
 using System.Linq;
 using Crossword.Objects;
 
-namespace Crossword.Services
+namespace Crossword.Services;
+
+public class DictionaryService : IDictionaryService
 {
-    public class DictionaryService : IDictionaryService
+    private const string DictionariesFolder = "Dictionaries";
+
+    public IEnumerable<string> GetDictionaryPaths()
     {
-        private const string DictionariesFolder = "Dictionaries";
-
-        public IEnumerable<string> GetDictionaryPaths()
+        if (!Directory.Exists(DictionariesFolder))
         {
-            if (!Directory.Exists(DictionariesFolder))
-            {
-                Directory.CreateDirectory(DictionariesFolder);
-                return Enumerable.Empty<string>();
-            }
-
-            return Directory.GetFiles(DictionariesFolder, "*.txt");
+            Directory.CreateDirectory(DictionariesFolder);
+            return Enumerable.Empty<string>();
         }
 
-        public Dictionary LoadDictionary(string path)
+        return Directory.GetFiles(DictionariesFolder, "*.txt");
+    }
+
+    public Dictionary LoadDictionary(string path)
+    {
+        var listWordsString = File.ReadAllLines(path);
+        var dictionary = new Dictionary();
+        foreach (var word in listWordsString)
         {
-            var listWordsString = File.ReadAllLines(path);
-            var dictionary = new Dictionary();
-            foreach (var word in listWordsString)
+            var answerAndDefinition = word.Split(';').ToList();
+            if (answerAndDefinition.Count == 0) continue;
+
+            var dictionaryWord = new DictionaryWord
             {
-                var answerAndDefinition = word.Split(';').ToList();
-                if (answerAndDefinition.Count == 0) continue;
-
-                var dictionaryWord = new DictionaryWord
-                {
-                    Answers = answerAndDefinition[0]
-                };
-                for (var i = 1; i < answerAndDefinition.Count; i++)
-                {
-                    dictionaryWord.Definitions.Add(answerAndDefinition[i]);
-                }
-
-                dictionary.Words.Add(dictionaryWord);
+                Answers = answerAndDefinition[0]
+            };
+            for (var i = 1; i < answerAndDefinition.Count; i++)
+            {
+                dictionaryWord.Definitions.Add(answerAndDefinition[i]);
             }
 
-            return dictionary;
+            dictionary.Words.Add(dictionaryWord);
         }
+
+        return dictionary;
     }
 }
