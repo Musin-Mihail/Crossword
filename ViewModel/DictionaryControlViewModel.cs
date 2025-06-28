@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
-using Crossword.Objects;
 using Crossword.Services;
 
 namespace Crossword.ViewModel;
@@ -11,17 +10,18 @@ public class DictionaryControlViewModel : ViewModelBase
 {
     private readonly IDialogService _dialogService;
     private readonly IDictionaryService _dictionaryService;
-    private readonly List<Dictionary> _listDictionaries;
+    private readonly ICrosswordStateService _crosswordStateService;
     private string _selectedDictionaryInfo = "Основной словарь";
     public ICommand ResetDictionariesCommand { get; }
     public ICommand SelectDictionariesCommand { get; }
     public ICommand CreateRequiredDictionaryCommand { get; }
 
-    public DictionaryControlViewModel(IDialogService dialogService, IDictionaryService dictionaryService, List<Dictionary> listDictionaries)
+    public DictionaryControlViewModel(IDialogService dialogService, IDictionaryService dictionaryService, ICrosswordStateService crosswordStateService)
     {
         _dialogService = dialogService;
         _dictionaryService = dictionaryService;
-        _listDictionaries = listDictionaries;
+        _crosswordStateService = crosswordStateService;
+
         ResetDictionariesCommand = new RelayCommand(_ => ResetDictionaries());
         SelectDictionariesCommand = new RelayCommand(_ => SelectDictionaries());
         CreateRequiredDictionaryCommand = new RelayCommand(_ => CreateRequiredDictionary());
@@ -36,11 +36,11 @@ public class DictionaryControlViewModel : ViewModelBase
 
     private void ResetDictionaries()
     {
-        _listDictionaries.Clear();
+        _crosswordStateService.Dictionaries.Clear();
         var commonDictionary = _dictionaryService.LoadDictionary("dict.txt");
         commonDictionary.Name = "Общий";
         commonDictionary.MaxCount = commonDictionary.Words.Count;
-        _listDictionaries.Add(commonDictionary);
+        _crosswordStateService.Dictionaries.Add(commonDictionary);
         SelectedDictionaryInfo = "Основной словарь";
     }
 
@@ -48,7 +48,7 @@ public class DictionaryControlViewModel : ViewModelBase
     {
         if (_dialogService.ShowDictionariesSelectionDialog(out var selectedDictionaries) == true && selectedDictionaries.Any())
         {
-            _listDictionaries.Clear();
+            _crosswordStateService.Dictionaries.Clear();
             var message = "Выбранные словари:\n";
             var dictionariesPaths = _dictionaryService.GetDictionaryPaths().ToList();
             foreach (var selectedDict in selectedDictionaries)
@@ -61,14 +61,14 @@ public class DictionaryControlViewModel : ViewModelBase
                     var dictionary = _dictionaryService.LoadDictionary(path);
                     dictionary.Name = list[0];
                     dictionary.MaxCount = int.Parse(list[1]);
-                    _listDictionaries.Add(dictionary);
+                    _crosswordStateService.Dictionaries.Add(dictionary);
                 }
             }
 
             var commonDictionary = _dictionaryService.LoadDictionary("dict.txt");
             commonDictionary.Name = "Общий";
             commonDictionary.MaxCount = commonDictionary.Words.Count;
-            _listDictionaries.Add(commonDictionary);
+            _crosswordStateService.Dictionaries.Add(commonDictionary);
             _dialogService.ShowMessage(message);
             SelectedDictionaryInfo = message;
         }
@@ -76,6 +76,6 @@ public class DictionaryControlViewModel : ViewModelBase
 
     private void CreateRequiredDictionary()
     {
-        _dialogService.ShowRequiredDictionaryDialog(_listDictionaries);
+        _dialogService.ShowRequiredDictionaryDialog(_crosswordStateService.Dictionaries);
     }
 }

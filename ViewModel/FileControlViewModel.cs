@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Media;
-using Crossword.Objects;
 using Crossword.Services;
 
 namespace Crossword.ViewModel;
@@ -14,9 +12,7 @@ public class FileControlViewModel : ViewModelBase
     private readonly IDialogService _dialogService;
     private readonly IScreenshotService _screenshotService;
     private readonly IGridManagerService _gridManagerService;
-    private readonly List<Word> _listWordsGrid;
-    private readonly List<Dictionary> _listDictionaries;
-    private readonly List<Cell> _listEmptyCellStruct;
+    private readonly ICrosswordStateService _crosswordStateService;
     public ICommand SaveGridCommand { get; }
     public ICommand LoadGridCommand { get; }
     public ICommand ScreenshotCommand { get; }
@@ -25,16 +21,12 @@ public class FileControlViewModel : ViewModelBase
         IDialogService dialogService,
         IScreenshotService screenshotService,
         IGridManagerService gridManagerService,
-        List<Word> listWordsGrid,
-        List<Dictionary> listDictionaries,
-        List<Cell> listEmptyCellStruct)
+        ICrosswordStateService crosswordStateService)
     {
         _dialogService = dialogService;
         _screenshotService = screenshotService;
         _gridManagerService = gridManagerService;
-        _listWordsGrid = listWordsGrid;
-        _listDictionaries = listDictionaries;
-        _listEmptyCellStruct = listEmptyCellStruct;
+        _crosswordStateService = crosswordStateService;
         SaveGridCommand = new RelayCommand(_ => SaveGrid());
         LoadGridCommand = new RelayCommand(_ => LoadGrid());
         ScreenshotCommand = new RelayCommand(_ => Screenshot());
@@ -66,16 +58,16 @@ public class FileControlViewModel : ViewModelBase
     {
         if (_dialogService.ShowLoadGridDialog(out var listEmptyCellStruct) == true && listEmptyCellStruct.Any())
         {
-            _listEmptyCellStruct.Clear();
-            _listEmptyCellStruct.AddRange(_gridManagerService.LoadGridFromStruct(listEmptyCellStruct));
+            _crosswordStateService.EmptyCells.Clear();
+            _crosswordStateService.EmptyCells.AddRange(_gridManagerService.LoadGridFromStruct(listEmptyCellStruct));
         }
     }
 
     private void Screenshot()
     {
-        if (_listWordsGrid.Any() && _gridManagerService.Cells.Any(c => c.Background == Brushes.Transparent))
+        if (_crosswordStateService.WordsGrid.Any() && _gridManagerService.Cells.Any(c => c.Background == Brushes.Transparent))
         {
-            _screenshotService.CreateCrosswordFiles(_listWordsGrid, _listDictionaries, _gridManagerService.Cells);
+            _screenshotService.CreateCrosswordFiles(_crosswordStateService.WordsGrid, _crosswordStateService.Dictionaries, _gridManagerService.Cells);
         }
         else
         {

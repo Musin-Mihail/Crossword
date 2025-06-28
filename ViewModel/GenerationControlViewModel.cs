@@ -15,9 +15,7 @@ public class GenerationControlViewModel : ViewModelBase
     private readonly GenerationService _generationService;
     private readonly IDialogService _dialogService;
     private readonly IGridManagerService _gridManagerService;
-    private readonly List<Cell> _listEmptyCellStruct;
-    private readonly List<Dictionary> _listDictionaries;
-    private readonly List<Word> _listWordsGrid;
+    private readonly ICrosswordStateService _crosswordStateService;
     private string _statusMessage = "Готов к генерации.";
     private bool _isGenerating;
     public string MaxSecondsText { get; set; } = "2";
@@ -30,17 +28,12 @@ public class GenerationControlViewModel : ViewModelBase
         GenerationService generationService,
         IDialogService dialogService,
         IGridManagerService gridManagerService,
-        List<Cell> listEmptyCellStruct,
-        List<Dictionary> listDictionaries,
-        List<Word> listWordsGrid)
+        ICrosswordStateService crosswordStateService)
     {
         _generationService = generationService;
         _dialogService = dialogService;
         _gridManagerService = gridManagerService;
-        _listEmptyCellStruct = listEmptyCellStruct;
-        _listDictionaries = listDictionaries;
-        _listWordsGrid = listWordsGrid;
-
+        _crosswordStateService = crosswordStateService;
         StartGenerationCommand = new RelayCommand(async _ => await StartGenerationAsync(), _ => !IsGenerating);
         StopGenerationCommand = new RelayCommand(_ => StopGeneration(), _ => IsGenerating);
 
@@ -81,20 +74,20 @@ public class GenerationControlViewModel : ViewModelBase
             return;
         }
 
-        _listEmptyCellStruct.Clear();
-        _listEmptyCellStruct.AddRange(_gridManagerService.GetEmptyCells());
-        if (_listEmptyCellStruct.Count == 0)
+        _crosswordStateService.EmptyCells.Clear();
+        _crosswordStateService.EmptyCells.AddRange(_gridManagerService.GetEmptyCells());
+        if (_crosswordStateService.EmptyCells.Count == 0)
         {
             _dialogService.ShowMessage("На поле нет пустых ячеек для генерации.");
             return;
         }
 
-        _listWordsGrid.Clear();
+        _crosswordStateService.WordsGrid.Clear();
         IsGenerating = true;
         try
         {
-            var result = await _generationService.GenerateAsync(_listEmptyCellStruct, _listDictionaries, maxSeconds, IsVisualizationChecked);
-            _listWordsGrid.AddRange(result);
+            var result = await _generationService.GenerateAsync(_crosswordStateService.EmptyCells, _crosswordStateService.Dictionaries, maxSeconds, IsVisualizationChecked);
+            _crosswordStateService.WordsGrid.AddRange(result);
         }
         catch (Exception ex)
         {

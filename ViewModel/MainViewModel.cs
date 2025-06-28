@@ -1,17 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using Crossword.Objects;
 using Crossword.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Crossword.ViewModel;
 
 public class MainViewModel : ViewModelBase
 {
     private readonly IGridManagerService _gridManagerService;
-    private readonly List<Cell> _listEmptyCellStruct = new();
-    private readonly List<Dictionary> _listDictionaries = new();
-    private readonly List<Word> _listWordsGrid = new();
     private string _difficulty = "Сложность: -";
     public GenerationControlViewModel GenerationControls { get; }
     public GridControlViewModel GridControls { get; }
@@ -20,13 +16,17 @@ public class MainViewModel : ViewModelBase
     public ObservableCollection<CellViewModel> Cells => _gridManagerService.Cells;
     public ObservableCollection<HeaderViewModel> Headers => _gridManagerService.Headers;
 
-    public MainViewModel(GenerationService generationService, IDialogService dialogService, IDictionaryService dictionaryService, IScreenshotService screenshotService, IGridManagerService gridManagerService)
+    public MainViewModel(IDialogService dialogService, IGridManagerService gridManagerService, IServiceScopeFactory scopeFactory)
     {
         _gridManagerService = gridManagerService;
-        GenerationControls = new GenerationControlViewModel(generationService, dialogService, gridManagerService, _listEmptyCellStruct, _listDictionaries, _listWordsGrid);
-        GridControls = new GridControlViewModel(dialogService, gridManagerService, () => !GenerationControls.IsGenerating);
-        FileControls = new FileControlViewModel(dialogService, screenshotService, gridManagerService, _listWordsGrid, _listDictionaries, _listEmptyCellStruct);
-        DictionaryControls = new DictionaryControlViewModel(dialogService, dictionaryService, _listDictionaries);
+        using (var scope = scopeFactory.CreateScope())
+        {
+            GenerationControls = scope.ServiceProvider.GetRequiredService<GenerationControlViewModel>();
+            GridControls = new GridControlViewModel(dialogService, gridManagerService, () => !GenerationControls.IsGenerating);
+            FileControls = scope.ServiceProvider.GetRequiredService<FileControlViewModel>();
+            DictionaryControls = scope.ServiceProvider.GetRequiredService<DictionaryControlViewModel>();
+        }
+
         GenerationControls.PropertyChanged += OnGenerationControlsPropertyChanged;
     }
 
