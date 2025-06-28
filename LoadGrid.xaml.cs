@@ -120,18 +120,12 @@ public partial class LoadGrid : Window
         return button;
     }
 
-    private void Button_Click(object sender, RoutedEventArgs e)
-    {
-        ListEmptyCellStruct = File.ReadAllLines("SaveGrid.txt");
-        DialogResult = false;
-    }
-
     private void Button_Load(object sender, RoutedEventArgs e)
     {
         var index = int.Parse(((Button)sender).Name.Remove(0, 1));
         ListEmptyCellStruct = File.ReadAllLines(_allGrid[index]);
         Ready = true;
-        DialogResult = false;
+        DialogResult = true;
     }
 
     private void Button_Delete(object sender, RoutedEventArgs e)

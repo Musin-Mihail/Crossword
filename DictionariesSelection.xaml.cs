@@ -48,6 +48,6 @@ public partial class DictionariesSelection : Window
         }
 
         Ready = true;
-        DialogResult = false;
+        DialogResult = true;
     }
 }

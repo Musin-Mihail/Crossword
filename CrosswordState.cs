@@ -5,15 +5,15 @@ namespace Crossword;
 
 public class CrosswordState
 {
-    public bool Stop = false;
-    public readonly List<Cell> ListEmptyCellStruct = new();
-    public readonly List<Cell> ListAllCellStruct = new();
-    public readonly List<Dictionary> ListDictionaries = new();
-    public readonly List<Word> ListWordsGrid = new();
-    public readonly List<string> AllInsertedWords = new();
-    public int Index = 0;
-    public int MaxSeconds = 0;
-    public int TaskDelay = 0;
+    public bool Stop { get; set; }
+    public List<Cell> ListEmptyCellStruct { get; } = new();
+    public List<Cell> ListAllCellStruct { get; } = new();
+    public List<Dictionary> ListDictionaries { get; } = new();
+    public List<Word> ListWordsGrid { get; } = new();
+    public List<string> AllInsertedWords { get; } = new();
+    public int Index { get; set; }
+    public int MaxSeconds { get; set; }
+    public int TaskDelay { get; set; }
     public bool IsGenerating { get; set; }
     public bool IsVisualizationEnabled { get; set; }
     public string StatusMessage { get; set; } = "Готов к генерации.";

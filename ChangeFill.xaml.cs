@@ -2,13 +2,13 @@
 
 namespace Crossword;
 
-public partial class сhangeFill : Window
+public partial class ChangeFill : Window
 {
     public bool Ready;
     public int NumberOfCellsHorizontally = 30;
     public int NumberOfCellsVertically = 30;
 
-    public сhangeFill()
+    public ChangeFill()
     {
         InitializeComponent();
     }
@@ -36,6 +36,6 @@ public partial class сhangeFill : Window
         }
 
         Ready = true;
-        DialogResult = false;
+        DialogResult = true;
     }
 }

@@ -4,6 +4,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using Crossword.Objects;
 using Crossword.ViewModel;
+using Point = System.Drawing.Point;
 using Brushes = System.Windows.Media.Brushes;
 
 namespace Crossword.Screenshot;
@@ -32,9 +33,7 @@ public class CreateEmptyGrid
 
         var numberedStartCells = new Dictionary<Point, int>();
         var numberCounter = 1;
-
-        Cell GetStartingCell(Word word) => !word.ListLabel.Any() ? null : gameState.ListAllCellStruct.FirstOrDefault(s => s.Label == word.ListLabel[0]);
-
+        Cell GetStartingCell(Word word) => word.Cells.FirstOrDefault();
         var orderedWords = gameState.ListWordsGrid
             .Select(w => new { WordObject = w, StartCell = GetStartingCell(w) })
             .Where(x => x.StartCell != null)
@@ -47,18 +46,11 @@ public class CreateEmptyGrid
         {
             var startingCellState = GetStartingCell(word);
             if (startingCellState == null) continue;
-
             var cellPoint = new Point(startingCellState.X, startingCellState.Y);
-            int wordNumber;
-
-            if (numberedStartCells.TryGetValue(cellPoint, out wordNumber))
-            {
-            }
-            else
+            if (!numberedStartCells.TryGetValue(cellPoint, out var wordNumber))
             {
                 wordNumber = numberCounter++;
                 numberedStartCells[cellPoint] = wordNumber;
-
                 var drawX = (startingCellState.X - topMaxX) * sizeCell;
                 var drawY = (startingCellState.Y - leftMaxY) * sizeCell;
                 graphics.DrawString(wordNumber.ToString(), font, blackBrush, drawX + 1, drawY + 1);

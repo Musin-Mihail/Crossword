@@ -1,16 +1,15 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Controls;
 
 namespace Crossword.Objects;
 
 public class Word
 {
-    public List<Label> ListLabel = new();
-    public readonly List<Label> ConnectionLabel = new();
-    public readonly List<Word> ConnectionWords = new();
-    public bool Full = false;
-    public string WordString = "";
-    public bool Right = false;
-    public readonly List<Dictionary> FullDictionaries = new();
-    public bool Fix = false;
+    public List<Cell> Cells { get; } = new();
+    public List<Cell> ConnectionCells { get; } = new();
+    public List<Word> ConnectionWords { get; } = new();
+    public bool Full { get; set; }
+    public string WordString { get; set; } = "";
+    public bool Right { get; set; }
+    public List<Dictionary> FullDictionaries { get; } = new();
+    public bool Fix { get; set; } = false;
 }

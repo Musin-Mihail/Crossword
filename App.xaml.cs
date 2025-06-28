@@ -25,6 +25,7 @@ public partial class App : Application
 
     private void ConfigureServices(IServiceCollection services)
     {
+        services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<CrosswordState>();
         services.AddTransient<GenerationService>();
         services.AddTransient<MainViewModel>();

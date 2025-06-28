@@ -11,7 +11,7 @@ public class Save
         var saveFile = "";
         foreach (var cell in gameState.ListEmptyCellStruct)
         {
-            saveFile += cell.X + ";" + cell.Y + "\n";
+            saveFile += $"{cell.X};{cell.Y}\n";
         }
 
         var name = DateTime.Now.ToString("MM_dd_yyyy-HH_mm_ss");

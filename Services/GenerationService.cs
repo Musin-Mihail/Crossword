@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Media;
 using Crossword.Objects;
 
@@ -63,28 +62,38 @@ public class GenerationService
 
     private void SaveWordRight(int x, int y)
     {
-        var newListLabel = new List<Label>();
+        var newCells = new List<Cell>();
         for (var i = x; i < 31; i++)
         {
             var cell = _state.ListEmptyCellStruct.FirstOrDefault(c => c.Y == y && c.X == i);
-            if (cell != null) newListLabel.Add(cell.Label);
+            if (cell != null) newCells.Add(cell);
             else break;
         }
 
-        if (newListLabel.Count > 1) _state.ListWordsGrid.Add(new Word { ListLabel = newListLabel, Right = true });
+        if (newCells.Count > 1)
+        {
+            var newWord = new Word { Right = true };
+            newWord.Cells.AddRange(newCells);
+            _state.ListWordsGrid.Add(newWord);
+        }
     }
 
     private void SaveWordDown(int x, int y)
     {
-        var newListLabel = new List<Label>();
+        var newCells = new List<Cell>();
         for (var i = y; i < 31; i++)
         {
             var cell = _state.ListEmptyCellStruct.FirstOrDefault(c => c.Y == i && c.X == x);
-            if (cell != null) newListLabel.Add(cell.Label);
+            if (cell != null) newCells.Add(cell);
             else break;
         }
 
-        if (newListLabel.Count > 1) _state.ListWordsGrid.Add(new Word { ListLabel = newListLabel });
+        if (newCells.Count > 1)
+        {
+            var newWord = new Word { Right = false };
+            newWord.Cells.AddRange(newCells);
+            _state.ListWordsGrid.Add(newWord);
+        }
     }
 
     private void SearchForConnectedWords()
@@ -93,14 +102,15 @@ public class GenerationService
         {
             if (_state.Stop) return;
             CreateWordSpecificDictionaries(word);
-            foreach (var label in word.ListLabel)
+            foreach (var cell in word.Cells)
             {
                 foreach (var word2 in _state.ListWordsGrid)
                 {
-                    if (word != word2 && word2.ListLabel.Contains(label))
+                    if (word != word2 && word2.Cells.Any(c => c.X == cell.X && c.Y == cell.Y))
                     {
                         if (!word.ConnectionWords.Contains(word2)) word.ConnectionWords.Add(word2);
-                        if (!word.ConnectionLabel.Contains(label)) word.ConnectionLabel.Add(label);
+                        var connectionCell = word2.Cells.First(c => c.X == cell.X && c.Y == cell.Y);
+                        if (!word.ConnectionCells.Contains(connectionCell)) word.ConnectionCells.Add(connectionCell);
                     }
                 }
             }
@@ -190,7 +200,7 @@ public class GenerationService
 
     private string FindMatchingWord(Word word)
     {
-        if (word.ListLabel.Count <= 1) return "";
+        if (word.Cells.Count <= 1) return "";
         var gridPattern = GetGridPatternRequestHandler?.Invoke(word);
         if (gridPattern == null) return "";
         RandomizeWordLists(word);
@@ -280,6 +290,10 @@ public class GenerationService
             word.Full = false;
             word.WordString = "";
             word.Fix = false;
+            foreach (var cell in word.Cells)
+            {
+                cell.Content = null;
+            }
         }
 
         ClearGridVisualization?.Invoke();
@@ -320,9 +334,9 @@ public class GenerationService
         float difficultyLevel = 0;
         foreach (var word in _state.ListWordsGrid)
         {
-            if (word.ListLabel.Count > 0)
+            if (word.Cells.Count > 0)
             {
-                difficultyLevel += (float)word.ConnectionLabel.Count / word.ListLabel.Count;
+                difficultyLevel += (float)word.ConnectionCells.Count / word.Cells.Count;
             }
         }
 
@@ -338,7 +352,7 @@ public class GenerationService
             var matchingWords = new List<DictionaryWord>();
             foreach (var dictionaryWord in dictionary.Words)
             {
-                if (dictionaryWord.Answers.Length == word.ListLabel.Count)
+                if (dictionaryWord.Answers.Length == word.Cells.Count)
                 {
                     matchingWords.Add(dictionaryWord);
                 }
@@ -354,7 +368,7 @@ public class GenerationService
         if (!hasWords && _state.ListEmptyCellStruct.Count > 0)
         {
             _state.Stop = true;
-            StatusUpdated?.Invoke($"Для слова длиной {word.ListLabel.Count} нет подходящих слов в словарях.");
+            StatusUpdated?.Invoke($"Для слова длиной {word.Cells.Count} нет подходящих слов в словарях.");
         }
     }
 
@@ -374,12 +388,7 @@ public class GenerationService
     private bool IsDictionaryAvailable(string nameDictionary)
     {
         var dictionary = _state.ListDictionaries.FirstOrDefault(d => d.Name == nameDictionary);
-        if (dictionary == null)
-        {
-            return true;
-        }
-
-        return dictionary.CurrentCount < dictionary.MaxCount;
+        return dictionary == null || dictionary.CurrentCount < dictionary.MaxCount;
     }
 
     private void AddDictionaryEntry(string answer, Word word)
