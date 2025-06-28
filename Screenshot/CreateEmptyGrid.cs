@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using Crossword.Objects;
 using Crossword.ViewModel;
 using Brushes = System.Windows.Media.Brushes;
 
@@ -16,7 +17,6 @@ public class CreateEmptyGrid
         var blackPen = new Pen(Color.Black, 1);
         var font = new Font("Arial", 4);
         graphics.Clear(Color.White);
-        var count = 0;
         foreach (var cellVm in cells.Where(c => c.X >= topMaxX && c.X <= downMaxX && c.Y >= leftMaxY && c.Y <= rightMaxY))
         {
             if (cellVm.Background == Brushes.Transparent)
@@ -30,13 +30,41 @@ public class CreateEmptyGrid
             }
         }
 
-        foreach (var word in gameState.ListWordsGrid)
+        var numberedStartCells = new Dictionary<Point, int>();
+        var numberCounter = 1;
+
+        Cell GetStartingCell(Word word) => !word.ListLabel.Any() ? null : gameState.ListAllCellStruct.FirstOrDefault(s => s.Label == word.ListLabel[0]);
+
+        var orderedWords = gameState.ListWordsGrid
+            .Select(w => new { WordObject = w, StartCell = GetStartingCell(w) })
+            .Where(x => x.StartCell != null)
+            .OrderBy(x => x.StartCell.Y)
+            .ThenBy(x => x.StartCell.X)
+            .ThenBy(x => x.WordObject.Right ? 0 : 1)
+            .Select(x => x.WordObject);
+
+        foreach (var word in orderedWords)
         {
-            if (!word.ListLabel.Any()) continue;
-            var startingCellState = gameState.ListAllCellStruct.FirstOrDefault(s => s.Label == word.ListLabel[0]);
+            var startingCellState = GetStartingCell(word);
             if (startingCellState == null) continue;
-            count++;
-            var text = count + ";" + word.WordString;
+
+            var cellPoint = new Point(startingCellState.X, startingCellState.Y);
+            int wordNumber;
+
+            if (numberedStartCells.TryGetValue(cellPoint, out wordNumber))
+            {
+            }
+            else
+            {
+                wordNumber = numberCounter++;
+                numberedStartCells[cellPoint] = wordNumber;
+
+                var drawX = (startingCellState.X - topMaxX) * sizeCell;
+                var drawY = (startingCellState.Y - leftMaxY) * sizeCell;
+                graphics.DrawString(wordNumber.ToString(), font, blackBrush, drawX + 1, drawY + 1);
+            }
+
+            var text = wordNumber + ";" + word.WordString;
             if (word.Right)
             {
                 listDefinitionRight.Add(text);
@@ -45,10 +73,6 @@ public class CreateEmptyGrid
             {
                 listDefinitionDown.Add(text);
             }
-
-            var drawX = (startingCellState.X - topMaxX) * sizeCell;
-            var drawY = (startingCellState.Y - leftMaxY) * sizeCell;
-            graphics.DrawString(count.ToString(), font, blackBrush, drawX + 1, drawY + 1);
         }
 
         img.Save("EmptyGrid.png", ImageFormat.Png);
