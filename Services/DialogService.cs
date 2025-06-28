@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using Crossword.Objects;
-using Crossword.ViewModel;
+using Crossword.Models;
+using Crossword.Services.Abstractions;
+using Crossword.ViewModels;
+using Crossword.Views;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Crossword.Services;

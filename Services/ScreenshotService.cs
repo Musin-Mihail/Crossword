@@ -4,8 +4,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using Crossword.Objects;
-using Crossword.ViewModel;
+using Crossword.Models;
+using Crossword.Services.Abstractions;
+using Crossword.ViewModels;
 using Point = System.Drawing.Point;
 using Brushes = System.Windows.Media.Brushes;
 
@@ -20,7 +21,7 @@ public class ScreenshotService : IScreenshotService
         _dialogService = dialogService;
     }
 
-    public void CreateCrosswordFiles(List<Word> listWordsGrid, List<Dictionary> listDictionaries, IEnumerable<CellViewModel> cells)
+    public void ExportCrossword(List<Word> listWordsGrid, List<Dictionary> listDictionaries, IEnumerable<CellViewModel> cells)
     {
         try
         {
@@ -41,12 +42,12 @@ public class ScreenshotService : IScreenshotService
             using var img = new Bitmap(width, height);
             img.SetResolution(300, 300);
             using var graphics = Graphics.FromImage(img);
-            var listDefinitionRight = new List<string>();
-            var listDefinitionDown = new List<string>();
-            CreateEmptyGrid(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, listDefinitionRight, listDefinitionDown, cells, listWordsGrid);
+            var horizontalDefinitions = new List<string>();
+            var verticalDefinitions = new List<string>();
+            CreateEmptyGrid(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, horizontalDefinitions, verticalDefinitions, cells, listWordsGrid);
             CreateFillGrid(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, cells);
-            CreateAnswerFile(listDefinitionRight, listDefinitionDown);
-            CreateDefinitionFile(listDefinitionRight, listDefinitionDown, listDictionaries);
+            CreateAnswerFile(horizontalDefinitions, verticalDefinitions);
+            CreateDefinitionFile(horizontalDefinitions, verticalDefinitions, listDictionaries);
             _dialogService.ShowMessage("Кросворд сохранён");
         }
         catch (Exception e)

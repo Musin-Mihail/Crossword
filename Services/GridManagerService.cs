@@ -3,8 +3,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Media;
-using Crossword.Objects;
-using Crossword.ViewModel;
+using Crossword.Infrastructure;
+using Crossword.Models;
+using Crossword.Services.Abstractions;
+using Crossword.ViewModels;
 
 namespace Crossword.Services;
 

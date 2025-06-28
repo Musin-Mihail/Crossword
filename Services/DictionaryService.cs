@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Crossword.Objects;
+using Crossword.Models;
+using Crossword.Services.Abstractions;
 
 namespace Crossword.Services;
 
@@ -26,16 +27,16 @@ public class DictionaryService : IDictionaryService
         var dictionary = new Dictionary();
         foreach (var word in listWordsString)
         {
-            var answerAndDefinition = word.Split(';').ToList();
-            if (answerAndDefinition.Count == 0) continue;
+            var answerWithDefinitions = word.Split(';').ToList();
+            if (answerWithDefinitions.Count == 0) continue;
 
             var dictionaryWord = new DictionaryWord
             {
-                Answers = answerAndDefinition[0]
+                Answers = answerWithDefinitions[0]
             };
-            for (var i = 1; i < answerAndDefinition.Count; i++)
+            for (var i = 1; i < answerWithDefinitions.Count; i++)
             {
-                dictionaryWord.Definitions.Add(answerAndDefinition[i]);
+                dictionaryWord.Definitions.Add(answerWithDefinitions[i]);
             }
 
             dictionary.Words.Add(dictionaryWord);

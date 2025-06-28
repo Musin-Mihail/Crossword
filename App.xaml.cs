@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Windows;
 using Crossword.Services;
-using Crossword.ViewModel;
+using Crossword.Services.Abstractions;
+using Crossword.ViewModels;
+using Crossword.Views;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Crossword;

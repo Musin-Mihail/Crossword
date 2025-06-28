@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using Crossword.Objects;
+using Crossword.Models;
+using Crossword.Services.Abstractions;
 
 namespace Crossword.Services;
 

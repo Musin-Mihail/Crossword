@@ -1,0 +1,119 @@
+<Window x:Class="Crossword.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:Crossword.ViewModels"
+        mc:Ignorable="d"
+        Title="Crossword" Height="1000" Width="1500"
+        WindowStartupLocation="Manual"
+        Top="0"
+        Left="0"
+        FontFamily="Arial"
+        d:DataContext="{d:DesignInstance viewModels:MainViewModel, IsDesignTimeCreatable=True}">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
+
+    <ScrollViewer>
+        <Grid IsEnabled="{Binding IsUiEnabled}">
+            <Canvas HorizontalAlignment="Left" VerticalAlignment="Top"
+                    Width="{Binding GridControls.FieldWidth}" Height="{Binding GridControls.FieldHeight}">
+                <Line X1="{Binding GridControls.LineCenterH_X}" Y1="0" X2="{Binding GridControls.LineCenterH_X}" Y2="{Binding GridControls.LineCenterH_Y2}"
+                      Stroke="Green" StrokeThickness="4" Visibility="{Binding GridControls.LineCenterHVisibility}" />
+                <Line X1="0" Y1="{Binding GridControls.LineCenterV_Y}" X2="{Binding GridControls.LineCenterV_X2}" Y2="{Binding GridControls.LineCenterV_Y}"
+                      Stroke="Green" StrokeThickness="4" Visibility="{Binding GridControls.LineCenterVVisibility}" />
+                <ItemsControl ItemsSource="{Binding Cells}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Left" Value="{Binding DisplayX}" />
+                            <Setter Property="Canvas.Top" Value="{Binding DisplayY}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type viewModels:CellViewModel}">
+                            <Border Background="{Binding Background}"
+                                    BorderBrush="Black"
+                                    BorderThickness="0.5"
+                                    Width="{Binding Width}"
+                                    Height="{Binding Height}"
+                                    MouseDown="Cell_Interaction"
+                                    MouseMove="Cell_Interaction">
+                                <TextBlock Text="{Binding Content}"
+                                           FontSize="20"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Margin="0,-1,0,0" />
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <ItemsControl ItemsSource="{Binding Headers}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Left" Value="{Binding DisplayX}" />
+                            <Setter Property="Canvas.Top" Value="{Binding DisplayY}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type viewModels:MainViewModel+HeaderViewModel}">
+                            <Border BorderBrush="Black" BorderThickness="0.5"
+                                    Width="{Binding Width}" Height="{Binding Height}">
+                                <TextBlock Text="{Binding Content}"
+                                           FontSize="16"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Margin="0,-1,0,0" />
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Canvas>
+            <Canvas Margin="0,0,0,0">
+                <Button Content="Изменить поле" Command="{Binding GridControls.ChangeFieldSizeCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,10,0,0" />
+                <Label Content="{Binding Difficulty}" HorizontalAlignment="Left" Margin="1000,100,0,0" VerticalAlignment="Top" Width="276" FontSize="20" />
+                <Label Content="{Binding GenerationControls.StatusMessage}" HorizontalAlignment="Left" Margin="1000,150,0,0" VerticalAlignment="Top" Width="276" FontSize="20" />
+                <Label Content="Количество секунд на одно слово" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" FontSize="18" Margin="978,250,0,0" />
+                <TextBox Text="{Binding GenerationControls.MaxSecondsText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Height="50" Width="120" Margin="1007,300,0,0" FontSize="36" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
+                <CheckBox Content="Визуализация" IsChecked="{Binding GenerationControls.IsVisualizationChecked, Mode=TwoWay}" HorizontalAlignment="Left" Margin="1042,360,0,0" VerticalAlignment="Top" />
+                <Label Content="Задержка" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" FontSize="18" Margin="1165,310,0,0" />
+                <TextBox Text="{Binding GenerationControls.TaskDelayText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Height="30" Width="120" Margin="1150,350,0,0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" />
+                <Button Content="Генерация" Command="{Binding GenerationControls.StartGenerationCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,400,0,0" />
+                <Button Content="Стоп" Command="{Binding GenerationControls.StopGenerationCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,400,0,0" Visibility="{Binding GenerationControls.IsGenerating, Converter={StaticResource BoolToVis}}" />
+                <Canvas HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,-20,0,0">
+                    <RadioButton IsChecked="{Binding GridControls.IsClearMirror, Mode=TwoWay}" GroupName="MirrorMode" Height="15" Width="15" Margin="1013,480,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <Image Source="pack://siteoforigin:,,,/Resources/Images/clear_mirror.png" Height="40" Margin="1000,500,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <RadioButton IsChecked="{Binding GridControls.IsHorizontallyMirror, Mode=TwoWay}" GroupName="MirrorMode" Height="15" Width="15" Margin="1064,480,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <Image Source="pack://siteoforigin:,,,/Resources/Images/horizontal_mirror.png" Height="40" Margin="1050,500,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <RadioButton IsChecked="{Binding GridControls.IsVerticallyMirror, Mode=TwoWay}" GroupName="MirrorMode" Height="15" Width="15" Margin="1112,480,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <Image Source="pack://siteoforigin:,,,/Resources/Images/vertical_mirror.png" Height="40" Margin="1100,500,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <RadioButton IsChecked="{Binding GridControls.IsAllMirror, Mode=TwoWay}" GroupName="MirrorMode" Height="15" Width="15" Margin="1163,480,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <Image Source="pack://siteoforigin:,,,/Resources/Images/all_mirror.png" Height="40" Margin="1150,500,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <RadioButton IsChecked="{Binding GridControls.IsHorizontallyMirrorRevers, Mode=TwoWay}" GroupName="MirrorMode" Height="15" Width="15" Margin="1064,550,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <Image Source="pack://siteoforigin:,,,/Resources/Images/horizontal_mirror_revers.png" Height="40" Margin="1052,570,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <RadioButton IsChecked="{Binding GridControls.IsVerticallyMirrorRevers, Mode=TwoWay}" GroupName="MirrorMode" Height="15" Width="15" Margin="1112,550,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <Image Source="pack://siteoforigin:,,,/Resources/Images/vertical_mirror_revers.png" Height="40" Margin="1100,570,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                </Canvas>
+                <Canvas>
+                    <Button Content="Обязательные слова" Command="{Binding DictionaryControls.CreateRequiredDictionaryCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,600,0,0" />
+                    <Button Content="Выбор словарей" Command="{Binding DictionaryControls.SelectDictionariesCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,660,0,0" />
+                    <Button Content="Основной словарь" Command="{Binding DictionaryControls.ResetDictionariesCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1140,660,0,0" />
+                    <Label Content="{Binding DictionaryControls.SelectedDictionaryInfo}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" Height="250" Width="120" Margin="1140,710,0,0" />
+                    <Button Content="Сохранить сетку" Command="{Binding FileControls.SaveGridCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,780,0,0" />
+                    <Button Content="Загрузить сетку" Command="{Binding FileControls.LoadGridCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,840,0,0" />
+                    <Button Content="Скриншот" Command="{Binding FileControls.ScreenshotCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="120" Margin="1010,900,0,0" />
+                </Canvas>
+            </Canvas>
+        </Grid>
+    </ScrollViewer>
+</Window>

@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using Crossword.Objects;
+using Crossword.Models;
 
 namespace Crossword.Services;
 
 public class GenerationService
 {
-    private List<Cell> _listEmptyCellStruct = new();
-    private List<Dictionary> _listDictionaries = new();
-    private List<Word> _listWordsGrid = new();
+    private List<Cell> _emptyCellModels = new();
+    private List<Dictionary> _dictionaries = new();
+    private List<Word> _wordGrid = new();
     private List<string> _allInsertedWords = new();
     private bool _stop;
     private int _maxSeconds;
@@ -26,14 +26,14 @@ public class GenerationService
 
     public async Task<List<Word>> GenerateAsync(List<Cell> emptyCells, List<Dictionary> dictionaries, int maxSeconds, bool isVisualizationEnabled)
     {
-        _listEmptyCellStruct = emptyCells;
-        _listDictionaries = dictionaries;
+        _emptyCellModels = emptyCells;
+        _dictionaries = dictionaries;
         _maxSeconds = maxSeconds;
         _stop = false;
         _allInsertedWords.Clear();
-        _listWordsGrid.Clear();
+        _wordGrid.Clear();
 
-        FormationQueue();
+        InitializeWordGrid();
         if (_stop)
         {
             StatusUpdated?.Invoke("Ошибка: не удалось сформировать очередь слов.");
@@ -43,7 +43,7 @@ public class GenerationService
         StatusUpdated?.Invoke("Сложность - " + CalculateDifficultyLevel());
         await GenerateWords(isVisualizationEnabled);
 
-        return _listWordsGrid;
+        return _wordGrid;
     }
 
     public void RequestStop()
@@ -53,21 +53,21 @@ public class GenerationService
 
     #region Word Queue Formation
 
-    private void FormationQueue()
+    private void InitializeWordGrid()
     {
-        SearchForTheBeginningAndLengthOfAllWords();
+        FindAllWordSpans();
         SearchForConnectedWords();
     }
 
-    private void SearchForTheBeginningAndLengthOfAllWords()
+    private void FindAllWordSpans()
     {
-        foreach (var cell in _listEmptyCellStruct)
+        foreach (var cell in _emptyCellModels)
         {
             var x = cell.X;
             var y = cell.Y;
-            var isStartOfHorizontal = !_listEmptyCellStruct.Any(cell2 => cell2.X == x - 1 && cell2.Y == y);
+            var isStartOfHorizontal = !_emptyCellModels.Any(cell2 => cell2.X == x - 1 && cell2.Y == y);
             if (isStartOfHorizontal) SaveWordRight(x, y);
-            var isStartOfVertical = !_listEmptyCellStruct.Any(cell2 => cell2.X == x && cell2.Y == y - 1);
+            var isStartOfVertical = !_emptyCellModels.Any(cell2 => cell2.X == x && cell2.Y == y - 1);
             if (isStartOfVertical) SaveWordDown(x, y);
         }
     }
@@ -77,7 +77,7 @@ public class GenerationService
         var newCells = new List<Cell>();
         for (var i = x; i < 31; i++)
         {
-            var cell = _listEmptyCellStruct.FirstOrDefault(c => c.Y == y && c.X == i);
+            var cell = _emptyCellModels.FirstOrDefault(c => c.Y == y && c.X == i);
             if (cell != null) newCells.Add(cell);
             else break;
         }
@@ -86,7 +86,7 @@ public class GenerationService
         {
             var newWord = new Word { Right = true };
             newWord.Cells.AddRange(newCells);
-            _listWordsGrid.Add(newWord);
+            _wordGrid.Add(newWord);
         }
     }
 
@@ -95,7 +95,7 @@ public class GenerationService
         var newCells = new List<Cell>();
         for (var i = y; i < 31; i++)
         {
-            var cell = _listEmptyCellStruct.FirstOrDefault(c => c.Y == i && c.X == x);
+            var cell = _emptyCellModels.FirstOrDefault(c => c.Y == i && c.X == x);
             if (cell != null) newCells.Add(cell);
             else break;
         }
@@ -104,19 +104,19 @@ public class GenerationService
         {
             var newWord = new Word { Right = false };
             newWord.Cells.AddRange(newCells);
-            _listWordsGrid.Add(newWord);
+            _wordGrid.Add(newWord);
         }
     }
 
     private void SearchForConnectedWords()
     {
-        foreach (var word in _listWordsGrid)
+        foreach (var word in _wordGrid)
         {
             if (_stop) return;
             CreateWordSpecificDictionaries(word);
             foreach (var cell in word.Cells)
             {
-                foreach (var word2 in _listWordsGrid)
+                foreach (var word2 in _wordGrid)
                 {
                     if (word != word2 && word2.Cells.Any(c => c.X == cell.X && c.Y == cell.Y))
                     {
@@ -139,7 +139,7 @@ public class GenerationService
         var startDate = DateTime.Now;
         var singleAttemptDate = DateTime.Now;
         RestartGenerationAttempt();
-        while (_index < _listWordsGrid.Count)
+        while (_index < _wordGrid.Count)
         {
             if ((DateTime.Now - singleAttemptDate).TotalSeconds > _maxSeconds)
             {
@@ -153,7 +153,7 @@ public class GenerationService
             {
                 singleAttemptDate = DateTime.Now;
                 maxIndex = _index;
-                StatusUpdated?.Invoke($"Подобрано {_index} из {_listWordsGrid.Count}");
+                StatusUpdated?.Invoke($"Подобрано {_index} из {_wordGrid.Count}");
                 await Task.Delay(1);
             }
 
@@ -163,7 +163,7 @@ public class GenerationService
                 return;
             }
 
-            var currentWord = _listWordsGrid[_index];
+            var currentWord = _wordGrid[_index];
             if (currentWord.Full)
             {
                 _index++;
@@ -189,7 +189,7 @@ public class GenerationService
             await StepBack(currentWord, isVisualizationEnabled);
         }
 
-        if (_index >= _listWordsGrid.Count)
+        if (_index >= _wordGrid.Count)
         {
             HandleSuccessfulGeneration(startDate);
         }
@@ -296,7 +296,7 @@ public class GenerationService
     {
         _index = 0;
         _allInsertedWords.Clear();
-        foreach (var word in _listWordsGrid)
+        foreach (var word in _wordGrid)
         {
             word.Full = false;
             word.WordString = "";
@@ -308,16 +308,16 @@ public class GenerationService
         }
 
         ClearGridVisualization?.Invoke();
-        foreach (var dictionary in _listDictionaries)
+        foreach (var dictionary in _dictionaries)
         {
             dictionary.CurrentCount = 0;
         }
 
         var rnd = new Random();
-        for (var i = _listWordsGrid.Count - 1; i > 0; i--)
+        for (var i = _wordGrid.Count - 1; i > 0; i--)
         {
             var j = rnd.Next(i + 1);
-            (_listWordsGrid[i], _listWordsGrid[j]) = (_listWordsGrid[j], _listWordsGrid[i]);
+            (_wordGrid[i], _wordGrid[j]) = (_wordGrid[j], _wordGrid[i]);
         }
     }
 
@@ -325,7 +325,7 @@ public class GenerationService
     {
         var time = DateTime.Now - startDate;
         var message = "";
-        foreach (var dictionary in _listDictionaries)
+        foreach (var dictionary in _dictionaries)
         {
             message += $"\n{dictionary.Name} - {dictionary.CurrentCount}/{dictionary.MaxCount}";
             dictionary.CurrentCount = 0;
@@ -340,9 +340,9 @@ public class GenerationService
 
     private float CalculateDifficultyLevel()
     {
-        if (_listWordsGrid.Count == 0) return 0;
+        if (_wordGrid.Count == 0) return 0;
         float difficultyLevel = 0;
-        foreach (var word in _listWordsGrid)
+        foreach (var word in _wordGrid)
         {
             if (word.Cells.Count > 0)
             {
@@ -350,14 +350,14 @@ public class GenerationService
             }
         }
 
-        return difficultyLevel / _listWordsGrid.Count;
+        return difficultyLevel / _wordGrid.Count;
     }
 
     private void CreateWordSpecificDictionaries(Word word)
     {
         var hasWords = false;
         word.FullDictionaries.Clear();
-        foreach (var dictionary in _listDictionaries)
+        foreach (var dictionary in _dictionaries)
         {
             var matchingWords = new List<DictionaryWord>();
             foreach (var dictionaryWord in dictionary.Words)
@@ -375,7 +375,7 @@ public class GenerationService
             }
         }
 
-        if (!hasWords && _listEmptyCellStruct.Count > 0)
+        if (!hasWords && _emptyCellModels.Count > 0)
         {
             _stop = true;
             StatusUpdated?.Invoke($"Для слова длиной {word.Cells.Count} нет подходящих слов в словарях.");
@@ -397,13 +397,13 @@ public class GenerationService
 
     private bool IsDictionaryAvailable(string nameDictionary)
     {
-        var dictionary = _listDictionaries.FirstOrDefault(d => d.Name == nameDictionary);
+        var dictionary = _dictionaries.FirstOrDefault(d => d.Name == nameDictionary);
         return dictionary == null || dictionary.CurrentCount < dictionary.MaxCount;
     }
 
     private void AddDictionaryEntry(string answer, Word word)
     {
-        foreach (var dictionary in _listDictionaries.Where(d => d.CurrentCount < d.MaxCount))
+        foreach (var dictionary in _dictionaries.Where(d => d.CurrentCount < d.MaxCount))
         {
             if (dictionary.Words.Any(w => w.Answers == answer))
             {
@@ -416,7 +416,7 @@ public class GenerationService
 
     private void RemoveDictionaryEntry(string answer)
     {
-        foreach (var dictionary in _listDictionaries)
+        foreach (var dictionary in _dictionaries)
         {
             if (dictionary.Words.Any(w => w.Answers == answer))
             {
