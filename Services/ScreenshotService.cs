@@ -72,7 +72,7 @@ public class ScreenshotService : IScreenshotService
         rightMaxY = transparentCells.Max(c => c.Y);
     }
 
-    private void CreateEmptyGrid(Bitmap img, Graphics graphics, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell, List<string> listDefinitionRight, List<string> listDefinitionDown, IEnumerable<CellViewModel> cells, List<Word> listWordsGrid)
+    private void CreateEmptyGrid(Bitmap img, Graphics graphics, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell, List<string> horizontalDefinitions, List<string> verticalDefinitions, IEnumerable<CellViewModel> cells, List<Word> listWordsGrid)
     {
         var blackBrush = new SolidBrush(Color.Black);
         var whiteBrush = new SolidBrush(Color.White);
@@ -121,11 +121,11 @@ public class ScreenshotService : IScreenshotService
             var text = wordNumber + ";" + word.WordString;
             if (word.Right)
             {
-                listDefinitionRight.Add(text);
+                horizontalDefinitions.Add(text);
             }
             else
             {
-                listDefinitionDown.Add(text);
+                verticalDefinitions.Add(text);
             }
         }
 
@@ -164,20 +164,20 @@ public class ScreenshotService : IScreenshotService
         img.Save("FillGrid.png", ImageFormat.Png);
     }
 
-    private void CreateAnswerFile(List<string> listDefinitionRight, List<string> listDefinitionDown)
+    private void CreateAnswerFile(List<string> horizontalDefinitions, List<string> verticalDefinitions)
     {
         var answerString = "По горизонтали: ";
-        for (var i = 0; i < listDefinitionRight.Count; i++)
+        for (var i = 0; i < horizontalDefinitions.Count; i++)
         {
-            var newListWord = new List<string>(listDefinitionRight[i].Split(';'));
+            var newListWord = new List<string>(horizontalDefinitions[i].Split(';'));
             var word = newListWord[1];
             answerString += newListWord[0] + ". " + word + ". ";
         }
 
         answerString += "\nПо вертикали: ";
-        for (var i = 0; i < listDefinitionDown.Count; i++)
+        for (var i = 0; i < verticalDefinitions.Count; i++)
         {
-            var newListWord = new List<string>(listDefinitionDown[i].Split(';'));
+            var newListWord = new List<string>(verticalDefinitions[i].Split(';'));
             var word = newListWord[1];
             answerString += newListWord[0] + ". " + word + ". ";
         }
@@ -185,7 +185,7 @@ public class ScreenshotService : IScreenshotService
         File.WriteAllText("Answer.txt", answerString);
     }
 
-    private void CreateDefinitionFile(List<string> listDefinitionRight, List<string> listDefinitionDown, List<Dictionary> listDictionaries)
+    private void CreateDefinitionFile(List<string> horizontalDefinitions, List<string> verticalDefinitions, List<Dictionary> listDictionaries)
     {
         try
         {
@@ -196,9 +196,9 @@ public class ScreenshotService : IScreenshotService
             }
 
             var definitionString = "По горизонтали: ";
-            for (var i = 0; i < listDefinitionRight.Count; i++)
+            for (var i = 0; i < horizontalDefinitions.Count; i++)
             {
-                var newListWord = new List<string>(listDefinitionRight[i].Split(';'));
+                var newListWord = new List<string>(horizontalDefinitions[i].Split(';'));
                 var word1 = newListWord[1];
                 foreach (var definition in listWordsString)
                 {
@@ -212,9 +212,9 @@ public class ScreenshotService : IScreenshotService
             }
 
             definitionString += "\nПо вертикали: ";
-            for (var i = 0; i < listDefinitionDown.Count; i++)
+            for (var i = 0; i < verticalDefinitions.Count; i++)
             {
-                var newListWord = new List<string>(listDefinitionDown[i].Split(';'));
+                var newListWord = new List<string>(verticalDefinitions[i].Split(';'));
                 var word1 = newListWord[1];
                 foreach (var definition in listWordsString)
                 {
