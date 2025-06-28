@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 using Crossword.Objects;
 using Crossword.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +28,7 @@ public class DialogService : IDialogService
             horizontal = viewModel.ResultHorizontal;
             vertical = viewModel.ResultVertical;
         }
+
         return result;
     }
 
@@ -41,9 +43,18 @@ public class DialogService : IDialogService
 
     public bool? ShowDictionariesSelectionDialog(out List<string> selectedDictionaries)
     {
-        var dialog = new DictionariesSelection();
+        var viewModel = _serviceProvider.GetRequiredService<DictionariesSelectionViewModel>();
+        var dialog = new DictionariesSelection(viewModel);
         var result = dialog.ShowDialog();
-        selectedDictionaries = dialog.Ready ? dialog.SelectedDictionaries : new List<string>();
+        if (result == true)
+        {
+            selectedDictionaries = viewModel.SelectionResult;
+        }
+        else
+        {
+            selectedDictionaries = new List<string>();
+        }
+
         return result;
     }
 
@@ -57,6 +68,6 @@ public class DialogService : IDialogService
 
     public void ShowMessage(string message)
     {
-        System.Windows.MessageBox.Show(message);
+        MessageBox.Show(message);
     }
 }
