@@ -2,23 +2,28 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
-using Microsoft.Extensions.DependencyInjection;
+using Crossword.ViewModel;
 
 namespace Crossword.Screenshot;
 
 public class CreateImage
 {
-    public static void Get()
+    public static void Get(CrosswordState gameState, IEnumerable<CellViewModel> cells)
     {
-        var gameState = App.ServiceProvider.GetRequiredService<CrosswordState>();
         try
         {
             var topMaxX = 99;
             var leftMaxY = 99;
-            var downMaxX = 99;
-            var rightMaxY = 99;
+            var downMaxX = 0;
+            var rightMaxY = 0;
             const float sizeCell = 37.938105f;
-            MaxCoordinateSearch.Get(ref topMaxX, ref downMaxX, ref leftMaxY, ref rightMaxY, gameState);
+            MaxCoordinateSearch.Get(ref topMaxX, ref downMaxX, ref leftMaxY, ref rightMaxY, cells);
+            if (downMaxX < topMaxX || rightMaxY < leftMaxY)
+            {
+                MessageBox.Show("Не найдено ячеек для создания скриншота. Убедитесь, что кроссворд сгенерирован.");
+                return;
+            }
+
             var width = (int)((downMaxX - topMaxX + 1) * sizeCell);
             var height = (int)((rightMaxY - leftMaxY + 1) * sizeCell);
             var img = new Bitmap(width, height);
@@ -26,16 +31,15 @@ public class CreateImage
             var graphics = Graphics.FromImage(img);
             var listDefinitionRight = new List<string>();
             var listDefinitionDown = new List<string>();
-            CreateEmptyGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, listDefinitionRight, listDefinitionDown, gameState);
-            CreateFillGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, gameState);
+            CreateEmptyGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, listDefinitionRight, listDefinitionDown, cells, gameState);
+            CreateFillGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, cells);
             CreateAnswer.Get(listDefinitionRight, listDefinitionDown);
             CreateDefinition.Get(listDefinitionRight, listDefinitionDown, gameState);
             MessageBox.Show("Кросворд сохранён");
         }
         catch (Exception e)
         {
-            MessageBox.Show("CreateImage\n" + e);
-            throw;
+            MessageBox.Show("Ошибка при создании скриншота:\n" + e.Message);
         }
     }
 }

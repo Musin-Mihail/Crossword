@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Crossword.Objects;
@@ -11,6 +11,13 @@ namespace Crossword.Services;
 public class GenerationService
 {
     private readonly CrosswordState _state;
+
+    public event Action<string>? StatusUpdated;
+    public event Func<Word, Brush, Task>? VisualizeWordPlacement;
+    public event Action? ClearGridVisualization;
+    public event Func<Word, string>? GetGridPatternRequestHandler;
+    public event Action<Word, string>? SetWordRequestHandler;
+    public event Action<Word>? ClearWordRequestHandler;
 
     public GenerationService(CrosswordState state)
     {
@@ -22,11 +29,17 @@ public class GenerationService
         _state.Stop = false;
         _state.AllInsertedWords.Clear();
         FormationQueue();
-        _state.Difficulty = "Сложность - " + CalculateDifficultyLevel();
+        if (_state.Stop)
+        {
+            StatusUpdated?.Invoke("Ошибка: не удалось сформировать очередь слов.");
+            return;
+        }
+
+        StatusUpdated?.Invoke("Сложность - " + CalculateDifficultyLevel());
         await GenerateWords();
     }
 
-    #region Word Queue Formation (from FormationOfAQueue namespace)
+    #region Word Queue Formation
 
     private void FormationQueue()
     {
@@ -41,27 +54,9 @@ public class GenerationService
         {
             var x = cell.X;
             var y = cell.Y;
-            var isStartOfHorizontal = true;
-            foreach (var cell2 in _state.ListEmptyCellStruct)
-            {
-                if (cell2.X == x - 1 && cell2.Y == y)
-                {
-                    isStartOfHorizontal = false;
-                    break;
-                }
-            }
-
+            var isStartOfHorizontal = !_state.ListEmptyCellStruct.Any(cell2 => cell2.X == x - 1 && cell2.Y == y);
             if (isStartOfHorizontal) SaveWordRight(x, y);
-            var isStartOfVertical = true;
-            foreach (var cell2 in _state.ListEmptyCellStruct)
-            {
-                if (cell2.X == x && cell2.Y == y - 1)
-                {
-                    isStartOfVertical = false;
-                    break;
-                }
-            }
-
+            var isStartOfVertical = !_state.ListEmptyCellStruct.Any(cell2 => cell2.X == x && cell2.Y == y - 1);
             if (isStartOfVertical) SaveWordDown(x, y);
         }
     }
@@ -71,24 +66,12 @@ public class GenerationService
         var newListLabel = new List<Label>();
         for (var i = x; i < 31; i++)
         {
-            var match = false;
-            foreach (var cell in _state.ListEmptyCellStruct)
-            {
-                if (cell.Y == y && cell.X == i)
-                {
-                    newListLabel.Add(cell.Label);
-                    match = true;
-                    break;
-                }
-            }
-
-            if (!match) break;
+            var cell = _state.ListEmptyCellStruct.FirstOrDefault(c => c.Y == y && c.X == i);
+            if (cell != null) newListLabel.Add(cell.Label);
+            else break;
         }
 
-        if (newListLabel.Count > 1)
-        {
-            _state.ListWordsGrid.Add(new Word { ListLabel = newListLabel, Right = true });
-        }
+        if (newListLabel.Count > 1) _state.ListWordsGrid.Add(new Word { ListLabel = newListLabel, Right = true });
     }
 
     private void SaveWordDown(int x, int y)
@@ -96,24 +79,12 @@ public class GenerationService
         var newListLabel = new List<Label>();
         for (var i = y; i < 31; i++)
         {
-            var match = false;
-            foreach (var cell in _state.ListEmptyCellStruct)
-            {
-                if (cell.Y == i && cell.X == x)
-                {
-                    newListLabel.Add(cell.Label);
-                    match = true;
-                    break;
-                }
-            }
-
-            if (!match) break;
+            var cell = _state.ListEmptyCellStruct.FirstOrDefault(c => c.Y == i && c.X == x);
+            if (cell != null) newListLabel.Add(cell.Label);
+            else break;
         }
 
-        if (newListLabel.Count > 1)
-        {
-            _state.ListWordsGrid.Add(new Word { ListLabel = newListLabel });
-        }
+        if (newListLabel.Count > 1) _state.ListWordsGrid.Add(new Word { ListLabel = newListLabel });
     }
 
     private void SearchForConnectedWords()
@@ -138,7 +109,7 @@ public class GenerationService
 
     #endregion
 
-    #region Generation Logic (from GridFill and other namespaces)
+    #region Generation Logic
 
     private async Task GenerateWords()
     {
@@ -160,14 +131,14 @@ public class GenerationService
             {
                 singleAttemptDate = DateTime.Now;
                 maxIndex = _state.Index;
-                _state.StatusMessage = $"Подобрано {_state.Index} из {_state.ListWordsGrid.Count}";
+                StatusUpdated?.Invoke($"Подобрано {_state.Index} из {_state.ListWordsGrid.Count}");
                 await Task.Delay(1);
             }
 
             if (_state.Stop)
             {
                 _state.Stop = false;
-                _state.StatusMessage = "Генерация остановлена пользователем.";
+                StatusUpdated?.Invoke("Генерация остановлена пользователем.");
                 return;
             }
 
@@ -180,18 +151,18 @@ public class GenerationService
 
             if (TryInsertWordIntoGrid(currentWord))
             {
-                if (_state.IsVisualizationEnabled)
+                if (_state.IsVisualizationEnabled && VisualizeWordPlacement != null)
                 {
-                    await VisualizeWordPlacement(currentWord, Brushes.Green);
+                    await VisualizeWordPlacement.Invoke(currentWord, Brushes.Green);
                 }
 
                 _state.Index++;
                 continue;
             }
 
-            if (_state.IsVisualizationEnabled)
+            if (_state.IsVisualizationEnabled && VisualizeWordPlacement != null)
             {
-                await VisualizeWordPlacement(currentWord, Brushes.Red);
+                await VisualizeWordPlacement.Invoke(currentWord, Brushes.Red);
             }
 
             await StepBack(currentWord);
@@ -211,13 +182,7 @@ public class GenerationService
             return false;
         }
 
-        Application.Current.Dispatcher.Invoke(() =>
-        {
-            for (var i = 0; i < word.ListLabel.Count; i++)
-            {
-                word.ListLabel[i].Content = answer[i];
-            }
-        });
+        SetWordRequestHandler?.Invoke(word, answer);
         word.Full = true;
         word.WordString = answer;
         return true;
@@ -226,14 +191,8 @@ public class GenerationService
     private string FindMatchingWord(Word word)
     {
         if (word.ListLabel.Count <= 1) return "";
-        var gridPattern = "";
-        Application.Current.Dispatcher.Invoke(() =>
-        {
-            foreach (var label in word.ListLabel)
-            {
-                gridPattern += label.Content?.ToString() ?? "*";
-            }
-        });
+        var gridPattern = GetGridPatternRequestHandler?.Invoke(word);
+        if (gridPattern == null) return "";
         RandomizeWordLists(word);
         foreach (var dictionary in word.FullDictionaries)
         {
@@ -280,9 +239,9 @@ public class GenerationService
                 ClearWordFromGrid(wordToClear);
                 if (TryInsertWordIntoGrid(currentWord))
                 {
-                    if (_state.IsVisualizationEnabled)
+                    if (_state.IsVisualizationEnabled && VisualizeWordPlacement != null)
                     {
-                        await VisualizeWordPlacement(currentWord, Brushes.Green);
+                        await VisualizeWordPlacement.Invoke(currentWord, Brushes.Green);
                     }
 
                     _state.Index = 0;
@@ -296,24 +255,7 @@ public class GenerationService
 
     private void ClearWordFromGrid(Word word)
     {
-        foreach (var label in word.ListLabel)
-        {
-            var isIntersection = false;
-            foreach (var connectedWord in word.ConnectionWords)
-            {
-                if (connectedWord.Full && connectedWord.ListLabel.Contains(label))
-                {
-                    isIntersection = true;
-                    break;
-                }
-            }
-
-            if (!isIntersection)
-            {
-                Application.Current.Dispatcher.Invoke(() => label.Content = null);
-            }
-        }
-
+        ClearWordRequestHandler?.Invoke(word);
         RemoveWord(word);
     }
 
@@ -332,7 +274,15 @@ public class GenerationService
     private void RestartGenerationAttempt()
     {
         _state.Index = 0;
-        Application.Current.Dispatcher.Invoke(ClearAllCells);
+        _state.AllInsertedWords.Clear();
+        foreach (var word in _state.ListWordsGrid)
+        {
+            word.Full = false;
+            word.WordString = "";
+            word.Fix = false;
+        }
+
+        ClearGridVisualization?.Invoke();
         foreach (var dictionary in _state.ListDictionaries)
         {
             dictionary.CurrentCount = 0;
@@ -343,26 +293,6 @@ public class GenerationService
         {
             var j = rnd.Next(i + 1);
             (_state.ListWordsGrid[i], _state.ListWordsGrid[j]) = (_state.ListWordsGrid[j], _state.ListWordsGrid[i]);
-        }
-    }
-
-    private void ClearAllCells()
-    {
-        _state.AllInsertedWords.Clear();
-        foreach (var word in _state.ListWordsGrid)
-        {
-            word.Full = false;
-            word.WordString = "";
-            word.Fix = false;
-            foreach (var label in word.ListLabel)
-            {
-                label.Content = null;
-            }
-        }
-
-        foreach (var cell in _state.ListEmptyCellStruct)
-        {
-            cell.Label.Background = Brushes.Transparent;
         }
     }
 
@@ -377,24 +307,12 @@ public class GenerationService
             dictionary.CurrentCount = 0;
         }
 
-        Application.Current.Dispatcher.Invoke(() =>
-            MessageBox.Show($"ГЕНЕРАЦИЯ УДАЛАСЬ\nза {time.TotalSeconds:F2} секунд\n{message}")
-        );
+        StatusUpdated?.Invoke($"ГЕНЕРАЦИЯ УДАЛАСЬ\nза {time.TotalSeconds:F2} секунд\n{message}");
     }
 
     #endregion
 
     #region Helpers
-
-    private async Task VisualizeWordPlacement(Word word, Brush color)
-    {
-        await Application.Current.Dispatcher.Invoke(async () =>
-        {
-            foreach (var item in word.ListLabel) item.Background = color;
-            await Task.Delay(_state.TaskDelay);
-            foreach (var item in word.ListLabel) item.Background = Brushes.Transparent;
-        });
-    }
 
     private float CalculateDifficultyLevel()
     {
@@ -426,19 +344,17 @@ public class GenerationService
                 }
             }
 
-            var newDictionary = new Dictionary
+            if (matchingWords.Count > 0)
             {
-                Name = dictionary.Name,
-                Words = matchingWords
-            };
-            if (newDictionary.Words.Count > 0) hasWords = true;
-            word.FullDictionaries.Add(newDictionary);
+                hasWords = true;
+                word.FullDictionaries.Add(new Dictionary { Name = dictionary.Name, Words = matchingWords });
+            }
         }
 
         if (!hasWords && _state.ListEmptyCellStruct.Count > 0)
         {
             _state.Stop = true;
-            throw new Exception($"Для слова длиной {word.ListLabel.Count} нет подходящих слов в словарях.");
+            StatusUpdated?.Invoke($"Для слова длиной {word.ListLabel.Count} нет подходящих слов в словарях.");
         }
     }
 
@@ -457,30 +373,24 @@ public class GenerationService
 
     private bool IsDictionaryAvailable(string nameDictionary)
     {
-        foreach (var dictionary in _state.ListDictionaries)
+        var dictionary = _state.ListDictionaries.FirstOrDefault(d => d.Name == nameDictionary);
+        if (dictionary == null)
         {
-            if (dictionary.Name == nameDictionary)
-            {
-                return dictionary.CurrentCount < dictionary.MaxCount;
-            }
+            return true;
         }
 
-        return true;
+        return dictionary.CurrentCount < dictionary.MaxCount;
     }
 
     private void AddDictionaryEntry(string answer, Word word)
     {
-        foreach (var dictionary in _state.ListDictionaries)
+        foreach (var dictionary in _state.ListDictionaries.Where(d => d.CurrentCount < d.MaxCount))
         {
-            if (dictionary.CurrentCount >= dictionary.MaxCount) continue;
-            foreach (var dictionaryWord in dictionary.Words)
+            if (dictionary.Words.Any(w => w.Answers == answer))
             {
-                if (dictionaryWord.Answers == answer)
-                {
-                    if (dictionary.Name == "!ОБЯЗАТЕЛЬНЫЕ") word.Fix = true;
-                    dictionary.CurrentCount++;
-                    return;
-                }
+                if (dictionary.Name == "!ОБЯЗАТЕЛЬНЫЕ") word.Fix = true;
+                dictionary.CurrentCount++;
+                return;
             }
         }
     }
@@ -489,13 +399,10 @@ public class GenerationService
     {
         foreach (var dictionary in _state.ListDictionaries)
         {
-            foreach (var dictionaryWord in dictionary.Words)
+            if (dictionary.Words.Any(w => w.Answers == answer))
             {
-                if (dictionaryWord.Answers == answer)
-                {
-                    dictionary.CurrentCount--;
-                    return;
-                }
+                dictionary.CurrentCount--;
+                return;
             }
         }
     }
