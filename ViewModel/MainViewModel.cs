@@ -9,8 +9,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Crossword.Objects;
-using Crossword.PlayingField;
-using Crossword.Screenshot;
 using Crossword.Services;
 
 namespace Crossword.ViewModel;
@@ -19,6 +17,8 @@ public class MainViewModel : ViewModelBase
 {
     private readonly GenerationService _generationService;
     private readonly IDialogService _dialogService;
+    private readonly IDictionaryService _dictionaryService;
+    private readonly IScreenshotService _screenshotService;
 
     private readonly List<Cell> _listAllCellStruct = new();
     private readonly List<Cell> _listEmptyCellStruct = new();
@@ -52,10 +52,12 @@ public class MainViewModel : ViewModelBase
     public ObservableCollection<CellViewModel> Cells { get; } = new();
     public ObservableCollection<HeaderViewModel> Headers { get; } = new();
 
-    public MainViewModel(GenerationService generationService, IDialogService dialogService)
+    public MainViewModel(GenerationService generationService, IDialogService dialogService, IDictionaryService dictionaryService, IScreenshotService screenshotService)
     {
         _generationService = generationService;
         _dialogService = dialogService;
+        _dictionaryService = dictionaryService;
+        _screenshotService = screenshotService;
 
         StartGenerationCommand = new RelayCommand(async _ => await StartGenerationAsync(), _ => !IsGenerating);
         StopGenerationCommand = new RelayCommand(_ => StopGeneration(), _ => IsGenerating);
@@ -576,7 +578,7 @@ public class MainViewModel : ViewModelBase
     {
         if (_listWordsGrid.Any() && Cells.Any(c => c.Background == Brushes.Transparent))
         {
-            CreateImage.Get(_listWordsGrid, _listDictionaries, Cells);
+            _screenshotService.CreateCrosswordFiles(_listWordsGrid, _listDictionaries, Cells);
         }
         else
         {
@@ -587,7 +589,7 @@ public class MainViewModel : ViewModelBase
     private void ResetDictionaries()
     {
         _listDictionaries.Clear();
-        var commonDictionary = CreateDictionary.Get("dict.txt");
+        var commonDictionary = _dictionaryService.LoadDictionary("dict.txt");
         _listDictionaries.Add(commonDictionary);
         _listDictionaries[^1].Name = "Общий";
         _listDictionaries[^1].MaxCount = commonDictionary.Words.Count;
@@ -600,7 +602,7 @@ public class MainViewModel : ViewModelBase
         {
             _listDictionaries.Clear();
             var message = "Выбранные словари:\n";
-            var dictionariesPaths = Directory.GetFiles("Dictionaries/").ToList();
+            var dictionariesPaths = _dictionaryService.GetDictionaryPaths().ToList();
             foreach (var selectedDict in selectedDictionaries)
             {
                 var list = new List<string>(selectedDict.Split(';'));
@@ -608,14 +610,14 @@ public class MainViewModel : ViewModelBase
                 if (path != null)
                 {
                     message += selectedDict + "\n";
-                    var dictionary = CreateDictionary.Get(path);
+                    var dictionary = _dictionaryService.LoadDictionary(path);
                     dictionary.Name = list[0];
                     dictionary.MaxCount = int.Parse(list[1]);
                     _listDictionaries.Add(dictionary);
                 }
             }
 
-            var commonDictionary = CreateDictionary.Get("dict.txt");
+            var commonDictionary = _dictionaryService.LoadDictionary("dict.txt");
             _listDictionaries.Add(commonDictionary);
             _listDictionaries[^1].Name = "Общий";
             _listDictionaries[^1].MaxCount = commonDictionary.Words.Count;

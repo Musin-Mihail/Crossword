@@ -80,8 +80,10 @@ public class RequiredDictionaryViewModel : ViewModelBase
             newDictionary.Add(line);
         }
 
-        const string path = "Dictionaries/!ОБЯЗАТЕЛЬНЫЕ.txt";
-        Directory.CreateDirectory("Dictionaries");
+        const string dictionariesFolder = "Dictionaries";
+        const string requiredDictFileName = "!ОБЯЗАТЕЛЬНЫЕ.txt";
+        var path = Path.Combine(dictionariesFolder, requiredDictFileName);
+        Directory.CreateDirectory(dictionariesFolder);
         File.WriteAllLines(path, newDictionary);
     }
 }
