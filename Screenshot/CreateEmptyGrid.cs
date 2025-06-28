@@ -11,7 +11,7 @@ namespace Crossword.Screenshot;
 
 public class CreateEmptyGrid
 {
-    public static void Get(Bitmap img, Graphics graphics, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell, List<string> listDefinitionRight, List<string> listDefinitionDown, IEnumerable<CellViewModel> cells, CrosswordState gameState)
+    public static void Get(Bitmap img, Graphics graphics, int topMaxX, int downMaxX, int leftMaxY, int rightMaxY, float sizeCell, List<string> listDefinitionRight, List<string> listDefinitionDown, IEnumerable<CellViewModel> cells, List<Word> listWordsGrid)
     {
         var blackBrush = new SolidBrush(Color.Black);
         var whiteBrush = new SolidBrush(Color.White);
@@ -34,7 +34,7 @@ public class CreateEmptyGrid
         var numberedStartCells = new Dictionary<Point, int>();
         var numberCounter = 1;
         Cell GetStartingCell(Word word) => word.Cells.FirstOrDefault();
-        var orderedWords = gameState.ListWordsGrid
+        var orderedWords = listWordsGrid
             .Select(w => new { WordObject = w, StartCell = GetStartingCell(w) })
             .Where(x => x.StartCell != null)
             .OrderBy(x => x.StartCell.Y)

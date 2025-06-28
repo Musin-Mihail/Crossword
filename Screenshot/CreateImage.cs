@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
+using Crossword.Objects;
 using Crossword.ViewModel;
 
 namespace Crossword.Screenshot;
 
 public class CreateImage
 {
-    public static void Get(CrosswordState gameState, IEnumerable<CellViewModel> cells)
+    public static void Get(List<Word> listWordsGrid, List<Dictionary> listDictionaries, IEnumerable<CellViewModel> cells)
     {
         try
         {
@@ -31,10 +32,10 @@ public class CreateImage
             var graphics = Graphics.FromImage(img);
             var listDefinitionRight = new List<string>();
             var listDefinitionDown = new List<string>();
-            CreateEmptyGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, listDefinitionRight, listDefinitionDown, cells, gameState);
+            CreateEmptyGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, listDefinitionRight, listDefinitionDown, cells, listWordsGrid);
             CreateFillGrid.Get(img, graphics, topMaxX, downMaxX, leftMaxY, rightMaxY, sizeCell, cells);
             CreateAnswer.Get(listDefinitionRight, listDefinitionDown);
-            CreateDefinition.Get(listDefinitionRight, listDefinitionDown, gameState);
+            CreateDefinition.Get(listDefinitionRight, listDefinitionDown, listDictionaries);
             MessageBox.Show("Кросворд сохранён");
         }
         catch (Exception e)

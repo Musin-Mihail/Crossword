@@ -8,10 +8,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using Crossword.Main;
 using Crossword.Objects;
 using Crossword.PlayingField;
-using Crossword.SaveLoad;
 using Crossword.Screenshot;
 using Crossword.Services;
 
@@ -19,20 +17,27 @@ namespace Crossword.ViewModel;
 
 public class MainViewModel : ViewModelBase
 {
-    private readonly CrosswordState _gameState;
     private readonly GenerationService _generationService;
     private readonly IDialogService _dialogService;
 
-    private string _statusMessage;
+    private readonly List<Cell> _listAllCellStruct = new();
+    private readonly List<Cell> _listEmptyCellStruct = new();
+    private readonly List<Dictionary> _listDictionaries = new();
+    private readonly List<Word> _listWordsGrid = new();
+
+    private string _statusMessage = "Готов к генерации.";
     private bool _isGenerating;
-    private string _difficulty;
-    private string _selectedDictionaryInfo;
+    private string _difficulty = "Сложность: -";
+    private string _selectedDictionaryInfo = "Основной словарь";
+
     private bool _isVerticallyMirror;
     private bool _isHorizontallyMirror;
     private bool _isAllMirror;
     private bool _isVerticallyMirrorRevers;
     private bool _isHorizontallyMirrorRevers;
     private bool _isClearMirror = true;
+    private int _numberOfCellsHorizontally = 30;
+    private int _numberOfCellsVertically = 30;
 
     public ICommand StartGenerationCommand { get; }
     public ICommand StopGenerationCommand { get; }
@@ -46,19 +51,11 @@ public class MainViewModel : ViewModelBase
     public ICommand CellInteractionCommand { get; }
     public ObservableCollection<CellViewModel> Cells { get; } = new();
     public ObservableCollection<HeaderViewModel> Headers { get; } = new();
-    private int _numberOfCellsHorizontally = 30;
-    private int _numberOfCellsVertically = 30;
 
-    public MainViewModel(CrosswordState gameState, GenerationService generationService, IDialogService dialogService)
+    public MainViewModel(GenerationService generationService, IDialogService dialogService)
     {
-        _gameState = gameState;
         _generationService = generationService;
         _dialogService = dialogService;
-
-        _statusMessage = _gameState.StatusMessage;
-        _isGenerating = _gameState.IsGenerating;
-        _difficulty = _gameState.Difficulty;
-        _selectedDictionaryInfo = _gameState.SelectedDictionaryInfo;
 
         StartGenerationCommand = new RelayCommand(async _ => await StartGenerationAsync(), _ => !IsGenerating);
         StopGenerationCommand = new RelayCommand(_ => StopGeneration(), _ => IsGenerating);
@@ -82,7 +79,7 @@ public class MainViewModel : ViewModelBase
         ResetDictionaries();
     }
 
-    #region Service Event Handlers (адаптация к новым моделям)
+    #region Service Event Handlers
 
     private void OnStatusUpdated(string status)
     {
@@ -126,12 +123,17 @@ public class MainViewModel : ViewModelBase
                 }
             }
 
+            if (!int.TryParse(TaskDelayText, out var taskDelay) || taskDelay <= 0)
+            {
+                taskDelay = 1;
+            }
+
             foreach (var vm in vmsToAnimate)
             {
                 vm.Background = color;
             }
 
-            await Task.Delay(_gameState.TaskDelay > 0 ? _gameState.TaskDelay : 1);
+            await Task.Delay(taskDelay);
 
             foreach (var vm in vmsToAnimate)
             {
@@ -215,6 +217,15 @@ public class MainViewModel : ViewModelBase
             if (SetProperty(ref _isGenerating, value))
             {
                 OnPropertyChanged(nameof(IsUiEnabled));
+                ((RelayCommand)StartGenerationCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)StopGenerationCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)SaveGridCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)LoadGridCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)ResetDictionariesCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)SelectDictionariesCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)CreateRequiredDictionaryCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)ScreenshotCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)CellInteractionCommand).RaiseCanExecuteChanged();
             }
         }
     }
@@ -290,7 +301,7 @@ public class MainViewModel : ViewModelBase
     {
         Cells.Clear();
         Headers.Clear();
-        _gameState.ListAllCellStruct.Clear();
+        _listAllCellStruct.Clear();
 
         for (var y = 1; y <= _numberOfCellsVertically; y++)
         {
@@ -298,7 +309,7 @@ public class MainViewModel : ViewModelBase
             {
                 var cellVm = new CellViewModel { X = x, Y = y };
                 Cells.Add(cellVm);
-                _gameState.ListAllCellStruct.Add(new Cell(x, y));
+                _listAllCellStruct.Add(new Cell(x, y));
             }
         }
 
@@ -462,35 +473,31 @@ public class MainViewModel : ViewModelBase
     {
         if (IsGenerating) return;
 
-        try
+        if (!int.TryParse(MaxSecondsText, out var maxSeconds))
         {
-            _gameState.MaxSeconds = int.Parse(MaxSecondsText);
-            _gameState.TaskDelay = int.Parse(TaskDelayText);
-        }
-        catch
-        {
-            _dialogService.ShowMessage("ОШИБКА. Вводите только цифры");
+            _dialogService.ShowMessage("ОШИБКА. Вводите только цифры в поле 'Макс. секунд'.");
             return;
         }
 
-        _gameState.ListEmptyCellStruct.Clear();
+        _listEmptyCellStruct.Clear();
         foreach (var cellVm in Cells.Where(c => c.Background == Brushes.Transparent))
         {
-            var cellModel = _gameState.ListAllCellStruct.First(c => c.X == cellVm.X && c.Y == cellVm.Y);
-            _gameState.ListEmptyCellStruct.Add(cellModel);
+            var cellModel = _listAllCellStruct.First(c => c.X == cellVm.X && c.Y == cellVm.Y);
+            _listEmptyCellStruct.Add(cellModel);
         }
 
-        if (_gameState.ListEmptyCellStruct.Count == 0)
+        if (_listEmptyCellStruct.Count == 0)
         {
             _dialogService.ShowMessage("На поле нет пустых ячеек для генерации.");
             return;
         }
 
+        _listWordsGrid.Clear();
         IsGenerating = true;
         try
         {
-            _gameState.IsVisualizationEnabled = IsVisualizationChecked;
-            await Task.Run(() => _generationService.GenerateAsync());
+            var result = await _generationService.GenerateAsync(_listEmptyCellStruct, _listDictionaries, maxSeconds, IsVisualizationChecked);
+            _listWordsGrid.AddRange(result);
         }
         catch (Exception ex)
         {
@@ -499,23 +506,37 @@ public class MainViewModel : ViewModelBase
         finally
         {
             IsGenerating = false;
-            if (!string.IsNullOrWhiteSpace(_gameState.StatusMessage))
-                StatusMessage = _gameState.StatusMessage;
         }
     }
 
-    private void StopGeneration() => _gameState.Stop = true;
+    private void StopGeneration() => _generationService.RequestStop();
 
     private void SaveGrid()
     {
-        _gameState.ListEmptyCellStruct.Clear();
+        _listEmptyCellStruct.Clear();
         foreach (var cellVm in Cells.Where(c => c.Background == Brushes.Transparent))
         {
-            var cellModel = _gameState.ListAllCellStruct.First(c => c.X == cellVm.X && c.Y == cellVm.Y);
-            _gameState.ListEmptyCellStruct.Add(cellModel);
+            var cellModel = _listAllCellStruct.First(c => c.X == cellVm.X && c.Y == cellVm.Y);
+            _listEmptyCellStruct.Add(cellModel);
         }
 
-        Save.Get(_gameState);
+        var saveFile = "";
+        foreach (var cell in _listEmptyCellStruct)
+        {
+            saveFile += $"{cell.X};{cell.Y}\n";
+        }
+
+        var name = DateTime.Now.ToString("MM_dd_yyyy-HH_mm_ss");
+        try
+        {
+            Directory.CreateDirectory("SaveGrid");
+            File.WriteAllText(@"SaveGrid\" + name + ".grid", saveFile);
+            _dialogService.ShowMessage("Сетка сохранена");
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowMessage($"Ошибка сохранения сетки: {ex.Message}");
+        }
     }
 
     private void LoadGrid()
@@ -528,7 +549,7 @@ public class MainViewModel : ViewModelBase
                 cellVm.Content = null;
             }
 
-            _gameState.ListEmptyCellStruct.Clear();
+            _listEmptyCellStruct.Clear();
 
             foreach (var item in listEmptyCellStruct)
             {
@@ -541,10 +562,10 @@ public class MainViewModel : ViewModelBase
                         cellVm.Background = Brushes.Transparent;
                     }
 
-                    var cellModel = _gameState.ListAllCellStruct.FirstOrDefault(c => c.X == x && c.Y == y);
+                    var cellModel = _listAllCellStruct.FirstOrDefault(c => c.X == x && c.Y == y);
                     if (cellModel != null)
                     {
-                        _gameState.ListEmptyCellStruct.Add(cellModel);
+                        _listEmptyCellStruct.Add(cellModel);
                     }
                 }
             }
@@ -553,9 +574,9 @@ public class MainViewModel : ViewModelBase
 
     private void Screenshot()
     {
-        if (_gameState.ListWordsGrid.Count > 0 && Cells.Any(c => c.Background == Brushes.Transparent))
+        if (_listWordsGrid.Any() && Cells.Any(c => c.Background == Brushes.Transparent))
         {
-            CreateImage.Get(_gameState, Cells);
+            CreateImage.Get(_listWordsGrid, _listDictionaries, Cells);
         }
         else
         {
@@ -565,16 +586,19 @@ public class MainViewModel : ViewModelBase
 
     private void ResetDictionaries()
     {
-        var resetDict = new ResetDict(_gameState);
-        resetDict.Get();
-        SelectedDictionaryInfo = _gameState.SelectedDictionaryInfo;
+        _listDictionaries.Clear();
+        var commonDictionary = CreateDictionary.Get("dict.txt");
+        _listDictionaries.Add(commonDictionary);
+        _listDictionaries[^1].Name = "Общий";
+        _listDictionaries[^1].MaxCount = commonDictionary.Words.Count;
+        SelectedDictionaryInfo = "Основной словарь";
     }
 
     private void SelectDictionaries()
     {
         if (_dialogService.ShowDictionariesSelectionDialog(out var selectedDictionaries) == true && selectedDictionaries.Any())
         {
-            _gameState.ListDictionaries.Clear();
+            _listDictionaries.Clear();
             var message = "Выбранные словари:\n";
             var dictionariesPaths = Directory.GetFiles("Dictionaries/").ToList();
             foreach (var selectedDict in selectedDictionaries)
@@ -587,20 +611,23 @@ public class MainViewModel : ViewModelBase
                     var dictionary = CreateDictionary.Get(path);
                     dictionary.Name = list[0];
                     dictionary.MaxCount = int.Parse(list[1]);
-                    _gameState.ListDictionaries.Add(dictionary);
+                    _listDictionaries.Add(dictionary);
                 }
             }
 
             var commonDictionary = CreateDictionary.Get("dict.txt");
-            _gameState.ListDictionaries.Add(commonDictionary);
-            _gameState.ListDictionaries[^1].Name = "Общий";
-            _gameState.ListDictionaries[^1].MaxCount = commonDictionary.Words.Count;
+            _listDictionaries.Add(commonDictionary);
+            _listDictionaries[^1].Name = "Общий";
+            _listDictionaries[^1].MaxCount = commonDictionary.Words.Count;
             _dialogService.ShowMessage(message);
             SelectedDictionaryInfo = message;
         }
     }
 
-    private void CreateRequiredDictionary() => _dialogService.ShowRequiredDictionaryDialog();
+    private void CreateRequiredDictionary()
+    {
+        _dialogService.ShowRequiredDictionaryDialog(_listDictionaries);
+    }
 
     public class HeaderViewModel
     {

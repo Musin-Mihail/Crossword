@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using Crossword.Objects;
 
 namespace Crossword.Services;
 
@@ -35,9 +36,9 @@ public class DialogService : IDialogService
         return result;
     }
 
-    public void ShowRequiredDictionaryDialog()
+    public void ShowRequiredDictionaryDialog(List<Dictionary> availableDictionaries)
     {
-        new RequiredDictionary().ShowDialog();
+        new RequiredDictionary(availableDictionaries).ShowDialog();
     }
 
     public void ShowMessage(string message)

@@ -8,12 +8,12 @@ namespace Crossword.Screenshot;
 
 public class CreateDefinition
 {
-    public static void Get(List<string> listDefinitionRight, List<string> listDefinitionDown, CrosswordState gameState)
+    public static void Get(List<string> listDefinitionRight, List<string> listDefinitionDown, List<Dictionary> listDictionaries)
     {
         try
         {
             List<DictionaryWord> listWordsString = new();
-            foreach (var dictionary in gameState.ListDictionaries)
+            foreach (var dictionary in listDictionaries)
             {
                 listWordsString.AddRange(dictionary.Words);
             }
