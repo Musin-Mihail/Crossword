@@ -10,7 +10,6 @@ namespace Crossword.ViewModels;
 public class GridPreviewViewModel : ViewModelBase
 {
     public string FilePath { get; }
-    public string DisplayName { get; }
     public ObservableCollection<CellViewModel> PreviewCells { get; } = new();
     public ICommand LoadCommand { get; }
     public ICommand DeleteCommand { get; }
@@ -18,7 +17,6 @@ public class GridPreviewViewModel : ViewModelBase
     public GridPreviewViewModel(string filePath, Action<GridPreviewViewModel> loadAction, Action<GridPreviewViewModel> deleteAction)
     {
         FilePath = filePath;
-        DisplayName = Path.GetFileNameWithoutExtension(filePath);
         LoadCommand = new RelayCommand(_ => loadAction(this));
         DeleteCommand = new RelayCommand(_ => deleteAction(this));
         GeneratePreview();
