@@ -22,6 +22,7 @@ public class GridControlViewModel : ViewModelBase
     private bool _isHorizontallyMirrorRevers;
     public ICommand ChangeFieldSizeCommand { get; }
     public ICommand CellInteractionCommand { get; }
+    public ICommand ClearGridCommand { get; }
 
     public GridControlViewModel(IDialogService dialogService, IGridManagerService gridManagerService, Func<bool> canInteract)
     {
@@ -30,6 +31,7 @@ public class GridControlViewModel : ViewModelBase
 
         ChangeFieldSizeCommand = new RelayCommand(_ => ChangeFieldSize());
         CellInteractionCommand = new RelayCommand(HandleCellInteraction, _ => canInteract());
+        ClearGridCommand = new RelayCommand(_ => ClearGrid(), _ => canInteract());
 
         _gridManagerService.PropertyChanged += OnGridManagerPropertyChanged;
         UpdateMirrorLines();
@@ -103,6 +105,11 @@ public class GridControlViewModel : ViewModelBase
     private void ChangeFieldSize()
     {
         _dialogService.ShowChangeFillDialog(ref _numberOfCellsHorizontally, ref _numberOfCellsVertically);
+        _gridManagerService.InitializeGrid(_numberOfCellsHorizontally, _numberOfCellsVertically);
+        UpdateMirrorLines();
+    }
+    private void ClearGrid()
+    {
         _gridManagerService.InitializeGrid(_numberOfCellsHorizontally, _numberOfCellsVertically);
         UpdateMirrorLines();
     }
