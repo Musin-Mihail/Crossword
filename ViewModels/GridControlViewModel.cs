@@ -14,6 +14,7 @@ public class GridControlViewModel : ViewModelBase
     private readonly IGridManagerService _gridManagerService;
     private int _numberOfCellsHorizontally = 30;
     private int _numberOfCellsVertically = 30;
+    private bool _isClearMirror;
     private bool _isVerticallyMirror;
     private bool _isHorizontallyMirror;
     private bool _isAllMirror;
@@ -32,6 +33,7 @@ public class GridControlViewModel : ViewModelBase
 
         _gridManagerService.PropertyChanged += OnGridManagerPropertyChanged;
         UpdateMirrorLines();
+        IsClearMirror = true;
     }
 
     private void OnGridManagerPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -44,6 +46,12 @@ public class GridControlViewModel : ViewModelBase
     public int FieldHeight => _gridManagerService.FieldHeight;
 
     #region Mirror Properties
+
+    public bool IsClearMirror
+    {
+        get => _isClearMirror;
+        set => SetProperty(ref _isClearMirror, value);
+    }
 
     public bool IsVerticallyMirror
     {
