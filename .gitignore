@@ -348,3 +348,11 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+context_crossword.md
+generate_project_context.py
+crossword_python/Answer.txt
+crossword_python/Definition.txt
+crossword_python/EmptyGrid.png
+crossword_python/FillGrid.png
+crossword_python/dict.txt
+crossword_python/SaveGrid
