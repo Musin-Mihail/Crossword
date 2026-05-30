@@ -132,6 +132,15 @@ class GenerationControlViewModel(ViewModelBase):
     def on_generation_finished(self, result: list):
         self._crossword_state_service.words_grid.extend(result)
         self.is_generating = False
+        
+        # Если была успешная генерация без визуализации, нужно отобразить слова
+        for word in result:
+            if word.full:
+                for cell in word.cells:
+                    cell_vm = self._grid_manager_service.find_cell_vm(cell.x, cell.y)
+                    if cell_vm:
+                        cell_vm.content = cell.content
+
         # Сбросим цвета обратно в transparent
         for cell_vm in self._grid_manager_service.cells:
             if cell_vm.background in ["red", "green"]:

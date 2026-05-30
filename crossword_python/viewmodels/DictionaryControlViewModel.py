@@ -58,3 +58,14 @@ class DictionaryControlViewModel(ViewModelBase):
 
     def create_required_dictionary(self, parameter=None):
         self._dialog_service.show_required_dictionary_dialog(self._crossword_state_service.dictionaries)
+        
+        # Автоматически подгружаем созданный обязательный словарь в генератор
+        path = os.path.join("Dictionaries", "!ОБЯЗАТЕЛЬНЫЕ.txt")
+        if os.path.exists(path):
+            if not any(d.name == "!ОБЯЗАТЕЛЬНЫЕ" for d in self._crossword_state_service.dictionaries):
+                req_dict = self._dictionary_service.load_dictionary(path)
+                req_dict.name = "!ОБЯЗАТЕЛЬНЫЕ"
+                req_dict.max_count = len(req_dict.words)
+                self._crossword_state_service.dictionaries.insert(0, req_dict)
+                if "!ОБЯЗАТЕЛЬНЫЕ" not in self.selected_dictionary_info:
+                    self.selected_dictionary_info += "\n+ !ОБЯЗАТЕЛЬНЫЕ"

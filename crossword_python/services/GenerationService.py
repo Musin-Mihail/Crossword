@@ -20,6 +20,7 @@ class GenerationService(QThread):
         self._dictionaries: list[Dictionary] = [ ]
         self._word_grid: list[Word] = [ ]
         self._all_inserted_words: list[str] = [ ]
+        self._word_to_dictionary: dict[str, Dictionary] = {}
         self._stop = False
         self._max_seconds = 2
         self._index = 0
@@ -33,6 +34,7 @@ class GenerationService(QThread):
         self._task_delay = task_delay / 1000.0  # переводим мс в секунды
         self._stop = False
         self._all_inserted_words.clear()
+        self._word_to_dictionary.clear()
         self._word_grid.clear()
 
     def request_stop(self):
@@ -113,10 +115,17 @@ class GenerationService(QThread):
         max_index = 0
         start_date = time.time()
         single_attempt_date = time.time()
+        last_yield_time = time.time()
         self._restart_generation_attempt()
 
         while self._index < len(self._word_grid):
-            if (time.time() - single_attempt_date) > self._max_seconds:
+            # Периодически отдаем GIL, чтобы не блокировать UI-поток
+            current_time = time.time()
+            if current_time - last_yield_time > 0.05:
+                time.sleep(0.001)
+                last_yield_time = time.time()
+
+            if (current_time - single_attempt_date) > self._max_seconds:
                 max_index = 0
                 single_attempt_date = time.time()
                 self._restart_generation_attempt()
@@ -160,7 +169,9 @@ class GenerationService(QThread):
         for i, cell in enumerate(word.cells):
             cell.content = answer[i]
 
-        self.set_word_request.emit(word, answer)
+        if self._is_visualization_enabled:
+            self.set_word_request.emit(word, answer)
+            
         word.full = True
         word.word_string = answer
         return True
@@ -195,7 +206,7 @@ class GenerationService(QThread):
                         
                 if matches and dictionary_word.answers not in self._all_inserted_words:
                     self._all_inserted_words.append(dictionary_word.answers)
-                    self._add_dictionary_entry(dictionary_word.answers, word)
+                    self._add_dictionary_entry(dictionary_word.answers, word, dictionary.name)
                     return dictionary_word.answers
         return ""
 
@@ -203,16 +214,25 @@ class GenerationService(QThread):
         connected_words = list(current_word.connection_words)
         random.shuffle(connected_words)
 
+        # Запоминаем минимальный индекс, чтобы не пропустить ни одно из стертых слов
+        min_cleared_index = self._index
+
         for word_to_clear in connected_words:
             if word_to_clear.full and not word_to_clear.fix:
+                cleared_index = self._word_grid.index(word_to_clear)
+                min_cleared_index = min(min_cleared_index, cleared_index)
+
                 self._clear_word_from_grid(word_to_clear)
                 if self._try_insert_word_into_grid(current_word):
                     if self._is_visualization_enabled:
                         self.visualize_word_placement.emit(current_word, "green")
                         time.sleep(self._task_delay)
-                    self._index = 0
+                    
+                    # Откатываемся до самого раннего слова, которое мы стерли в попытках найти место.
+                    self._index = min_cleared_index
                     return
         
+        # Полный сброс прогресса делаем только если вообще ни одно пересечение не помогло
         self._index = 0
 
     def _clear_word_from_grid(self, word: Word):
@@ -224,7 +244,9 @@ class GenerationService(QThread):
             if not is_intersection:
                 cell.content = None
 
-        self.clear_word_request.emit(word)
+        if self._is_visualization_enabled:
+            self.clear_word_request.emit(word)
+            
         self._remove_word(word)
 
     def _remove_word(self, word: Word):
@@ -238,6 +260,7 @@ class GenerationService(QThread):
     def _restart_generation_attempt(self):
         self._index = 0
         self._all_inserted_words.clear()
+        self._word_to_dictionary.clear()
         for word in self._word_grid:
             word.full = False
             word.word_string = ""
@@ -249,7 +272,9 @@ class GenerationService(QThread):
         for dictionary in self._dictionaries:
             dictionary.current_count = 0
 
-        random.shuffle(self._word_grid)
+        # Умная сортировка: сначала ставим слова с наибольшим числом пересечений и самые длинные.
+        # random.random() добавляет чуть-чуть энтропии при равенстве, чтобы сетки получались разными.
+        self._word_grid.sort(key=lambda w: (len(w.connection_words), len(w.cells), random.random()), reverse=True)
 
     def _handle_successful_generation(self, start_date: float):
         time_spent = time.time() - start_date
@@ -278,7 +303,9 @@ class GenerationService(QThread):
                 has_words = True
                 new_dict = Dictionary(name=dictionary.name, words=matching_words)
                 word.full_dictionaries.append(new_dict)
-        
+                # Сортируем словари так, чтобы обязательные слова всегда проверялись первыми!
+                word.full_dictionaries.sort(key=lambda d: 0 if d.name == "!ОБЯЗАТЕЛЬНЫЕ" else 1)
+            
         if not has_words and self._empty_cell_models:
             self._stop = True
             self.status_updated.emit(f"Для слова длиной {len(word.cells)} нет подходящих слов в словарях.")
@@ -291,16 +318,15 @@ class GenerationService(QThread):
         dictionary = next((d for d in self._dictionaries if d.name == name_dictionary), None)
         return dictionary is None or dictionary.current_count < dictionary.max_count
 
-    def _add_dictionary_entry(self, answer: str, word: Word):
-        for dictionary in (d for d in self._dictionaries if d.current_count < d.max_count):
-            if any(w.answers == answer for w in dictionary.words):
-                if dictionary.name == "!ОБЯЗАТЕЛЬНЫЕ":
-                    word.fix = True
-                dictionary.current_count += 1
-                return
+    def _add_dictionary_entry(self, answer: str, word: Word, dictionary_name: str):
+        dictionary = next((d for d in self._dictionaries if d.name == dictionary_name), None)
+        if dictionary:
+            if dictionary.name == "!ОБЯЗАТЕЛЬНЫЕ":
+                word.fix = True
+            dictionary.current_count += 1
+            self._word_to_dictionary[answer] = dictionary
 
     def _remove_dictionary_entry(self, answer: str):
-        for dictionary in self._dictionaries:
-            if any(w.answers == answer for w in dictionary.words):
-                dictionary.current_count -= 1
-                return
+        dictionary = self._word_to_dictionary.pop(answer, None)
+        if dictionary:
+            dictionary.current_count -= 1
